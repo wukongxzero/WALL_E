@@ -1,0 +1,56 @@
+L298N #1 (Front-Left + Front-Right)
+
+ENA → D5 (PWM)
+
+IN1 → D7
+
+IN2 → D8
+
+ENB → D6 (PWM)
+
+IN3 → D9
+
+IN4 → D10
+
+L298N #2 (Rear-Left + Rear-Right)
+
+ENA → D3 (PWM)
+
+IN1 → D11
+
+IN2 → D12
+
+ENB → D4 (PWM) (D4 isn’t PWM, so we’ll treat it as on/off for now)
+
+If you want PWM on all 4 channels, we’ll remap later (UNO has only 6 PWM pins).
+
+IN3 → D13
+
+IN4 → A0 (yes, A0 can be digital pin 14)
+
+Power rules (important)
+
+Motor battery → L298N “12V/VIN” (or “+12V”) and GND
+
+Arduino powered separately (USB ok)
+
+Common ground: Arduino GND ↔ both L298N GND ↔ battery GND
+
+Also: remove the ENA/ENB jumpers on L298N if you want PWM speed control.
+
+
+Pass/Fail for Step 1A
+
+✅ PASS if:
+
+each channel spins forward and reverse when its test runs
+
+motors don’t brown-out Arduino (if they do, your grounds/power are wrong)
+
+❌ FAIL if:
+
+Arduino resets when motors start → common ground missing / motor supply sag / using Arduino 5V
+
+motor only spins one direction → IN1/IN2 wiring wrong or driver channel bad
+
+nothing spins → EN jumpers still on? (or EN not powered)
