@@ -1,3 +1,9 @@
 [submodule "PS5_control_test/lib/ps5-esp32"]
 	path = PS5_control_test/lib/ps5-esp32
 	url = git@github.com:rodneybakiskan/ps5-esp32.git
+[submodule "TankBotPIO/lib/PS2X_lib"]
+	path = TankBotPIO/lib/PS2X_lib
+	url = https://github.com/simondlevy/PS2X_lib.git
+[submodule "TankBotPIO/lib/ServoTimer2"]
+	path = TankBotPIO/lib/ServoTimer2
+	url = https://github.com/nabontra/ServoTimer2.git
