@@ -7,3 +7,6 @@
 [submodule "TankBotPIO/lib/ServoTimer2"]
 	path = TankBotPIO/lib/ServoTimer2
 	url = https://github.com/nabontra/ServoTimer2.git
+[submodule "ParralaxController/flexprop"]
+	path = ParralaxController/flexprop
+	url = https://github.com/totalspectrum/flexprop
