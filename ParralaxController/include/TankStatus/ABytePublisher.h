@@ -1,7 +1,8 @@
 #pragma once
 #include "IOutImpl.h"
+#include "ATankStatusPublisher.h"
 
-class ABytePublisher {
+class ABytePublisher:public ATankStatusPublisher {
 public:
   IOutImpl byteSender;
   virtual void listen();
