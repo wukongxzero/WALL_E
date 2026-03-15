@@ -1,4 +1,6 @@
 #include "simpletools.h"
+#include <TankStatus/ABytePublisher.h>
+#include <TankStatus/IOutImpl.h>
 #include <TankStatus/ITankStatus.h>
 #include <propeller.h>
 #include <stdio.h>
