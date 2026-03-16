@@ -1,15 +1,16 @@
 #pragma once
 
 #include "ITankStatus.h"
-#include "ITankStatusSubscriber.h"
+#include <TankStatus/ITankStatusSubscriber.h>
+
 class ATankStatusPublisher {
 private:
-  ITankStatusSubscriber *tsSubuscriberList[2];
+  class ITankStatusSubscriber *tsSubuscriberList[2];
 
 public:
-  volatile TankStatus originalTankStatus;
+  volatile struct TankStatus originalTankStatus;
 
 public:
   void notify();
-  void subscribe(ITankStatusSubscriber &tsSubuscriber);
+  void subscribe(class ITankStatusSubscriber &tsSubuscriber);
 };
