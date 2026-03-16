@@ -1,10 +1,11 @@
 #pragma once
-#include "ITankStatus.h"
+#include <TankStatus/ITankStatus.h>
 
 class ITankStatusSubscriber {
 public:
   // locally stored tank status
-  TankStatus tankStatusSync;
+  //
+  struct TankStatus tankStatusSync;
 
 private:
 };
