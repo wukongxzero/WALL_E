@@ -1,19 +1,24 @@
-#pragma once
+// #pragma once
+
+#ifndef PIXELDATA
+#define PIXELDATA
 #define SPRITE_MAX_SIZE 16
 
 #define _ 0   // Background
 #define X 254 // Outline/Color
 
-// sprite are 32 pix x 32
+// Note: this is not how graphics work, use 8_bit double array
+//  sprite are 32 pix x 32
 struct PixelDataFrame {
-public:
   unsigned char red[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];
   unsigned char green[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];
   unsigned char blue[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];
 };
 
-struct PixelDataGrayScale {
-public:
+struct PixelDataRGB_8bit {
+  // support animated sprites
+  int frameCount;
+  bool isAnimnated;
   unsigned char gray[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];
 };
 
@@ -57,4 +62,5 @@ unsigned char samplePixelSprite2[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE] = {
     {_, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _}};
 
 PixelDataGrayScale.gray = samplePixelSprite1;
+#endif
 #endif

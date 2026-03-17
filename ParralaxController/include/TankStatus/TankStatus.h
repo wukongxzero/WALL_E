@@ -6,7 +6,7 @@
 
 // todo: rename file as from ITankStatus to tankStatus
 struct TankStatus {
-  volatile unsigned char driveLeft;  // 1 byte 0-255
+  volatile unsigned char driveLeft;  // = 0;  // 1 byte 0-255
   volatile unsigned char driveRight; // 1 byte 0-255
 
   // TODO: can optimize float into unsigned decimal point char and a signed char

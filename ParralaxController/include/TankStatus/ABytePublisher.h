@@ -11,22 +11,22 @@
 struct UsartBytePublisher {
   // TODO: add USART Hand
   // putchar and getchar are used to call placement of char into usart(pin 31)
-  PropellorUSART *btInterface;
+  struct PropellorUSART *btInterface;
   // loop over TankStatusPublisher->TankStatisSubscriberList to notify all
   // subscriber
-  TankStatusPublisher *ptrWithSubscriberList;
+  struct TankStatusPublisher *ptrWithSubscriberList;
 
   // store serial read usart data into this struct which will be used to notify
-  TankStatus buffer;
+  struct TankStatus buffer;
 };
 
 // TODO:take in a message Struct refrence and update all the
 // TankStatusSubscribers' TanksStatus pointers to update to the messageStruct
 // input
-void notify(UsartBytePublisher *self, TankStatus &messageStruct);
+void notify(struct UsartBytePublisher *self, struct TankStatus &messageStruct);
 
 // TODO:Update the tankstatus buffer using the readByteTankStatus() method after
 // gathering getchar() data from the btInterface
-void readInterface(UsartBytePublisher *self);
+void readInterface(struct UsartBytePublisher *self);
 
 #endif
