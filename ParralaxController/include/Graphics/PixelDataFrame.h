@@ -2,10 +2,12 @@
 
 #ifndef PIXELDATA
 #define PIXELDATA
+
+#include <locale.h> // Required for UTF-8 support
 #define SPRITE_MAX_SIZE 16
 
-#define _ 0   // Background
-#define X 254 // Outline/Color
+#define _ 32  // Background
+#define X 219 // Outline/Color
 
 // Note: this is not how graphics work, use 8_bit double array
 //  sprite are 32 pix x 32
@@ -18,10 +20,9 @@ struct PixelDataFrame {
 struct PixelDataRGB_8bit {
   // support animated sprites
   int frameCount;
-  bool isAnimnated;
-  unsigned char gray[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];
+  unsigned char isAnimnated; // boolean not supported
+  char frame[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];
 };
-
 // example array sprite
 #ifdef INCLUDE_SAMPLES
 
@@ -61,6 +62,5 @@ unsigned char samplePixelSprite2[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE] = {
     {_, _, X, X, _, X, _, _, _, _, X, _, X, X, _, _},
     {_, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _}};
 
-PixelDataGrayScale.gray = samplePixelSprite1;
 #endif
 #endif
