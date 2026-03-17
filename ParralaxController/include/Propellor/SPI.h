@@ -1,7 +1,7 @@
-#pragma once
+// #pragma once
 
-#include "simpletools.h" // Include simpletools lib
-// https://learn.parallax.com/courses/propeller-c-simple-protocols/lessons/spi-example/
+// #include "simpletools.h" // Include simpletools lib
+//  https://learn.parallax.com/courses/propeller-c-simple-protocols/lessons/spi-example/
 
 // signed char z;                                    // Z-axis value
 //
@@ -33,15 +33,33 @@
 //   }
 // }
 //
-namespace TankBot {
-class SPI {
-private:
-  int _csPin;
-  int _clkPin;
-  int _misoPin;
-  int _mosiPin;
+// namespace TankBot {
+// class SPI {
+// private:
+//  int _csPin;
+//  int _clkPin;
+//  int _misoPin;
+//  int _mosiPin;
+//
+// public:
+//  SPI(int cs, int clk, int miso);
+//};
+//}; // namespace TankBot
+#ifndef TANKBOT_SPI
+#define TankBotSPI
+#include <simpletools.h>
 
-public:
-  SPI(int cs, int clk, int miso);
+struct TankBotSPI {
+  unsigned char _clkPin;
+  unsigned char _csPin;
+  unsigned char _mosiPin;
+  unsigned char _misoPin;
 };
-}; // namespace TankBot
+// uhh not sure why clangd compiler said I couldn't have an annonymous
+// structure...so call spi insterface with singleSPI
+//
+
+// see slopcoderefrence gemeni tft display for parralax implememntation
+// int writeToSPIDisplay(TankBotSPI *self, char data);
+
+#endif

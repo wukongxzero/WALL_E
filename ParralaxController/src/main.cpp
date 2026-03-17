@@ -1,8 +1,8 @@
-#include "simpletools.h"
+#include <Graphics/ARendederSubscriber.h>
+#include <Propellor/SPI.h>
 #include <TankStatus/ABytePublisher.h>
-#include <TankStatus/IOutImpl.h>
-#include <TankStatus/ITankStatus.h>
 #include <propeller.h>
+#include <simpletools.h>
 #include <stdio.h>
 
 int main(void) {
