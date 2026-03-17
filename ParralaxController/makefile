@@ -5,14 +5,16 @@ PORT= /dev/ttyUSB0
 BIN_PROP=main.o
 BAUD=156200
 SRCDIR = ./src
+CC=clang
 
 # Target binaries
 FLAGS =
 TARGET = main.binary
-SRC = src/main.cpp
-CFILES = $(wildcard $(SRCDIR)/*.cpp)
+SIM_TARGET = simulate.o
+SRC = src/
+CFILES = $(wildcard $(SRCDIR)/*.c)
 
-all: $(TARGET)
+all: $(TARGET) $(SIM_TARGET)
 
 $(TARGET): $(SRC)
 	$(FC) -L $(TANK_BOT_LIB) $(CFILES)
@@ -20,6 +22,8 @@ $(TARGET): $(SRC)
 load:
 	./build/bin/proploader -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200
 
+run-simulation:
+	$(CC) -I $(TANK_BOT_LIB) $(CFILES) -lncurses -o ./build/$(SIM_TARGET) && ./build/$(SIM_TARGET)
 
 install-flexspin:
 	git submodule update --recursive && cd ./flexprop/ && pwd && make install INSTALL=../build 
