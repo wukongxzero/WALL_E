@@ -12,5 +12,8 @@ void endCurse();
 void draw_rectangle(int y1, int x1, int y2, int x2);
 void clearRenderedFrame(int x, int y);
 void renderFrame(struct PixelDataRGB_8bit *frame, int offsetX, int offsetY);
+void playLoadingAnimation(struct PixelDataRGB_8bit *sampleSprite1,
+                          unsigned char *sprite1[16][16],
+                          unsigned char *sprite2[16][16]);
 
 #endif

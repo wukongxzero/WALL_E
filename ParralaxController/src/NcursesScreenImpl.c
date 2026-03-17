@@ -3,6 +3,7 @@
 #include <locale.h>
 #include <ncurses.h>
 #include <stdio.h>
+#include <string.h>
 
 void startCurse() {
   setlocale(LC_ALL, "");
@@ -59,6 +60,8 @@ void renderFrame(struct PixelDataRGB_8bit *image, int offsetX, int offsetY) {
   for (int y = 0; y < 16; y++) {
     for (int x = 0; x < 16; x++) {
       mvaddch(y + offsetY, (x * 2) + offsetX, image->frame[y][x]);
+      // TODO: can optimize by adding all X vals to a queue that resetes only
+      // activated cells
 
       //
       //
@@ -76,4 +79,22 @@ void renderFrame(struct PixelDataRGB_8bit *image, int offsetX, int offsetY) {
     }
   }
   refresh();
+}
+
+void playLoadingAnimation(struct PixelDataRGB_8bit *sampleSprite1,
+                          unsigned char *sprite1[16][16],
+                          unsigned char *sprite2[16][16]) {
+  memcpy(sampleSprite1->frame, sprite1, 16 * 16);
+  for (int i = 0; i <= 100; i++) {
+    renderFrame(sampleSprite1, 100 - i, 10);
+    if (i % 2) {
+      memcpy(sampleSprite1->frame, sprite1, 16 * 16);
+    } else {
+      memcpy(sampleSprite1->frame, sprite2, 16 * 16);
+    }
+
+    napms(100); // Pause for 1000ms (1 second)
+    clearRenderedFrame(100 - i, 10);
+    refresh();
+  }
 }
