@@ -38,7 +38,7 @@ void moveGraphicByVal(struct GraphicsObject *self, signed short byX,
                       signed short byY);
 
 // set self to all pixels 0 so it can clean itself up on render
-void clear(struct GraphicsObject *self);
+void clearObject(struct GraphicsObject *self);
 // allow animation frames to cycle, cant do it if bool denies ability to be
 // animated
 void update(struct GraphicsObject *self);
