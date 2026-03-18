@@ -33,23 +33,9 @@ void draw_rectangle(int y1, int x1, int y2, int x2) {
 }
 
 void clearRenderedFrame(int offsetX, int offsetY) {
-  for (int y = 0; y < 16; y++) {
-    for (int x = 0; x < 16; x++) {
+  for (int y = -4; y <= 16; y++) {
+    for (int x = -4; x <= 16; x++) {
       mvaddch(y + offsetY, (x * 2) + offsetX, _);
-
-      //
-      //
-      // if (image->frame[y][x] == X) {
-      //  // Use 'attron' with a color pair to draw a colored block
-      //  mvwaddstr(stdscr, y + 2, (x * 2) + 2, " ");
-      //  mvprintw(x + 20, y + 20,
-      //           "X"); // Prints at Row 10, Col 20
-
-      //} else {
-      //  mvwaddstr(stdscr, y + 2, (x * 2) + 2, " ");
-      //  mvprintw(x + 20, y + 20,
-      //           "~X"); // Prints at Row 10, Col 20
-      //}
     }
   }
   refresh();
@@ -59,41 +45,47 @@ void renderFrame(struct PixelDataRGB_8bit *image, int offsetX, int offsetY) {
 
   for (int y = 0; y < 16; y++) {
     for (int x = 0; x < 16; x++) {
+      /*
+      if (image->frame[y][x] == X) { // X is 219
+        // Use the ncurses solid block macro
+        // We use two chars because terminal cells are tall/skinny
+        mvaddch(y + offsetY, (x * 2) + offsetX, X);
+        mvaddch(y + offsetY, (x * 2) + offsetX + 1, X);
+      } else {
+        // Background/Empty space
+        mvaddch(y + offsetY, (x * 2) + offsetX, _);
+        mvaddch(y + offsetY, (x * 2) + offsetX + 1, _);
+      }
+      */
       mvaddch(y + offsetY, (x * 2) + offsetX, image->frame[y][x]);
-      // TODO: can optimize by adding all X vals to a queue that resetes only
-      // activated cells
-
-      //
-      //
-      // if (image->frame[y][x] == X) {
-      //  // Use 'attron' with a color pair to draw a colored block
-      //  mvwaddstr(stdscr, y + 2, (x * 2) + 2, " ");
-      //  mvprintw(x + 20, y + 20,
-      //           "X"); // Prints at Row 10, Col 20
-
-      //} else {
-      //  mvwaddstr(stdscr, y + 2, (x * 2) + 2, " ");
-      //  mvprintw(x + 20, y + 20,
-      //           "~X"); // Prints at Row 10, Col 20
-      //}
     }
   }
   refresh();
 }
+void renderFrameAnimation(struct PixelDataRGB_8bit_Animation *animation,
+                          int offsetX, int offsetY) {
+
+  renderFrame(&(animation->frames[animation->frameCurrent]), offsetX, offsetY);
+}
 
 void playLoadingAnimation(struct PixelDataRGB_8bit *sampleSprite1,
-                          unsigned char *sprite1[16][16],
-                          unsigned char *sprite2[16][16]) {
-  memcpy(sampleSprite1->frame, sprite1, 16 * 16);
+                          unsigned char sprite1[16][16],
+                          unsigned char sprite2[16][16]) {
+  // memcpy(sampleSprite1->frame, sprite1, 16 * 16);
+
+  constructSprite(sampleSprite1, sprite1);
   for (int i = 0; i <= 100; i++) {
     renderFrame(sampleSprite1, 100 - i, 10);
     if (i % 2) {
-      memcpy(sampleSprite1->frame, sprite1, 16 * 16);
+      constructSprite(sampleSprite1, sprite1);
+      // memcpy(sampleSprite1->frame, sprite1, 16 * 16);
     } else {
-      memcpy(sampleSprite1->frame, sprite2, 16 * 16);
+
+      constructSprite(sampleSprite1, sprite2);
+      // memcpy(sampleSprite1->frame, sprite2, 16 * 16);
     }
 
-    napms(100); // Pause for 1000ms (1 second)
+    napms(10); // Pause for 1000ms (1 second)
     clearRenderedFrame(100 - i, 10);
     refresh();
   }

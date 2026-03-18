@@ -17,15 +17,26 @@
 #define GRAPHICS_OBJECT
 #include "PixelDataFrame.h"
 
-// not a c++ object lol
-struct GraphicsObject {
-  unsigned char _id;
+struct BoundingBox {
   unsigned short _x;
   unsigned short _y;
+  // TODO: change to signed short to support pixel flips
   unsigned short _width;
   unsigned short _height;
+};
 
-  struct PixelDataRGB_8bit *frame;
+// not a c++ object lol
+struct GraphicsObject {
+  struct BoundingBox boundingBox;
+  unsigned char _id;
+  // defualt sprite
+  struct PixelDataRGB_8bit *defaultSprite;
+};
+
+// difference is this one animates
+struct GraphicsObjectSprite {
+  struct GraphicsObject *graphicsObject;
+  struct PixelDataRGB_8bit_Animation *spriteAnimation;
 };
 
 // update hard position
@@ -41,6 +52,24 @@ void moveGraphicByVal(struct GraphicsObject *self, signed short byX,
 void clearObject(struct GraphicsObject *self);
 // allow animation frames to cycle, cant do it if bool denies ability to be
 // animated
+
 void update(struct GraphicsObject *self);
+void updateAnimate(struct GraphicsObjectSprite *self);
+void attachGraphicsObjectToAnimatedSprite(struct GraphicsObjectSprite *self,
+                                          struct GraphicsObject *boundingBox);
+void moveByAnimatedSprite(struct GraphicsObjectSprite *self, signed short byX,
+                          signed short byY);
+
+void constructGraphicsObject(struct GraphicsObject *self, unsigned short loc_x,
+                             unsigned short loc_y, unsigned short width_x,
+                             unsigned short height_y);
+
+void constructGraphicsSprite(struct GraphicsObjectSprite *self,
+                             struct GraphicsObject *selfBoundingBox);
+
+void constructGraphicsSpriteWOrigin(struct GraphicsObjectSprite *self,
+                                    struct GraphicsObject *selfBoundingBox,
+                                    unsigned short loc_x, unsigned short loc_y,
+                                    unsigned width_x, unsigned height_y);
 
 #endif

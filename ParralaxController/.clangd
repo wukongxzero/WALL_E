@@ -1,2 +1,13 @@
 CompileFlags:
-  Add: [-I/include, -Wall]
+  Add: [
+    "-I", "include",         # Tells clangd where your .h files are
+    "-D", "SIMULATION_SCREEN", # Enables your ncurses code paths
+    "-D", "INCLUDE_SAMPLES",   # Enables your sprite data
+    "-std=c11",              # Use C11 standard
+    "-Wall",                 # Show all warnings
+    "-Wno-missing-braces"    # 2D arrays sometimes trigger this annoyingly
+  ]
+  CompilationDatabase: "."   # Look for compile_commands.json here
+
+Index:
+  Background: true           # Index project in background for fast "Go to Definition"
