@@ -92,6 +92,7 @@ int main(void) {
 
   char ch;
 
+  animatedTankSpriteObject.spriteAnimation->isAnimated = false;
   mvprintw(42, 32, "Button Press");
   refresh();
   nodelay(stdscr, TRUE);

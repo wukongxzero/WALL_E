@@ -10,3 +10,6 @@
 [submodule "ParralaxController/flexprop"]
 	path = ParralaxController/flexprop
 	url = https://github.com/totalspectrum/flexprop
+[submodule "ParralaxController/test/Unity"]
+	path = ParralaxController/test/Unity
+	url = git@github.com:ThrowTheSwitch/Unity.git
