@@ -79,3 +79,10 @@ void constructGraphicsObjectWOrigin(struct GraphicsObjectSprite *self,
   constructGraphicsObject(selfBoundingBox, loc_x, loc_y, width_x, height_y);
   self->graphicsObject = selfBoundingBox;
 }
+
+void changeFrame(struct GraphicsObjectSprite *self, unsigned char frameIdx) {
+  // memory protect if statement
+  if (frameIdx >= 0 && frameIdx <= self->spriteAnimation->frameCount) {
+    self->spriteAnimation->frameCurrent = frameIdx;
+  }
+}

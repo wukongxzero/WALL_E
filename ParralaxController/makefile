@@ -16,6 +16,7 @@ SRC = src/
 ALL_CFILES = $(wildcard $(SRCDIR)/*.c)
 CFILES = $(filter-out $(SRCDIR)/main.c, $(ALL_CFILES))
 UNITY_CFILE = test/Unity/src/unity.c
+TEST_SOURCES = $(wildcard $(TESTDIR)/Test*.c)
 
 all: $(TARGET) $(SIM_TARGET)
 
@@ -33,17 +34,31 @@ install-flexspin:
 
 test-clang:
 	#src/tankStatus.c test/unity/unity.c test/test_tankStatus.c
+
 	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestTankStatus.c -o ./build/test.o
 	./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestGraphicsNoRender.c -o ./build/test.o
+	./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestRenderCurses.c -o ./build/test.o
+	./build/test.o
 
-#compile: $(BIN_PROP)
-#	./build/bin/flexspin main.cpp
+#	setup $(TEST_SOURCES)
+#	@echo "--- Starting Unit Tests ---"
+#	@for file in $(TEST_SOURCES); do \
+#		echo "Compiling and running $$file..."; \
+#		$(CC) $(CFLAGS) $(SRC_FILES) $(UNITY_SRC) $$file -o $(BUILDDIR)/runner; \
+#		./$(BUILDDIR)/runner; \
+#	done
+#	@echo "--- All Tests Complete ---"
+#
+compile: $(BIN_PROP)
+	./build/bin/flexspin main.cpp
 
-#set-port:
-#	echo ($(FLEXSPIN) -P)
+set-port:
+	echo ($(FLEXSPIN) -P)
 
-#upload:
-#	$(FLEXSPIN) -p $(PORT) build/bin/$(BIN_PROP) -D baudrate=156200 -t
+upload:
+	$(FLEXSPIN) -p $(PORT) build/bin/$(BIN_PROP) -D baudrate=156200 -t
 
 clean:
 	rm -r ./build/*;rm $(TARGET);rm *.pasm;*.
