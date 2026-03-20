@@ -55,6 +55,7 @@ void clearObject(struct GraphicsObject *self);
 
 void update(struct GraphicsObject *self);
 void updateAnimate(struct GraphicsObjectSprite *self);
+void changeFrame(struct GraphicsObjectSprite *self, unsigned char frameIdx);
 void attachGraphicsObjectToAnimatedSprite(struct GraphicsObjectSprite *self,
                                           struct GraphicsObject *boundingBox);
 void moveByAnimatedSprite(struct GraphicsObjectSprite *self, signed short byX,
