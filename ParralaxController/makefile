@@ -21,7 +21,7 @@ TEST_SOURCES = $(wildcard $(TESTDIR)/Test*.c)
 all: $(TARGET) $(SIM_TARGET)
 
 $(TARGET): $(SRC)
-	$(FC) -L $(TANK_BOT_LIB) $(CFILES)
+	$(FC) -I $(TANK_BOT_LIB) $(CFILES) src/main.c
 
 load:
 	./build/bin/proploader -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200
@@ -40,6 +40,8 @@ test-clang:
 	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestGraphicsNoRender.c -o ./build/test.o
 	./build/test.o
 	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestRenderCurses.c -o ./build/test.o
+	./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestPubSubTankStatus.c -o ./build/test.o
 	./build/test.o
 
 #	setup $(TEST_SOURCES)

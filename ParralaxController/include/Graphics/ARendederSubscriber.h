@@ -29,6 +29,7 @@ void move(struct GraphicsTankStatusAdopterSubscriber *self, unsigned char _id,
 
 void moveBy(struct GraphicsTankStatusAdopterSubscriber *self, unsigned char _id,
             signed short byX, signed short byY);
+void onPublisherUpdate(struct TankStatus ts);
 
 // update graphics animations/movements and render them to spiscreenpointer
 #ifndef SIMULATION_SCREEN
@@ -36,7 +37,7 @@ void update(struct GraphicsTankStatusAdopterSubscriber *self,
             struct TankBotSPI spiScreenInterface);
 
 #else
-void updateCurses(GraphicsTankStatusAdopterSubscriber *self);
+void updateCurses(struct GraphicsTankStatusAdopterSubscriber *self);
 #endif
 
 #endif

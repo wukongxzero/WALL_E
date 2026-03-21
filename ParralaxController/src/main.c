@@ -1,11 +1,12 @@
 #include "Graphics/AGraphicsObject.h"
+#include "TankStatus/TankStatus.h"
 #include <stdio.h>
 
 #ifndef SIMULATION_SCREEN
 #include "simpletools.h"
 #include <Graphics/ARendederSubscriber.h>
-#include <ITankStatus.h>
 #include <Propellor/SPI.h>
+#include <TankStatus/TankStatus.h>
 #include <propeller.h>
 
 #include <TankStatus/ABytePublisher.h>
@@ -24,6 +25,9 @@ int main(void) {
 #include <string.h>
 
 int main(void) {
+#ifdef PROPELLOR
+  rdlong atomicLong;
+#endif
   startCurse();
   //  init_pair(1, COLOR_GREEN, COLOR_WHITE);
   // start_color();

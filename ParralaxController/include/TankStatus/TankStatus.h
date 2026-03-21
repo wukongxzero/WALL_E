@@ -16,7 +16,12 @@ struct TankStatus {
   volatile float eulerX; // 4 byte 32 bit
   volatile float eulerY; // 4 byte
   volatile float eulerZ; // 4 byte
+  // unsigned char isLocked; // adding a pthreads equivelent of a thread lock
+  // int lockID;
+  //  (mutex lock) based on ai telling me to lol.
+  //  I should not have a problem unless I use multiple publishers
 };
+void constructTankStatus(struct TankStatus *self);
 // TODO: should turn all chars into one char byte array as a buffer to be
 // streamed over usart
 void makeByteTankStatus(unsigned char *buffer, int byteLength,

@@ -1,7 +1,12 @@
+#ifdef SIMULATION_SCREEN
+
+#include <ncurses.h>
+
+#endif
 #include <Graphics/AGraphicsObject.h>
 #include <Graphics/NcursesScreenImpl.h>
 #include <locale.h>
-#include <ncurses.h>
+
 #include <stdio.h>
 #include <string.h>
 

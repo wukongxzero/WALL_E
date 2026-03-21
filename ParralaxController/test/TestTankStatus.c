@@ -23,6 +23,30 @@ void test_Serialization_ShouldMatchPacketLength(void) {
   TEST_ASSERT_EQUAL_HEX8(200, buffer[1]);
 }
 
+void test_TankStatus_MemcpyCopy(void) {
+  struct TankStatus source;
+  struct TankStatus destination;
+
+  // 1. Initialize source with distinct values
+  source.driveLeft = 127;
+  source.driveRight = 255;
+  source.eulerX = 1.23f;
+  source.eulerY = -4.56f;
+  source.eulerZ = 360.0f;
+
+  // 2. Use memcpy to clone the structure
+  // We cast to (void*) because the struct members are volatile
+  memcpy((void *)&destination, (const void *)&source,
+         sizeof(struct TankStatus));
+
+  // 3. Assert all fields are identical
+  TEST_ASSERT_EQUAL_UINT8(source.driveLeft, destination.driveLeft);
+  TEST_ASSERT_EQUAL_UINT8(source.driveRight, destination.driveRight);
+  TEST_ASSERT_EQUAL_FLOAT(source.eulerX, destination.eulerX);
+  TEST_ASSERT_EQUAL_FLOAT(source.eulerY, destination.eulerY);
+  TEST_ASSERT_EQUAL_FLOAT(source.eulerZ, destination.eulerZ);
+}
+
 void test_RoundTrip_ShouldPreserveData(void) {
   struct TankStatus input = {50, 60, 12.5f, -45.0f, 180.0f};
   struct TankStatus output;
@@ -39,5 +63,6 @@ int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_Serialization_ShouldMatchPacketLength);
   RUN_TEST(test_RoundTrip_ShouldPreserveData);
+  RUN_TEST(test_TankStatus_MemcpyCopy);
   return UNITY_END();
 }
