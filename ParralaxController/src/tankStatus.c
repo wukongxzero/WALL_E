@@ -4,6 +4,15 @@
 /**
  * Serializes the TankStatus struct into a byte buffer for USART streaming.
  */
+void constructTankStatus(struct TankStatus *self) {
+  self->driveLeft = 0;
+  self->driveRight = 0;
+  self->eulerX = 0;
+  self->eulerY = 0;
+  self->eulerZ = 0;
+  // self->isLocked = 0;
+}
+// note: memcopy ignores the locked boolean/byte
 void makeByteTankStatus(unsigned char *buffer, int byteLength,
                         struct TankStatus *ts) {
   // Safety check: ensure buffer is large enough
