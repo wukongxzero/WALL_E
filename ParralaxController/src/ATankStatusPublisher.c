@@ -14,9 +14,9 @@ void constructTankStatusPublisher(struct TankStatusPublisher *self) {
 void notify(struct TankStatusPublisher *self) {
 
 #ifdef _PROPELLER_H_
-  //  while (__builtin_propeller_lockset(self->lockID)) {
-  // Spin/Wait for our turn in the Hub rotation
-  //}
+  while (__builtin_propeller_lockset(self->lockID)) {
+   Spin/Wait for our turn in the Hub rotation
+  }
 #endif
   // TODO: implement clang mutex pthreads lock
   for (int i = 0; i < self->subscriberCount; i++) {
@@ -25,7 +25,7 @@ void notify(struct TankStatusPublisher *self) {
   }
 
 #ifdef _PROPELLER_H_
-  //__builtin_propeller_lockclr(self->lockID);
+  __builtin_propeller_lockclr(self->lockID);
 #endif
 }
 
