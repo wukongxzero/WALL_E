@@ -2,9 +2,6 @@
 #include <Graphics/RotatePixelArt.h>
 #include <math.h>
 #include <string.h>
-#define PI 3.14159265359
-#define PIXEL_DATA_FRAME_MIDPOINT 7.5
-
 void extractForegroundFromSprite(
     struct RotatingSprite *self,
     unsigned char sourceGrid[CENTER_GRAPHIC_PIXEL_MAX]
@@ -34,32 +31,39 @@ void extractForegroundFromSprite(
 // TODO: repeat this constructor with dynamic arrays and malloc, for now build
 // elements on stack
 
-void constructGraphicsSpriteWOrigin(struct RotatingSprite *self,
-                                    struct PixelDataRGB_8bit *space) {
+void constructGraphicsSpriteRotatableWOrigin(struct RotatingSprite *self,
+                                             struct PixelDataRGB_8bit *space) {
   self->rotateSpace = space;
   self->angleDegrees = 0;
   self->elementCount = 0;
 }
 
 void rotateSprite(struct RotatingSprite *self, signed int angle) {
-  memset(self->rotateSpace->frame, _, sizeof(self->rotateSpace->frame));
+  memset(self->rotateSpace->frame, (unsigned char)_,
+         sizeof(self->rotateSpace->frame));
   angle %= 360;
 
   float radiansCos = cos(angle * (PI / 180.0));
   float radiansSin = sin(angle * (PI / 180.0));
 
   for (int i = 0; i < self->elementCount; i++) {
-    // 1. Shift coordinates so the center of the 16x16 grid is at (0,0)
-    float cx = self->centerGraphic[i]._col - PIXEL_DATA_FRAME_MIDPOINT;
-    float cy = self->centerGraphic[i]._row - PIXEL_DATA_FRAME_MIDPOINT;
+
+    self->rotateSpace
+        ->frame[self->centerGraphic[i]._row + PIXEL_DATA_FRAME_MIDPOINT]
+               [self->centerGraphic[i]._col + PIXEL_DATA_FRAME_MIDPOINT] =
+        (unsigned char)_;
+    double cx = self->centerGraphic[i]._col - 7.5 / 2;
+    double cy = self->centerGraphic[i]._row - 7.5 / 2;
 
     // 2. Apply Z-axis rotation matrix
-    float rotX = (cx * radiansCos) - (cy * radiansSin);
-    float rotY = (cx * radiansSin) + (cy * radiansCos);
+    double rotX = (cx * radiansCos) - (cy * radiansSin);
+    double rotY = (cx * radiansSin) + (cy * radiansCos);
 
-    int newCol = (int)round(rotX + PIXEL_DATA_FRAME_MIDPOINT);
-    int newRow = (int)round(rotY + PIXEL_DATA_FRAME_MIDPOINT);
-    self->rotateSpace->frame[newCol][newRow] = self->centerGraphic[i]._value;
+    int newCol = (int)round((rotX + 7.5 / 2) + 4);
+    int newRow = (int)round((rotY + 7.5 / 2) + 4);
+
+    self->rotateSpace->frame[newCol][newRow] =
+        (unsigned char)self->centerGraphic[i]._value;
   }
 }
 

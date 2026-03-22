@@ -4,6 +4,8 @@
 
 #include <Graphics/PixelDataFrame.h>
 #define CENTER_GRAPHIC_PIXEL_MAX 8
+#define PI 3.14159265359
+#define PIXEL_DATA_FRAME_MIDPOINT 7
 
 struct SparseElement {
   unsigned short _row;
@@ -32,8 +34,8 @@ void constructSparseRotationElement(struct SparseElement *self,
                                     unsigned short row, unsigned short col,
                                     unsigned char pixelValue);
 
-void constructGraphicsSpriteWOrigin(struct RotatingSprite *self,
-                                    struct PixelDataRGB_8bit *space);
+void constructGraphicsSpriteRotatableWOrigin(struct RotatingSprite *self,
+                                             struct PixelDataRGB_8bit *space);
 
 void rotateSprite(struct RotatingSprite *self, signed int angle);
 

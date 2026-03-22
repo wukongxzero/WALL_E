@@ -1,5 +1,7 @@
 #include "Graphics/AGraphicsObject.h"
+#include "Graphics/RotatePixelArt.h"
 #include "TankStatus/TankStatus.h"
+#include <Graphics/RotatePixelArt.h>
 #include <stdio.h>
 
 #ifndef SIMULATION_SCREEN
@@ -59,10 +61,21 @@ int main(void) {
   animatedTankSpriteObject.spriteAnimation = &tankAnimation;
   animatedTankSpriteObject.spriteAnimation->isAnimated = 1;
 
-  moveGraphicAbs(&tankSpriteControl, 10, 10);
+  // set up rotating sprite
+  struct GraphicsObject rotationTransformHandler;
+  struct RotatingSprite balanceBeamAngle;
+  struct PixelDataRGB_8bit transparentSpriteContainer;
+  constructGraphicsObject(&rotationTransformHandler, 0, 0, 0, 0);
+  constructSprite(&transparentSpriteContainer, samplePixelSprite1);
+  // construct must come first
+  constructGraphicsSpriteRotatableWOrigin(&balanceBeamAngle,
+                                          &transparentSpriteContainer);
+  extractForegroundFromSprite(&balanceBeamAngle, sampleRotateBeam, 16);
 
+  moveGraphicAbs(&tankSpriteControl, 10, 10);
   // gameloop
-  // playLoadingAnimation(&tankImage1, samplePixelSprite1, samplePixelSprite2);
+  // playLoadingAnimation(&tankImage1, samplePixelSprite1,
+  // samplePixelSprite2);
   for (int i = 0; i <= 42; i++) {
     moveGraphicByVal(&tankSpriteControl, 1, 0);
     update(&tankSpriteControl);
@@ -82,8 +95,8 @@ int main(void) {
     renderFrameAnimation(animatedTankSpriteObject.spriteAnimation,
                          tankSpriteControl.boundingBox._x,
                          tankSpriteControl.boundingBox._y);
-    //   fix I just found, becuase sprite is a pointer i should not pass this
-    //   an object, pass the .sprite as itslef
+    //   fix I just found, becuase sprite is a pointer i should not pass
+    //   this an object, pass the .sprite as itslef
     //   renderFrameAnimation(tankAnimatedObject.spriteAnimation,
     //                       tankObject.boundingBox._x,
     //                       tankObject.boundingBox._y);
@@ -91,9 +104,31 @@ int main(void) {
     clearRenderedFrame(tankSpriteControl.boundingBox._x,
                        tankSpriteControl.boundingBox._y);
   }
-  // free(tank);
-  // free(&tankObject);
+  napms(1000);
 
+  // rotate visual test
+  clearRenderedFrame(rotationTransformHandler.boundingBox._x,
+                     rotationTransformHandler.boundingBox._y);
+  rotateSprite(&balanceBeamAngle, 0);
+  moveGraphicAbs(&rotationTransformHandler, 20, 15);
+  clearRenderedFrame(rotationTransformHandler.boundingBox._x,
+                     rotationTransformHandler.boundingBox._y);
+  renderFrame(rotationTransformHandler.defaultSprite,
+              rotationTransformHandler.boundingBox._x,
+              rotationTransformHandler.boundingBox._y);
+
+  for (int i = 0; i <= 360 * 10; i++) {
+    rotateSprite(&balanceBeamAngle, i);
+    clearRenderedFrame(rotationTransformHandler.boundingBox._x,
+                       rotationTransformHandler.boundingBox._y);
+    renderFrame(balanceBeamAngle.rotateSpace,
+                rotationTransformHandler.boundingBox._x,
+                rotationTransformHandler.boundingBox._y);
+
+    napms(10);
+  }
+
+  // TODO:test button on seperate pthread.h
   char ch;
 
   animatedTankSpriteObject.spriteAnimation->isAnimated = false;
