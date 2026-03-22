@@ -2,6 +2,7 @@
 #ifndef SAMPLES_HEADER_GUARD
 #define SAMPLES_HEADER_GUARD
 #include <Graphics/PixelDataFrame.h>
+#include <Graphics/RotatePixelArt.h>
 
 unsigned char samplePixelSprite1[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE] = {
     {_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _},
@@ -73,6 +74,13 @@ unsigned char samplePixelSpriteAnimation
          {_, X, X, _, X, _, _, _, _, _, _, X, _, X, X, _},
          {_, _, X, X, _, X, _, _, _, _, X, _, X, X, _, _},
          {_, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _}}};
+
+unsigned char
+    sampleRotateBeam[CENTER_GRAPHIC_PIXEL_MAX][CENTER_GRAPHIC_PIXEL_MAX] = {
+        {_, _, _, _, _, _, _, _}, {_, _, _, _, _, _, _, _},
+        {_, _, _, _, _, _, _, _}, {X, X, X, X, X, X, X, X},
+        {_, _, _, _, _, _, _, _}, {_, _, _, _, _, _, _, _},
+        {_, _, _, _, _, _, _, _}, {_, _, _, _, _, _, _, _}};
 
 #endif
 #endif

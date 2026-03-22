@@ -10,6 +10,7 @@ CC=clang
 
 # Target binaries
 FLAGS =
+TESTFLAGS = -lncurses -lm 
 TARGET = main.binary
 SIM_TARGET = simulate.o
 SRC = src/
@@ -27,7 +28,7 @@ load:
 	./build/bin/proploader -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200
 
 run-simulation:
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses src/main.c -o ./build/$(SIM_TARGET) && ./build/$(SIM_TARGET)
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(SIM_TARGET) && ./build/$(SIM_TARGET)
 
 install-flexspin:
 	git submodule update --recursive && cd ./flexprop/ && pwd && make install INSTALL=../build 
@@ -35,13 +36,15 @@ install-flexspin:
 test-clang:
 	#src/tankStatus.c test/unity/unity.c test/test_tankStatus.c
 
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestTankStatus.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestTankStatus.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestGraphicsNoRender.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestGraphicsNoRender.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestRenderCurses.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestRenderCurses.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses ./test/TestPubSubTankStatus.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN"  $(TESTFLAGS) ./test/TestPubSubTankStatus.c -o ./build/test.o
+	./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestRotateSprite.c -o ./build/test.o
 	./build/test.o
 
 #	setup $(TEST_SOURCES)
