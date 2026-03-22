@@ -17,7 +17,7 @@ unsigned char
 
 void setUp(void) {
   // Initialize the structures
-  constructGraphicsSpriteWOrigin(&testSprite, &testFrame);
+  constructGraphicsSpriteRotatableWOrigin(&testSprite, &testFrame);
   // Clear the frame memory
   memset(testFrame.frame, _, sizeof(testFrame.frame));
 }
