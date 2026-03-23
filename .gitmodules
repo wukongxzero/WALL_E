@@ -13,3 +13,6 @@
 [submodule "ParralaxController/test/Unity"]
 	path = ParralaxController/test/Unity
 	url = git@github.com:ThrowTheSwitch/Unity.git
+[submodule "ParralaxController/Simple-Libraries"]
+	path = ParralaxController/Simple-Libraries
+	url = git@github.com:parallaxinc/Simple-Libraries.git

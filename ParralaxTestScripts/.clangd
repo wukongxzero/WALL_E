@@ -1,0 +1,12 @@
+CompileFlags:
+  Add: [
+    "-I", "include",         # Tells clangd where your .h files are
+    "-std=c99",              # Use C11 standard
+    "-Wall",                 # Show all warnings
+    "-Wno-missing-braces"    # 2D arrays sometimes trigger this annoyingly
+  ]
+  CompilationDatabase: "."   # Look for compile_commands.json here
+  Add: [-I../ParralaxController/build/include/, -I../Simple-Libraries/Learn/Simple\ Libraries/]
+
+Index:
+  Background: true           # Index project in background for fast "Go to Definition"
