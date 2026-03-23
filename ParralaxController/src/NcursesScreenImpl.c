@@ -3,7 +3,7 @@
 
 #include <ncurses.h>
 
-#endif
+
 #include <Graphics/AGraphicsObject.h>
 #include <Graphics/NcursesScreenImpl.h>
 #include <locale.h>
@@ -117,3 +117,4 @@ void *async_notify_worker_virtualJoystick(void *arg) {
   notify(virtualJoystickOne.tankPub);
   return NULL;
 }
+#endif
