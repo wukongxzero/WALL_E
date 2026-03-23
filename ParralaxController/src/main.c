@@ -220,7 +220,7 @@ int main(void) {
       rotateSprite(&balanceBeamAngle, mainTankStatus.eulerY);
       updateAnimate(&animatedTankSpriteObject);
       moveGraphicAbs(&rotationTransformHandler, mainTankStatus.driveLeft + 10,
-                     mainTankStatus.driveRight);
+                     mainTankStatus.driveRight + 4);
       moveGraphicAbs(animatedTankSpriteObject.graphicsObject,
                      mainTankStatus.driveLeft + 10,
                      mainTankStatus.driveRight + 10);

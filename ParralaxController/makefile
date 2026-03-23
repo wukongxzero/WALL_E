@@ -1,5 +1,6 @@
 FC="./build/bin/flexspin"
 PROP_LIB= "./build/include/"
+SIMPLE_IDE_LIB = "./Simple-Libraries/Learn/Simple Libraries/"
 TANK_BOT_LIB= ./include/
 UNITY_TEST_LIB=./test/Unity/src/
 PORT= /dev/ttyUSB0
@@ -59,6 +60,12 @@ test-clang:
 #	done
 #	@echo "--- All Tests Complete ---"
 #
+#
+install-simple-ide:
+	add-apt-repository ppa:rock-core/qt4
+	apt update
+	apt install libqtgui4 libqtcore4
+	wget https://archive.org/download/simpleide-0.9.66-amd64-debian-linux/simpleide-0.9.66-amd64-debian-linux.deb -P ./build/
 compile: $(BIN_PROP)
 	./build/bin/flexspin main.cpp
 
