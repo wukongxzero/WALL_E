@@ -30,7 +30,10 @@ load:
 run-simulation:
 	$(CC) -I$(TANK_BOT_LIB) $(CFILES) -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(SIM_TARGET) && ./build/$(SIM_TARGET)
 
+
 install-flexspin:
+	git submodule init 
+	mkdir -p ./build
 	git submodule update --recursive && cd ./flexprop/ && pwd && make install INSTALL=../build 
 
 test-clang:
