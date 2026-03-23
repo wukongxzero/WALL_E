@@ -12,7 +12,7 @@ unsigned char
     horizontalBeam[CENTER_GRAPHIC_PIXEL_MAX][CENTER_GRAPHIC_PIXEL_MAX] = {
         {_, _, _, _, _, _, _, _}, {_, _, _, _, _, _, _, _},
         {_, _, _, _, _, _, _, _}, {X, X, X, X, X, X, X, X}, // Row 3 is full
-        {_, _, _, _, _, _, _, _}, {_, _, _, _, _, _, _, _},
+        {X, X, X, X, X, X, X, X}, {_, _, _, _, _, _, _, _},
         {_, _, _, _, _, _, _, _}, {_, _, _, _, _, _, _, _}};
 
 void setUp(void) {
@@ -30,7 +30,7 @@ void tearDown(void) {}
 void test_Extraction_CorrectlyIdentifiesForeground(void) {
   extractForegroundFromSprite(&testSprite, horizontalBeam, 64);
 
-  TEST_ASSERT_EQUAL_INT(8, testSprite.elementCount);
+  TEST_ASSERT_EQUAL_INT(16, testSprite.elementCount);
 
   // Check first and last element coordinates
   TEST_ASSERT_EQUAL_INT(3, testSprite.centerGraphic[0]._row);

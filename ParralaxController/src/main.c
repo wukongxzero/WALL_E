@@ -1,5 +1,6 @@
 #include "Graphics/AGraphicsObject.h"
 #include "Graphics/RotatePixelArt.h"
+#include "TankStatus/ATankStatusPublisher.h"
 #include "TankStatus/TankStatus.h"
 #include <Graphics/RotatePixelArt.h>
 #include <stdio.h>
@@ -25,6 +26,7 @@ int main(void) {
 #include <ncurses.h>
 #include <stdlib.h> // for malloc
 #include <string.h>
+// must define
 
 int main(void) {
 #ifdef PROPELLOR
@@ -76,6 +78,7 @@ int main(void) {
   // gameloop
   // playLoadingAnimation(&tankImage1, samplePixelSprite1,
   // samplePixelSprite2);
+  /*
   for (int i = 0; i <= 42; i++) {
     moveGraphicByVal(&tankSpriteControl, 1, 0);
     update(&tankSpriteControl);
@@ -117,7 +120,7 @@ int main(void) {
               rotationTransformHandler.boundingBox._x,
               rotationTransformHandler.boundingBox._y);
 
-  for (int i = 0; i <= 360 * 10; i++) {
+  for (int i = 0; i <= 360; i++) {
     rotateSprite(&balanceBeamAngle, i);
     clearRenderedFrame(rotationTransformHandler.boundingBox._x,
                        rotationTransformHandler.boundingBox._y);
@@ -127,10 +130,144 @@ int main(void) {
 
     napms(10);
   }
+*/
 
+  for (int i = 0; i <= 180; i++) {
+    clearRenderedFrame(rotationTransformHandler.boundingBox._x,
+                       rotationTransformHandler.boundingBox._y);
+    clearRenderedFrame(tankSpriteControl.boundingBox._x,
+                       tankSpriteControl.boundingBox._y);
+
+    rotateSprite(&balanceBeamAngle, 90 + i);
+    updateAnimate(&animatedTankSpriteObject);
+    moveGraphicAbs(&rotationTransformHandler, 10, 2);
+
+    renderFrameAnimation(animatedTankSpriteObject.spriteAnimation,
+                         tankSpriteControl.boundingBox._x,
+                         tankSpriteControl.boundingBox._y);
+    renderFrame(balanceBeamAngle.rotateSpace,
+                rotationTransformHandler.boundingBox._x,
+                rotationTransformHandler.boundingBox._y);
+    napms(10);
+  }
+
+  int angleToTurn = 90;
+
+  printw("ASCII Value Inspector\n");
+  printw("---------------------\n");
+  printw("Press any key to see its value. Press 'q' to quit.\n\n");
+  refresh();
+  cbreak();             // 1. Disable line buffering (no "Enter" needed)
+  noecho();             // 2. Don't print the character back to the screen
+  keypad(stdscr, TRUE); // 3. Enable Arrow keys and Function keys
+                        //
+  struct TankStatusPublisher virtJoyStickStatus;
+  constructVirtualJoystick(&virtJoyStickStatus);
+  struct TankStatus mainTankStatus;
+  constructTankStatus(&mainTankStatus);
+  subscribe(virtualJoystickOne.tankPub, &mainTankStatus);
+
+  int ch;
+  for (int i = 0; i < 3; i++) {
+    erase();
+    while ((ch = getch()) != 'q') {
+      // Clear the previous line and print the new values
+      clearRenderedFrame(tankSpriteControl.boundingBox._x,
+                         tankSpriteControl.boundingBox._y);
+
+      if (ch == 'd') {
+        // moveGraphicByVal(&tankSpriteControl, 1, 0);
+        // moveGraphicByVal(&rotationTransformHandler, 1, 0);
+        virtualJoystickOne.virtJoystickX += 1;
+      }
+      if (ch == 'a') {
+        // moveGraphicByVal(&tankSpriteControl, -1, 0);
+
+        // moveGraphicByVal(&rotationTransformHandler, -1, 0);
+        virtualJoystickOne.virtJoystickX -= 1;
+      }
+
+      if (ch == 'w') {
+        // moveGraphicByVal(&tankSpriteControl, 0, -1);
+        // moveGraphicByVal(&rotationTransformHandler, 0, -1);
+        virtualJoystickOne.virtJoyStickY -= 1;
+      }
+      if (ch == 's') {
+        // moveGraphicByVal(&rotationTransformHandler, 0, 1);
+        // moveGraphicAbsveGraphicByVal(&tankSpriteControl, 0, 1);
+        virtualJoystickOne.virtJoyStickY += 1;
+      }
+      if (ch == 'r') {
+        angleToTurn += 5;
+        virtualJoystickOne.tankPub->_localStatus.eulerY = angleToTurn;
+      }
+
+      if (ch == 'e') {
+        angleToTurn -= 5;
+        virtualJoystickOne.tankPub->_localStatus.eulerY = angleToTurn;
+      }
+
+      virtualJoystickOne.tankPub->_localStatus.driveLeft =
+          virtualJoystickOne.virtJoystickX;
+
+      virtualJoystickOne.tankPub->_localStatus.driveRight =
+          virtualJoystickOne.virtJoyStickY;
+
+      virtualJoystickOne.tankPub->_localStatus.eulerY = angleToTurn;
+
+      notify(virtualJoystickOne.tankPub);
+
+      rotateSprite(&balanceBeamAngle, mainTankStatus.eulerY);
+      updateAnimate(&animatedTankSpriteObject);
+      moveGraphicAbs(&rotationTransformHandler, mainTankStatus.driveLeft + 10,
+                     mainTankStatus.driveRight);
+      moveGraphicAbs(animatedTankSpriteObject.graphicsObject,
+                     mainTankStatus.driveLeft + 10,
+                     mainTankStatus.driveRight + 10);
+      renderFrame(tankSpriteControl.defaultSprite,
+                  tankSpriteControl.boundingBox._x,
+                  tankSpriteControl.boundingBox._y);
+
+      renderFrame(balanceBeamAngle.rotateSpace,
+                  rotationTransformHandler.boundingBox._x,
+                  rotationTransformHandler.boundingBox._y);
+
+      clrtoeol();
+
+      // %d prints the decimal (ASCII) value
+      // %c prints the actual character representation
+      // %x prints the Hexadecimal value
+      // printw("Key: '%c' | Decimal: %d | Hex: 0x%X \n",
+      //        (ch >= 32 && ch <= 126) ? ch : '?', ch, ch);
+      // printw("leftDrive '%i' | rightDrive '%i' | eulerY '%f'\n",
+      //        virtualJoystickOne.tankPub->_localStatus.driveRight,
+      //        virtualJoystickOne.tankPub->_localStatus.driveLeft,
+      //        virtualJoystickOne.tankPub->_localStatus.eulerY);
+      // printw("leftDrive '%i' | rightDrive '%i' | eulerY '%f'\n",
+      //        mainTankStatus.driveRight, mainTankStatus.driveLeft,
+      //        mainTankStatus.eulerY);
+      // printw("subscriberCount:%i",
+      // virtualJoystickOne.tankPub->subscriberCount);
+
+      refresh();
+    }
+  }
+
+  // int result = pthread_create(&thread_id, NULL, async_notify_worker, &pub);
+  //
+  //
+  pthread_t thread_id;
+  // int result =
+  //    pthread_create(&thread_id, NULL, async_notify_worker_virtualJoystick,
+  //                   &virtualJoystickOne);
+
+  renderFrameAnimation(animatedTankSpriteObject.spriteAnimation,
+                       tankSpriteControl.boundingBox._x,
+                       tankSpriteControl.boundingBox._y);
+
+  pthread_join(thread_id, NULL);
   // TODO:test button on seperate pthread.h
-  char ch;
-
+  /*
   animatedTankSpriteObject.spriteAnimation->isAnimated = false;
   mvprintw(42, 32, "Button Press");
   refresh();
@@ -153,7 +290,9 @@ int main(void) {
 
       break;
     }
-    /*
+  }
+  */
+  /*
 refresh();
 switch (ch) {
 case KEY_UP:
@@ -184,7 +323,6 @@ break;
 update(&tankObject);
 
 */
-  }
 
   // renderFrame(&tank, 0, 10);
 

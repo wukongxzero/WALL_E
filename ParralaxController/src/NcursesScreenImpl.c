@@ -1,3 +1,4 @@
+#include "TankStatus/ATankStatusPublisher.h"
 #ifdef SIMULATION_SCREEN
 
 #include <ncurses.h>
@@ -38,9 +39,10 @@ void draw_rectangle(int y1, int x1, int y2, int x2) {
 }
 
 void clearRenderedFrame(int offsetX, int offsetY) {
-  for (int y = -4; y <= 16; y++) {
-    for (int x = -4; x <= 16; x++) {
-      mvaddch(y + offsetY, (x * 2) + offsetX, _);
+  for (int y = -5; y <= 20; y++) {
+    for (int x = -5; x <= 20; x++) {
+      // mvaddch(y + offsetY, (x * 2) + offsetX, _);
+      mvaddstr(y + offsetY, (x * 2) + offsetX, " ");
     }
   }
   refresh();
@@ -94,4 +96,24 @@ void playLoadingAnimation(struct PixelDataRGB_8bit *sampleSprite1,
     clearRenderedFrame(100 - i, 10);
     refresh();
   }
+}
+
+struct AsyncInputManager virtualJoystickOne;
+void constructVirtualJoystick(struct TankStatusPublisher *pub) {
+  virtualJoystickOne.virtJoyStickY = 0;
+  virtualJoystickOne.virtJoystickX = 0;
+  virtualJoystickOne.tankPub = pub;
+}
+
+void *async_notify_worker_virtualJoystick(void *arg) {
+  virtualJoystickOne.virtJoystickX = 1;
+  virtualJoystickOne.virtJoyStickY = 10;
+  virtualJoystickOne.tankPub->_localStatus.eulerY = 30; // pitch 30
+  virtualJoystickOne.tankPub->_localStatus.driveLeft =
+      virtualJoystickOne.virtJoystickX + virtualJoystickOne.virtJoystickX;
+
+  virtualJoystickOne.tankPub->_localStatus.driveRight =
+      virtualJoystickOne.virtJoyStickY - virtualJoystickOne.virtJoystickX;
+  notify(virtualJoystickOne.tankPub);
+  return NULL;
 }
