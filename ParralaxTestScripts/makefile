@@ -1,7 +1,7 @@
 # --- Compiler & Paths ---
 FLEXSPIN = ../ParralaxController/build/bin/flexspin
 FLEXSPIN_LOADER = ../ParralaxController/build/bin/proploader
-PORT = /dev/ttyUSB0
+PORT = /dev/ttyUSB1
 # Use abspath to ensure FlexSpin doesn't get lost in relative "../" paths
 #LIB_ROOT = $(abspath ../ParralaxController/Simple-Libraries/Learn/Simple-Libraries)
 # --- 1. Targeted Library Includes (-I) ---
@@ -21,19 +21,33 @@ INC_FLAGS += -I$(abspath ../ParralaxController/build/include)
 # --- 3. Project Files ---
 TARGET = TestJoyStick.elf
 SRCS = TestJoyStick.c
+HEADERS = ./include/
+
+
+TEST1 = TestJoyStick.c
+TEST2 = testSPIDisplay.c ST7796S.c 
+
+TARGET_TEST_1 = TestJoyStick.o
+TARGET_TEST_2 = testSPIDisplay.o
+
 
 # --- Build Rules ---
 all: $(TARGET)
 
-$(TARGET): $(SRCS)
-	@echo "Linking ADC Libraries and Compiling..."
-	$(FLEXSPIN) $(INC_FLAGS) $(SRCS) $(LIB_SRCS) -o $(TARGET)
+compile:
+	$(FLEXSPIN)  $(INC_FLAGS) $(TEST1) -I$(HEADERS) -o $(TARGET_TEST_1)
+	$(FLEXSPIN) $(INC_FLAGS) $(TEST2) -I ./include/ -o $(TARGET_TEST_2)
 
 set-port:
 	$PORT = $(FLEXSPIN_LOADER) -P
 
-upload:
-	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET) -D baudrate=156200 -t
+upload-joystick:
+	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_1) -D baudrate=156200 -t
+
+upload-SPI:
+	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_2) -D baudrate=156200 -t
+
+
 
 
 

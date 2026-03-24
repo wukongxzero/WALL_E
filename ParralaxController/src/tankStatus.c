@@ -10,6 +10,7 @@ void constructTankStatus(struct TankStatus *self) {
   self->eulerX = 0;
   self->eulerY = 0;
   self->eulerZ = 90;
+  self->changeFlag = 0;
   // self->isLocked = 0;
 }
 // note: memcopy ignores the locked boolean/byte

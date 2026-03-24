@@ -91,6 +91,7 @@ void test_Publisher_NotifyFromDifferentThread(void) {
   // 1. Reset values and subscribe
   pub._localStatus.driveLeft = 0;
   sub1.driveLeft = 0;
+  sub1.changeFlag = 0;
   subscribe(&pub, &sub1);
 
   // 2. Spawn a thread to run the notify function
@@ -104,6 +105,7 @@ void test_Publisher_NotifyFromDifferentThread(void) {
   // 4. Verify the data arrived in the subscriber memory
   TEST_ASSERT_EQUAL_UINT8(255, sub1.driveLeft);
   TEST_ASSERT_EQUAL_FLOAT(90.0f, sub1.eulerZ);
+  TEST_ASSERT_EQUAL_UINT8(1, sub1.changeFlag);
 }
 
 int main(void) {
