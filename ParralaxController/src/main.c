@@ -1,5 +1,7 @@
 #include "Graphics/AGraphicsObject.h"
 #include "Graphics/RotatePixelArt.h"
+#include "JoyStickPublisher.h"
+#include "Propellor/PrintStatusSubscriber.h"
 #include "TankStatus/ATankStatusPublisher.h"
 #include "TankStatus/TankStatus.h"
 #include <Graphics/RotatePixelArt.h>
@@ -12,10 +14,41 @@
 #include <TankStatus/TankStatus.h>
 #include <propeller.h>
 
+#include <JoyStickPublisher.h>
+#include <Propellor/PrintStatusSubscriber.h>
 #include <TankStatus/ABytePublisher.h>
+// NOTE: not using the heap allows better preformance
+
+struct JoyStickPublisher wheelDriver;
+struct TankStatus printTankStatusVar;
 
 int main(void) {
-  for (;;) {
+
+  test_adc_heartbeat();
+  adc_init(21, 20, 19, 18);
+
+  constructTankStatus(&printTankStatusVar);
+  constructJoystick(&wheelDriver, 0, 2);
+
+  subscribe(wheelDriver.publisher, &printTankStatusVar);
+
+  calibrateCenter(&wheelDriver);
+
+  while (1) {
+    // print("newline\n");
+    int rawX = adc_in(0); // Joystick X
+    int rawY = adc_in(2); // Joystick Y
+
+    // Use (double) cast for printf compatibility with --printf=float
+    printf("X: %1.2fV (%4d) | Y: %1.2fV (%4d)\r", (double)adc_volts(0), rawX,
+           (double)adc_volts(1), rawY);
+
+    // test on this thread
+
+    readJoystick(&wheelDriver);
+    //  notify(wheelDriver.publisher);
+    // printTankStatus(&printTankStatusVar);
+    waitcnt(CNT + CLKFREQ / 10);
   }
   return 0;
 }

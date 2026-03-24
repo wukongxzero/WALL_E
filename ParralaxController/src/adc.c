@@ -1,5 +1,8 @@
-#include "adc.h"
+
+#ifndef SIMULATION_SCREEN
+#include <Propellor/adc.h>
 #include <propeller.h>
+
 #include <stdio.h>
 
 // 1. Declare the macros for the Activity Board ADC Pins
@@ -112,3 +115,5 @@ void test_adc_heartbeat() {
 
   OUTA |= (1 << ADC_CS);
 }
+
+#endif

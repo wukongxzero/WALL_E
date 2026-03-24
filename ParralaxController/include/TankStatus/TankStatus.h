@@ -17,6 +17,7 @@ struct TankStatus {
   volatile float eulerY; // 4 byte
   volatile float eulerZ; // 4 byte
   volatile int lockID;
+  volatile unsigned char changeFlag;
   // unsigned char isLocked; // adding a pthreads equivelent of a thread lock
   // int lockID;
   //  (mutex lock) based on ai telling me to lol.
