@@ -19,6 +19,9 @@
 #include <TankStatus/ABytePublisher.h>
 
 #include <Propellor/ST7796S.h>
+
+#include <Graphics/pixelArtSampleData.h>
+#include <math.h>
 // NOTE: not using the heap allows better preformance
 //
 unsigned char lastX = 0;
@@ -27,6 +30,90 @@ unsigned char lastY = 0;
 struct JoyStickPublisher wheelDriver;
 struct TankStatusPublisher tsPublisher;
 struct TankStatus printTankStatusVar;
+void rotateAndRenderSparse(struct RotatingSprite *self, int screenX,
+                           int screenY, int angle, int scale, int offsetX,
+                           int offsetY) {
+  float rad = angle * (PI / 180.0f);
+  float s = sin(rad);
+  float c = cos(rad);
+
+  // The pivot point for an 8x8 grid is 3.5 (the middle of 0-7)
+  float pivot = 3.5f;
+
+  for (int i = 0; i < self->elementCount; i++) {
+    struct SparseElement *el = &self->centerGraphic[i];
+
+    // 1. Translate point so pivot is at (0,0)
+    float x = (float)el->_col - pivot;
+    float y = (float)el->_row - pivot;
+
+    // 2. Rotate
+    float rotX = (x * c) - (y * s);
+    float rotY = (x * s) + (y * c);
+
+    // 3. Translate back to screen coordinates and scale
+    // We add 0.5f before casting to int to perform rounding
+    int drawX = screenX + (int)((rotX + pivot) * scale + 0.5f);
+    int drawY = screenY + (int)((rotY + pivot) * scale + 0.5f);
+
+    // 4. Render using your high-speed 16-bit block write
+    tft_fillRect(drawX + offsetX, drawY + offsetY, scale, scale,
+                 (RGB565(255, 255, 255)));
+  }
+}
+
+void renderSparseSprite(struct RotatingSprite *self, int screenX, int screenY,
+                        int scale) {
+  for (int i = 0; i < self->elementCount; i++) {
+    struct SparseElement *el = &self->centerGraphic[i];
+
+    // 1. Calculate the scaled position on the LCD
+    // We use the coordinates stored in the sparse element
+    int posX = screenX + (el->_col * scale);
+    int posY = screenY + (el->_row * scale);
+
+    // 2. Convert the 8-bit sprite value to RGB565
+    // unsigned short color = get565Color(el->_value);
+
+    // 3. Use the high-speed 16-bit fill feature
+    tft_fillRect(posX, posY, scale, scale, RGB565(255, 255, 255));
+  }
+}
+
+void renderSparsePointSprite(struct SparsePointSprite *self, int screenX,
+                             int screenY, int scale) {
+  for (int i = 0; i < self->elementCount; i++) {
+    struct SparseElement *el = &self->vertexes[i];
+
+    // 1. Calculate the scaled position on the LCD
+    // We use the coordinates stored in the sparse element
+    int posX = screenX + (el->_col * scale);
+    int posY = screenY + (el->_row * scale);
+
+    // 2. Convert the 8-bit sprite value to RGB565
+    // unsigned short color = get565Color(el->_value);
+
+    // 3. Use the high-speed 16-bit fill feature
+    tft_fillRect(posX, posY, scale, scale, RGB565(255, 255, 255));
+  }
+}
+void ClearSparseSprite(struct RotatingSprite *self, int screenX, int screenY,
+                       int scale) {
+  for (int i = 0; i < self->elementCount; i++) {
+    struct SparseElement *el = &self->centerGraphic[i];
+
+    // 1. Calculate the scaled position on the LCD
+    // We use the coordinates stored in the sparse element
+    int posX = screenX + (el->_col * scale);
+    int posY = screenY + (el->_row * scale);
+
+    // 2. Convert the 8-bit sprite value to RGB565
+    // unsigned short color = get565Color(el->_value);
+
+    // 3. Use the high-speed 16-bit fill feature
+    tft_fillRect(posX, posY, scale, scale, RGB565(0, 0, 0));
+  }
+}
 
 int main(void) {
 
@@ -43,6 +130,34 @@ int main(void) {
 
   calibrateCenter(&wheelDriver);
 
+  struct SparsePointSprite rotateBeamSparseSprite;
+  struct GraphicsObject rotationTransformHandler;
+  struct RotatingSprite balanceBeamAngle;
+  struct PixelDataRGB_8bit transparentSpriteContainer;
+  constructGraphicsObject(&rotationTransformHandler, 0, 0, 0, 0);
+  // construct must come first
+  constructGraphicsSpriteRotatableWOrigin(&balanceBeamAngle,
+                                          &transparentSpriteContainer);
+  extractForegroundFromSprite(&balanceBeamAngle, sampleRotateBeam, 16);
+
+  // rotateSpriteHardModify(&balanceBeamAngle, 10);
+
+  constructSparseMatrixSprite(&rotateBeamSparseSprite);
+  extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16);
+  rotateSparsePointSprite(&rotateBeamSparseSprite, 90);
+
+  print("rotateBeam rotated 90 %i elementCount\n",
+        rotateBeamSparseSprite.elementCount);
+  print("rotateBeam rotated 90 %i|%i centerPoint\n",
+        rotateBeamSparseSprite.centerRotatePointX,
+        rotateBeamSparseSprite.centerRotatePointY);
+
+  renderSparsePointSprite(&rotateBeamSparseSprite, 200, 100, 10);
+
+  waitcnt(CNT + CLKFREQ / 1);
+
+  ClearSparseSprite(&rotateBeamSparseSprite, 200, 100, 10);
+
   while (1) {
     // print("newline\n");
     int rawX = adc_in(0); // Joystick X
@@ -56,6 +171,16 @@ int main(void) {
 
     readJoystick(&wheelDriver);
     notify(wheelDriver.publisher);
+
+    ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
+    // rotateSpriteHardModify(&balanceBeamAngle, 10);
+    rotateSparsePointSprite(&rotateBeamSparseSprite, 1);
+
+    tft_fillRect(rotateBeamSparseSprite.centerRotatePointX + 100,
+                 rotateBeamSparseSprite.centerRotatePointY + 250, 1, 1,
+                 RGB565(255, 0, 0));
+
+    renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
 
     if (lastX != wheelDriver.publisher->_localStatus.driveLeft ||
         lastY != wheelDriver.publisher->_localStatus.driveRight) {
@@ -82,7 +207,7 @@ int main(void) {
       //               40, RGB565(0, 0, 0));
     }
 
-    waitcnt(CNT + CLKFREQ / 10);
+    waitcnt(CNT + CLKFREQ / 1);
   }
   return 0;
 }

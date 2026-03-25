@@ -1,3 +1,5 @@
+
+#ifndef SIMULATION_SCREEN
 #include <Propellor/ST7796S.h>
 #include <Propellor/font.h>
 
@@ -229,3 +231,4 @@ void tft_fillRect(int x, int y, int w, int h, unsigned short color) {
 
   OUTA |= (1 << _CS);
 }
+#endif
