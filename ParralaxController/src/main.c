@@ -17,9 +17,15 @@
 #include <JoyStickPublisher.h>
 #include <Propellor/PrintStatusSubscriber.h>
 #include <TankStatus/ABytePublisher.h>
+
+#include <Propellor/ST7796S.h>
 // NOTE: not using the heap allows better preformance
+//
+unsigned char lastX = 0;
+unsigned char lastY = 0;
 
 struct JoyStickPublisher wheelDriver;
+struct TankStatusPublisher tsPublisher;
 struct TankStatus printTankStatusVar;
 
 int main(void) {
@@ -27,8 +33,11 @@ int main(void) {
   test_adc_heartbeat();
   adc_init(21, 20, 19, 18);
 
+  tft_init(0, 4, 3, 2, 1);
+  tft_fillScreen(RGB565(0, 0, 0));
+
   constructTankStatus(&printTankStatusVar);
-  constructJoystick(&wheelDriver, 0, 2);
+  constructJoystick(&wheelDriver, 0, 2, &tsPublisher);
 
   subscribe(wheelDriver.publisher, &printTankStatusVar);
 
@@ -46,8 +55,33 @@ int main(void) {
     // test on this thread
 
     readJoystick(&wheelDriver);
-    //  notify(wheelDriver.publisher);
-    // printTankStatus(&printTankStatusVar);
+    notify(wheelDriver.publisher);
+
+    if (lastX != wheelDriver.publisher->_localStatus.driveLeft ||
+        lastY != wheelDriver.publisher->_localStatus.driveRight) {
+      tft_fillRect(lastX, lastY + 10, 30, 30, RGB565(0, 0, 0));
+
+      tft_fillRect(wheelDriver.publisher->_localStatus.driveLeft,
+                   wheelDriver.publisher->_localStatus.driveRight + 10, 10, 10,
+                   RGB565(0, 0, 255));
+      lastX = wheelDriver.publisher->_localStatus.driveLeft;
+      lastY = wheelDriver.publisher->_localStatus.driveRight;
+
+      tft_fillRect(printTankStatusVar.driveLeft,
+                   printTankStatusVar.driveRight + 10, 10, 10,
+                   RGB565(0, 255, 0));
+      // tft_fillRect(printTankStatusVar.driveRight,
+      // printTankStatusVar.driveLeft,
+      //              40, 40, RGB565(0, 0, 0));
+
+      // notify(wheelDriver.publisher);
+      //  printTankStatus(&printTankStatusVar);
+
+      //  tft_fillRect(printTankStatusVar.driveRight,
+      //  printTankStatusVar.driveLeft, 40,
+      //               40, RGB565(0, 0, 0));
+    }
+
     waitcnt(CNT + CLKFREQ / 10);
   }
   return 0;

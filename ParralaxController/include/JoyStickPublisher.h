@@ -71,7 +71,8 @@ struct JoyStickPublisher {
 
 void calibrateCenter(struct JoyStickPublisher *self);
 void constructJoystick(struct JoyStickPublisher *self, unsigned char channelX,
-                       unsigned char channelY);
+                       unsigned char channelY,
+                       struct TankStatusPublisher *localPublisher);
 
 // TODO: see arduino calculation
 void applyDeadzone(int *input, int rangeHigh, int rangeLow);

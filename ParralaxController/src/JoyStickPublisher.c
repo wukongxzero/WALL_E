@@ -1,3 +1,5 @@
+#include "TankStatus/ATankStatusPublisher.h"
+#include "TankStatus/TankStatus.h"
 #include <JoyStickPublisher.h>
 
 #ifndef SIMULATION_SCREEN
@@ -72,26 +74,27 @@ void readJoystick(struct JoyStickPublisher *self) {
   // y is throttle, x is differenrtial
   // Note: maybe I should decouple this... but itll be faster and more
   // performant doing this
-  self->publisher->_localStatus.driveRight =
-      (unsigned char)((yaxis + xaxis) / ADC_RES_CHAR_SCALAR);
+  self->publisher->_localStatus.driveRight = CLAMP_JOYSTICK(scaled_charX);
 
-  self->publisher->_localStatus.driveLeft =
-      (unsigned char)((yaxis - xaxis) / ADC_RES_CHAR_SCALAR);
+  self->publisher->_localStatus.driveLeft = CLAMP_JOYSTICK(scaled_charY);
 
   printf("xaxis %d|yaxis %d | driveX %d | driveY %d \n", scaled_charX,
          scaled_charY, xRead, yRead);
-  // notify(&self->publisher);
+  // notify(self->publisher);
 }
 #endif
 
 void constructJoystick(struct JoyStickPublisher *self, unsigned char channelX,
-                       unsigned char channelY) {
+                       unsigned char channelY,
+                       struct TankStatusPublisher *localPublisher) {
   self->_channelX = channelX;
   self->_channelY = channelY;
   self->_xAxis = CENTER_JOYSTICK / ADC_RES_CHAR_SCALAR;
   self->_yAxis = CENTER_JOYSTICK / ADC_RES_CHAR_SCALAR;
   self->trimX = 0;
   self->trimY = 0;
+  self->publisher = localPublisher;
+  constructTankStatus(&(localPublisher->_localStatus));
 }
 
 void applyDeadzone(int *input, int rangeHigh, int rangeLow) {
