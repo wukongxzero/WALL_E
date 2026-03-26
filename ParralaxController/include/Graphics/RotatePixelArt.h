@@ -33,7 +33,7 @@ struct RotatingSprite {
 // TODO:refactor as a transformation struct like SparsePointTrasnformation
 // potentially isolate sprite tranbsformation as seperate structure
 struct SparsePointSprite {
-  int angleDegreesl;
+  int angleDegrees;
   unsigned short elementCount;
   struct SparseElement vertexes[SPARSE_PIXEL_MAX];
 
@@ -68,5 +68,7 @@ void constructSparseMatrixSprite(struct SparsePointSprite *self);
 void extractSparseMatrix(struct SparsePointSprite *self,
                          unsigned char sourceGrid[16][16]);
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle);
+
+void reverseRotationSparsePointSprite(struct SparsePointSprite *self);
 
 #endif

@@ -156,7 +156,8 @@ void extractSparseMatrix(struct SparsePointSprite *self,
 // }
 //
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle) {
-  float rad = angle * (PI / 180.0f);
+  self->angleDegrees = angle;
+  float rad = self->angleDegrees * (PI / 180.0f);
   float s = sin(rad);
   float c = cos(rad);
 
@@ -179,4 +180,8 @@ void rotateSparsePointSprite(struct SparsePointSprite *self, int angle) {
   }
   // DO NOT call autoFindCenterPoint(self) here if you want it to stay in one
   // place!
+}
+
+void reverseRotationSparsePointSprite(struct SparsePointSprite *self) {
+  rotateSparsePointSprite(self, -self->angleDegrees);
 }

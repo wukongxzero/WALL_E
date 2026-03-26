@@ -1,7 +1,7 @@
 # --- Compiler & Paths ---
 FLEXSPIN = ../ParralaxController/build/bin/flexspin
 FLEXSPIN_LOADER = ../ParralaxController/build/bin/proploader
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 # Use abspath to ensure FlexSpin doesn't get lost in relative "../" paths
 #LIB_ROOT = $(abspath ../ParralaxController/Simple-Libraries/Learn/Simple-Libraries)
 # --- 1. Targeted Library Includes (-I) ---
@@ -26,9 +26,11 @@ HEADERS = ./include/
 
 TEST1 = TestJoyStick.c
 TEST2 = testSPIDisplay.c ST7796S.c 
+TEST3 = TestHC05.c hco5.c
 
 TARGET_TEST_1 = TestJoyStick.o
 TARGET_TEST_2 = testSPIDisplay.o
+TARGET_TEST_3 = TestHC05.o
 
 
 # --- Build Rules ---
@@ -37,6 +39,8 @@ all: $(TARGET)
 compile:
 	$(FLEXSPIN)  $(INC_FLAGS) $(TEST1) -I$(HEADERS) -o $(TARGET_TEST_1)
 	$(FLEXSPIN) $(INC_FLAGS) $(TEST2) -I ./include/ -o $(TARGET_TEST_2)
+	$(FLEXSPIN) $(INC_FLAGS) $(TEST3) -I $(HEADERS) -o $(TARGET_TEST_3)
+	gcc BlueToothSerial.c -o bt_term.o -lbluetooth
 
 set-port:
 	$PORT = $(FLEXSPIN_LOADER) -P
@@ -46,6 +50,15 @@ upload-joystick:
 
 upload-SPI:
 	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_2) -D baudrate=156200 -t
+
+upload-HC05:
+
+	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_3) -D baudrate=156200 -t
+
+ubuntu-install-dep:
+	sudo apt-get install libbluetooth-dev
+
+
 
 
 
