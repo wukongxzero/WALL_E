@@ -26,6 +26,8 @@
 //
 unsigned char lastX = 0;
 unsigned char lastY = 0;
+int lastEulerY = 0;
+unsigned char isStationary;
 
 struct JoyStickPublisher wheelDriver;
 struct TankStatusPublisher tsPublisher;
@@ -172,15 +174,29 @@ int main(void) {
     readJoystick(&wheelDriver);
     notify(wheelDriver.publisher);
 
-    ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
-    // rotateSpriteHardModify(&balanceBeamAngle, 10);
-    rotateSparsePointSprite(&rotateBeamSparseSprite, 1);
+    if (lastEulerY != printTankStatusVar.driveLeft) {
+      lastEulerY = printTankStatusVar.driveLeft;
 
-    tft_fillRect(rotateBeamSparseSprite.centerRotatePointX + 100,
-                 rotateBeamSparseSprite.centerRotatePointY + 250, 1, 1,
-                 RGB565(255, 0, 0));
+      ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
+      // rotateSpriteHardModify(&balanceBeamAngle, 10);
+      reverseRotationSparsePointSprite(&rotateBeamSparseSprite);
+      rotateSparsePointSprite(&rotateBeamSparseSprite,
+                              printTankStatusVar.driveLeft - 128);
 
-    renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
+      tft_fillRect(rotateBeamSparseSprite.centerRotatePointX + 100,
+                   rotateBeamSparseSprite.centerRotatePointY + 250, 1, 1,
+                   RGB565(255, 0, 0));
+
+      renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
+      isStationary = 0;
+    } else {
+      if ((abs((lastEulerY - 128) % 360) < 4) == !isStationary) {
+        ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
+        extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16);
+        renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
+        isStationary = 1;
+      }
+    }
 
     if (lastX != wheelDriver.publisher->_localStatus.driveLeft ||
         lastY != wheelDriver.publisher->_localStatus.driveRight) {
@@ -207,7 +223,7 @@ int main(void) {
       //               40, RGB565(0, 0, 0));
     }
 
-    waitcnt(CNT + CLKFREQ / 1);
+    waitcnt(CNT + CLKFREQ / 10);
   }
   return 0;
 }
