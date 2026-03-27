@@ -39,29 +39,30 @@ all: $(TARGET)
 compile:
 	$(FLEXSPIN)  $(INC_FLAGS) $(TEST1) -I$(HEADERS) -o $(TARGET_TEST_1)
 	$(FLEXSPIN) $(INC_FLAGS) $(TEST2) -I ./include/ -o $(TARGET_TEST_2)
-	$(FLEXSPIN) $(INC_FLAGS) $(TEST3) -I $(HEADERS) -o $(TARGET_TEST_3)
-	gcc BlueToothSerial.c -o bt_term.o -lbluetooth
+	$(FLEXSPIN) $(INC_FLAGS) $(TEST3) tankStatus.c -I $(HEADERS) -o $(TARGET_TEST_3)
+	gcc -I$(INC_FLAGS) tankStatus.c BlueToothSerial.c -o bt_term.o -lbluetooth
 
 set-port:
 	$PORT = $(FLEXSPIN_LOADER) -P
 
 upload-joystick:
-	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_1) -D baudrate=156200 -t
+	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_1) -D baudrate=115200 -t
 
 upload-SPI:
-	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_2) -D baudrate=156200 -t
+	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_2) -D baudrate=115200 -t
 
 upload-HC05:
 
-	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_3) -D baudrate=156200 -t
+	$(FLEXSPIN_LOADER) -p $(PORT) $(TARGET_TEST_3) -D baudrate=115200 -t
 
 ubuntu-install-dep:
 	sudo apt-get install libbluetooth-dev
-
-
-
-
-
+open-bt-terminal:
+	./bt_term.o 00:25:08:E0:1F:EF
+find-bt-mac-hc05:
+	bluetoothctl menu scan
+	namepattern HC-05
+	scan on
 
 
 clean:
