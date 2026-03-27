@@ -1,15 +1,28 @@
+#include "include/TankStatus.h"
 #include <hc05.h>
 #include <propeller.h>
 
 #include <simpletools.h> // Basic Propeller tools
+void hc05_tx_hex(hc05_t *bt, unsigned char b) {
+  const char hex_chars[] = "0123456789ABCDEF";
+  hc05_tx(bt, hex_chars[b >> 4]);   // Send first digit
+  hc05_tx(bt, hex_chars[b & 0x0F]); // Send second digit
+  hc05_tx(bt, ' ');                 // Add a space for readability
+}
 
 // Example Pins for Parallax Propeller
 #define HC05_RX 11
 #define HC05_TX 10
 #define HC05_EN 12
+#define START_BIT_SIZE 3
+#define TANKSTATUS_USART_PACKAGE_SIZE 16 + START_BIT_SIZE
+struct TankStatus localUsartTankStatus;
+unsigned char tsUsartBuffer[TANKSTATUS_USART_PACKAGE_SIZE] = {};
+int totalStatus = 0;
 
 int main() {
   hc05_t bt;
+  constructTankStatus(&localUsartTankStatus);
   print("bt declare\n");
 
   // 1. Initialize variables (RX, TX, EN, Data Baud)
@@ -45,23 +58,45 @@ int main() {
   hc05_set_at_mode(&bt, 0);
 
 #endif
+
+  // buffer count
   print("mode revert\n");
-  hc05_print(&bt, "WALL-E Configured and Ready!\r\n");
+  // hc05_print(&bt, "WALL-E Configured and Ready!\r\n");
 
   while (1) {
     // Fast, non-blocking check of the circular buffer
     int incoming = hc05_rx_check(&bt);
 
     if (incoming != -1) {
-      char c = (char)incoming;
 
-      hc05_tx(&bt, c); // Echo back
+      unsigned char c = (unsigned char)incoming;
+      tsUsartBuffer[totalStatus] = c;
 
-      if (c == 'F')
-        hc05_print(&bt, " -> Forward\r\n");
-      if (c == 'S')
-        hc05_print(&bt, " -> Stopping\r\n");
+      // print("bufferRead%X bitsatus %i| saved ts buffer %c <-should be same "
+      //       "num\n",
+      //     c, totalStatus, tsUsartBuffer[totalStatus]);
+
+      print("bufferRead %02X | status %i | saved ts buffer %02X <-should be "
+            "same num\n",
+            c, totalStatus, tsUsartBuffer[totalStatus]);
+
+      totalStatus++;
     }
+    if (totalStatus == 16) {
+      // send ts back
+      // readByteTankStatus(tsUsartBuffer, 16, &localUsartTankStatus);
+
+      // hc05_print(&bt, "start");
+      for (int i = 0; i < 16; i++) {
+
+        hc05_tx(&bt, tsUsartBuffer[i]);
+        print("[%u]", tsUsartBuffer[i]);
+        // hc05_print(&bt, &tsUsartBuffer[i]);
+      }
+
+      // hc05_print(&bt, "end");
+    }
+    totalStatus %= 16; // reset after 16 chars
 
     // Do your heavy matrix math or screen updates here!
     // The RX cog is safely catching data in the background.
