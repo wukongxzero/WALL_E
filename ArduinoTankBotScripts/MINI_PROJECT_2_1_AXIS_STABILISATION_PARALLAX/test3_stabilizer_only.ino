@@ -7,16 +7,16 @@
 
 int controllerMode = 0;
 
-#define K0_PP    2.4034f
-#define K1_PP    0.1450f
-#define K0_LQR   6.6772f
-#define K1_LQR   0.4824f
-#define K0_LQG   6.6772f
-#define K1_LQG   0.4824f
+#define K0_PP    0.8961f
+#define K1_PP    0.0457f
+#define K0_LQR   6.4539f
+#define K1_LQR   0.4565f
+#define K0_LQG   6.4539f
+#define K1_LQG   0.4565f
 #define L0_KAL   0.992877f
-#define L1_KAL   10.030236f
-#define G_OVER_L 140.14f
-#define INV_MLL  408.16f
+#define L1_KAL   10.173582f
+#define G_OVER_L 196.20f
+#define INV_MLL  1532.57f
 
 // ── EXACT SAME AS YOUR WORKING PID ──
 static const uint8_t MPU_ADDR   = 0x68;

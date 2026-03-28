@@ -9,9 +9,9 @@ import matplotlib.gridspec as gridspec
 # ══════════════════════════════════════════════════════
 #  YOUR BOT PARAMETERS
 # ══════════════════════════════════════════════════════
-m   = 0.50    # kg  — platform + payload (MEASURE THIS)
+m   = 0.261    # kg  — platform + payload (MEASURE THIS)
 
-l   = 0.07    # m   — servo shaft to CoM (MEASURE THIS)
+l   = 0.05    # m   — servo shaft to CoM (MEASURE THIS)
 g   = 9.81
 dt  = 1.0/200 # 200Hz (your existing loop rate)
 SERVO_MAX_DEG = 25.0  # CMD_LIMIT from your code
