@@ -1,6 +1,6 @@
 FLEXSPIN = ../ParralaxController/build/bin/flexspin
 FLEXSPIN_LOADER = ../ParralaxController/build/bin/proploader
-PORT = /dev/ttyUSB1
+PORT = /dev/ttyUSB0
 INC_FLAGS += -I$(abspath ../ParralaxController/build/include)
 
 
