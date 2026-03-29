@@ -3,6 +3,8 @@
 #include <math.h>
 #include <string.h>
 
+#define SNAP_MULTIPLE(a, b) ((a) - ((a) % (b)))
+
 void extractForegroundFromSprite(struct RotatingSprite *self,
                                  unsigned char sourceGrid[16][16],
                                  int maxCapacity) {
@@ -103,28 +105,56 @@ static void autoFindCenterPoint(struct SparsePointSprite *self) {
 
 void constructSparseMatrixSprite(struct SparsePointSprite *self) {}
 void extractSparseMatrix(struct SparsePointSprite *self,
-                         unsigned char sourceGrid[16][16]) {
+                         unsigned char *sourceGrid, int spriteFlatLength) {
   self->elementCount = 0;
   unsigned int x = 0;
   unsigned int y = 0;
 
-  for (int r = 0; r < CENTER_GRAPHIC_PIXEL_MAX; r++) {
-    for (int c = 0; c < CENTER_GRAPHIC_PIXEL_MAX; c++) {
+  for (int r = 0; r < spriteFlatLength; r++) {
+    // Check if the pixel is NOT the background
+    if (sourceGrid[r] != _) {
 
-      // Check if the pixel is NOT the background
-      if (sourceGrid[r][c] != _) {
+      // Ensure we don't overflow the provided sparse array
+      if (self->elementCount < spriteFlatLength) {
 
-        // Ensure we don't overflow the provided sparse array
-        if (self->elementCount < SPARSE_PIXEL_MAX) {
+        x += r % 32;
+        y += 0 + ((int)(r / 32));
+        self->vertexes[self->elementCount]._row = r % 32;
+        self->vertexes[self->elementCount]._col = 0 + ((int)(r / 32));
+        self->vertexes[self->elementCount]._value =
+            (unsigned char)sourceGrid[r];
+        self->elementCount++;
+      }
+    }
+  }
 
-          x += r;
-          y += c;
-          self->vertexes[self->elementCount]._row = r;
-          self->vertexes[self->elementCount]._col = c;
-          self->vertexes[self->elementCount]._value =
-              (unsigned char)sourceGrid[r][c];
-          self->elementCount++;
-        }
+  self->centerRotatePointY =
+      (x + (self->elementCount / 2)) / self->elementCount;
+  self->centerRotatePointX =
+      (y + (self->elementCount / 2)) / self->elementCount;
+  self->screenLocationX = self->centerRotatePointX * 2;
+  self->screenLocationY = self->centerRotatePointY * 2;
+}
+void extractLargeSparseMatrix(struct SparsePointSprite *self,
+                              unsigned char *sourceGrid) {
+  self->elementCount = 0;
+  unsigned int x = 0;
+  unsigned int y = 0;
+
+  for (int r = 0; r < 32 * 32; r++) {
+    // Check if the pixel is NOT the background
+    if (sourceGrid[r] != _) {
+
+      // Ensure we don't overflow the provided sparse array
+      if (self->elementCount < 1024) {
+
+        x += r % 32;
+        y += 0 + ((int)(r / 32));
+        self->vertexes[self->elementCount]._row = r % 32;
+        self->vertexes[self->elementCount]._col = 0 + ((int)(r / 32));
+        self->vertexes[self->elementCount]._value =
+            (unsigned char)sourceGrid[r];
+        self->elementCount++;
       }
     }
   }
@@ -156,7 +186,10 @@ void extractSparseMatrix(struct SparsePointSprite *self,
 // }
 //
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle) {
-  self->angleDegrees = angle;
+  self->angleDegrees = SNAP_MULTIPLE(angle % 360, 10);
+
+  // TODO: issue: because of weird rounding error should be able to have angle
+  // be an even multiple of something(90 and 45 work)
   float rad = self->angleDegrees * (PI / 180.0f);
   float s = sin(rad);
   float c = cos(rad);

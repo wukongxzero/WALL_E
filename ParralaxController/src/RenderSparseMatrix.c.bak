@@ -1,0 +1,31 @@
+/*void extractSparseMatrix(struct SparsePointSprite *self,
+ * algo one
+                          unsigned char *sourceGrid, int spriteFlatLength) {
+
+   for (int r = 0; r < CENTER_GRAPHIC_PIXEL_MAX * CENTER_GRAPHIC_PIXEL_MAX;
+        r += CENTER_GRAPHIC_PIXEL_MAX) {
+     // Check if the pixel is NOT the background
+     if (sourceGrid[r] != _) {
+
+       for (int c = 0; c < CENTER_GRAPHIC_PIXEL_MAX; c++) {
+         if (self->elementCount < SPARSE_PIXEL_MAX) {
+
+           x += c;                                      // r % 32;
+           y += r;                                      // 0 + ((int)(r / 32));
+           self->vertexes[self->elementCount]._row = r; // r % 32;
+           self->vertexes[self->elementCount]._col = c; // 0 + ((int)(r / 32));
+           self->vertexes[self->elementCount]._value =
+               (unsigned char)sourceGrid[r + c];
+           self->elementCount++;
+         }
+       }
+     }
+
+     self->centerRotatePointY =
+         (x + (self->elementCount / 2)) / self->elementCount;
+     self->centerRotatePointX =
+         (y + (self->elementCount / 2)) / self->elementCount;
+     self->screenLocationX = self->centerRotatePointX * 2;
+     self->screenLocationY = self->centerRotatePointY * 2;
+   }
+ */

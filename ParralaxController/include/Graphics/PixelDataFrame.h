@@ -10,7 +10,6 @@
 
 #define _ 32  // Background
 #define X 219 // Outline/Color
-
 struct PixelDataRGB_8bit {
   unsigned short copySize; // = SPRITE_MAX_SIZE * SPRITE_MAX_SIZE;
   unsigned char frame[SPRITE_MAX_SIZE][SPRITE_MAX_SIZE];

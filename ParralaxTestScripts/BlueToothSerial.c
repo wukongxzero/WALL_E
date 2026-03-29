@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   constructTankStatus(&dummyData2);
   dummyData.driveLeft = 130;
   dummyData.driveRight = 155;
-  dummyData.eulerY = 24.5;
+  dummyData.eulerY = 45; // for easy round animation
 
   // // Test bytre status again
 
@@ -90,6 +90,9 @@ int main(int argc, char **argv) {
       if (bytes_read > 0) {
         printf("tankstatusMode%s\n", tankStatusBufferOut);
         // write(s, buf, bytes_read);
+        dummyData.eulerY += 1;
+        makeByteTankStatus(tankStatusBufferOut, 16, &dummyData);
+
         write(s, tankStatusBufferOut, 16);
       }
     }

@@ -7,18 +7,27 @@
 #include <Graphics/RotatePixelArt.h>
 #include <stdio.h>
 
+// todo:place in macros
+#define HC05_RX 11
+#define HC05_TX 10
+#define HC05_EN 12
+#define HC05_BAUD 9600 // 115200
+// HC05_DATA_BAUD
+
 #ifndef SIMULATION_SCREEN
 #include "simpletools.h"
 #include <Graphics/ARendederSubscriber.h>
-#include <Propellor/SPI.h>
-#include <TankStatus/TankStatus.h>
-#include <propeller.h>
-
+#include <Graphics/AsyncTankStatusGraphics.h>
 #include <JoyStickPublisher.h>
 #include <Propellor/PrintStatusSubscriber.h>
-#include <TankStatus/ABytePublisher.h>
-
+#include <Propellor/SPI.h>
 #include <Propellor/ST7796S.h>
+#include <Propellor/hc05.h>
+#include <SPIRendering.h>
+#include <TankStatus/ABytePublisher.h>
+#include <TankStatus/TankStatus.h>
+#include <TankStatusBTAdopt.h>
+#include <propeller.h>
 
 #include <Graphics/pixelArtSampleData.h>
 #include <math.h>
@@ -30,95 +39,143 @@ int lastEulerY = 0;
 unsigned char isStationary;
 
 struct JoyStickPublisher wheelDriver;
-struct TankStatusPublisher tsPublisher;
-struct TankStatus printTankStatusVar;
-void rotateAndRenderSparse(struct RotatingSprite *self, int screenX,
-                           int screenY, int angle, int scale, int offsetX,
-                           int offsetY) {
-  float rad = angle * (PI / 180.0f);
-  float s = sin(rad);
-  float c = cos(rad);
+struct TankStatusPublisher tsPublisher; // legacy for config 1
 
-  // The pivot point for an 8x8 grid is 3.5 (the middle of 0-7)
-  float pivot = 3.5f;
+struct TankStatusPublisher tsPublisherJoystick;
+struct TankStatusPublisher tsPublisherhc05;
 
-  for (int i = 0; i < self->elementCount; i++) {
-    struct SparseElement *el = &self->centerGraphic[i];
+struct TankStatus printTankStatusVar; // legacy...originally used to print but
+                                      // then I used to test joystick mapping
+struct TankStatus displayTankStatus;  // act as a subscriber for tft
+struct TankStatus
+    btLocalStatus; // act as a subscriber for the bluetooth...the publisher
+                   // structure status is in built into the tank status
 
-    // 1. Translate point so pivot is at (0,0)
-    float x = (float)el->_col - pivot;
-    float y = (float)el->_row - pivot;
+struct CoreMapping graphicsCoreBeam;
+struct CoreMapping graphicsCoreWheelLeft;
+struct CoreMapping graphicsCoreWheelRight;
+//
+unsigned int cogStackBTRead[128];
+unsigned int cogDisplay[128];
 
-    // 2. Rotate
-    float rotX = (x * c) - (y * s);
-    float rotY = (x * s) + (y * c);
+TankStatusBTAdopter hc05ToTankStatus;
 
-    // 3. Translate back to screen coordinates and scale
-    // We add 0.5f before casting to int to perform rounding
-    int drawX = screenX + (int)((rotX + pivot) * scale + 0.5f);
-    int drawY = screenY + (int)((rotY + pivot) * scale + 0.5f);
+struct GroupMapping gm;
+struct DriveLeftMapping wlLeft;
+struct DriveRightMapping wlright;
+struct AngleMapping beamMiddle;
 
-    // 4. Render using your high-speed 16-bit block write
-    tft_fillRect(drawX + offsetX, drawY + offsetY, scale, scale,
-                 (RGB565(255, 255, 255)));
-  }
-}
-
-void renderSparseSprite(struct RotatingSprite *self, int screenX, int screenY,
-                        int scale) {
-  for (int i = 0; i < self->elementCount; i++) {
-    struct SparseElement *el = &self->centerGraphic[i];
-
-    // 1. Calculate the scaled position on the LCD
-    // We use the coordinates stored in the sparse element
-    int posX = screenX + (el->_col * scale);
-    int posY = screenY + (el->_row * scale);
-
-    // 2. Convert the 8-bit sprite value to RGB565
-    // unsigned short color = get565Color(el->_value);
-
-    // 3. Use the high-speed 16-bit fill feature
-    tft_fillRect(posX, posY, scale, scale, RGB565(255, 255, 255));
-  }
-}
-
-void renderSparsePointSprite(struct SparsePointSprite *self, int screenX,
-                             int screenY, int scale) {
-  for (int i = 0; i < self->elementCount; i++) {
-    struct SparseElement *el = &self->vertexes[i];
-
-    // 1. Calculate the scaled position on the LCD
-    // We use the coordinates stored in the sparse element
-    int posX = screenX + (el->_col * scale);
-    int posY = screenY + (el->_row * scale);
-
-    // 2. Convert the 8-bit sprite value to RGB565
-    // unsigned short color = get565Color(el->_value);
-
-    // 3. Use the high-speed 16-bit fill feature
-    tft_fillRect(posX, posY, scale, scale, RGB565(255, 255, 255));
-  }
-}
-void ClearSparseSprite(struct RotatingSprite *self, int screenX, int screenY,
-                       int scale) {
-  for (int i = 0; i < self->elementCount; i++) {
-    struct SparseElement *el = &self->centerGraphic[i];
-
-    // 1. Calculate the scaled position on the LCD
-    // We use the coordinates stored in the sparse element
-    int posX = screenX + (el->_col * scale);
-    int posY = screenY + (el->_row * scale);
-
-    // 2. Convert the 8-bit sprite value to RGB565
-    // unsigned short color = get565Color(el->_value);
-
-    // 3. Use the high-speed 16-bit fill feature
-    tft_fillRect(posX, posY, scale, scale, RGB565(0, 0, 0));
-  }
-}
+int config1();
 
 int main(void) {
+  // return config1(); //exists for code refrence without switching branches
+  test_adc_heartbeat();
+  // initialize hardware peripherals(adc tftscreen  spi hc05 usart )
+  // //TODO: declare pins with macro...
+  adc_init(21, 20, 19, 18);
+  tft_init(0, 4, 3, 2, 1);
+  tft_fillScreen(RGB565(0, 0, 0));
+  hc05_t btModule;
+  hc05_init(&btModule, HC05_RX, HC05_TX, HC05_EN, HC05_DATA_BAUD);
+  printTankStatus(
+      &displayTankStatus); // should have update tank status based on cog
+                           // publishing/updating  this subscriber
 
+  constructTankStatus(&displayTankStatus);
+  constructJoystick(&wheelDriver, 0, 2, &tsPublisher);
+
+  constructTankStatusBTAdopter(&hc05ToTankStatus, &btLocalStatus, &tsPublisher,
+                               &btModule);
+  // Graphics construction
+
+  constructCoreMap(&graphicsCoreBeam, &beamMiddle, 256, &displayTankStatus);
+  constructCoreMap(&graphicsCoreWheelLeft, &gear32x32_slim, 1024,
+                   &displayTankStatus);
+  constructCoreMap(&graphicsCoreWheelRight, &gear32x32_slim, 1024,
+                   &displayTankStatus);
+
+  constructAngleMapping(&beamMiddle, &graphicsCoreBeam);
+  constructDriveLeftMapping(&wlLeft, &graphicsCoreWheelLeft);
+  constructDriveRightMapping(&wlright, &graphicsCoreWheelRight);
+
+  gm.leftCtrl = &wlLeft;
+  gm.rightCtrl = &wlright;
+  gm.angleCtrl = &beamMiddle;
+
+  gm.leftCtrl->sprite.screenLocationY = 10;
+  gm.leftCtrl->sprite.screenLocationX = 10;
+
+  gm.rightCtrl->sprite.screenLocationY = TFT_HEIGHT - 45;
+  gm.rightCtrl->sprite.screenLocationX = TFT_WIDTH - 45;
+
+  gm.angleCtrl->sprite.screenLocationY = TFT_WIDTH / 2 - 45;
+  gm.angleCtrl->sprite.screenLocationX = TFT_HEIGHT / 2 - 45;
+  // print("Subscriber TankStatus for display : time 1");
+  subscribe(hc05ToTankStatus.publisher,
+            &displayTankStatus); // in this configuration the bluetooth recv is
+                                 // directly publishing to the display status
+
+  //
+  //
+  // print("testing publisher");
+  // removing from blocking thread
+  //  readTankStatusBT(&hc05ToTankStatus); // should also notify publisher
+  //  directly
+  int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
+                        cogStackBTRead, sizeof(cogStackBTRead));
+  int cog_id_2 = cogstart(AsyncStartTankStatusRenderMap, (void *)&gm,
+                          cogDisplay, sizeof(cogDisplay));
+  renderSparsePointSpriteColor(
+      &gm.angleCtrl->sprite, gm.angleCtrl->sprite.screenLocationX,
+      gm.angleCtrl->sprite.screenLocationY, 1, RGB565(255, 255, 255));
+  renderSparsePointSpriteColor(
+      &gm.leftCtrl->sprite, gm.leftCtrl->sprite.screenLocationX,
+      gm.leftCtrl->sprite.screenLocationY, 1, RGB565(0, 0, 255));
+  renderSparsePointSpriteColor(
+      &gm.rightCtrl->sprite, gm.rightCtrl->sprite.screenLocationX,
+      gm.rightCtrl->sprite.screenLocationY, 1, RGB565(0, 0, 255));
+
+  print("gearSprite count %i", gm.rightCtrl->sprite.elementCount);
+
+  // start display status
+
+  // add delay between start cog and cog 0 print
+  while (1) {
+    waitcnt(CNT + CLKFREQ);
+    readJoystick(&wheelDriver);
+    notify(&wheelDriver);
+    // print("Subscriber TankStatus for display : time 2,euler Y%f \n",
+    //       displayTankStatus.eulerY);
+  }
+
+  // printTankStatus(
+  //    &displayTankStatus); // should have update tank status based on cog
+  // publishing/updating  this subscriber
+  //
+
+  // TODO: need to map balance beam to euler Y
+}
+
+#else
+#include <Graphics/NcursesScreenImpl.h>
+#include <Graphics/PixelDataFrame.h>
+#include <Graphics/pixelArtSampleData.h>
+#include <ncurses.h>
+#include <stdlib.h> // for malloc
+#include <string.h>
+// must define
+
+int configSimulation();
+int main(void) {
+  configSimulation();
+  return 0;
+}
+
+#endif
+
+#ifndef SIMULATION_SCREEN
+
+int config1() {
   test_adc_heartbeat();
   adc_init(21, 20, 19, 18);
 
@@ -145,7 +202,7 @@ int main(void) {
   // rotateSpriteHardModify(&balanceBeamAngle, 10);
 
   constructSparseMatrixSprite(&rotateBeamSparseSprite);
-  extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16);
+  extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16, 256);
   rotateSparsePointSprite(&rotateBeamSparseSprite, 90);
 
   print("rotateBeam rotated 90 %i elementCount\n",
@@ -192,7 +249,7 @@ int main(void) {
     } else {
       if ((abs((lastEulerY - 128) % 360) < 4) == !isStationary) {
         ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
-        extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16);
+        extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16, 256);
         renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
         isStationary = 1;
       }
@@ -228,17 +285,9 @@ int main(void) {
   return 0;
 }
 #else
-#include <Graphics/NcursesScreenImpl.h>
-#include <Graphics/PixelDataFrame.h>
-#include <Graphics/pixelArtSampleData.h>
-#include <ncurses.h>
-#include <stdlib.h> // for malloc
-#include <string.h>
-// must define
 
-int main(void) {
-#ifdef PROPELLOR
-  rdlong atomicLong;
+int configSimulation() {
+#ifdef PROPELLOR rdlong atomicLong;
 #endif
   startCurse();
   //  init_pair(1, COLOR_GREEN, COLOR_WHITE);
@@ -338,7 +387,7 @@ int main(void) {
 
     napms(10);
   }
-*/
+  */
 
   for (int i = 0; i <= 180; i++) {
     clearRenderedFrame(rotationTransformHandler.boundingBox._x,
@@ -501,36 +550,36 @@ int main(void) {
   }
   */
   /*
-refresh();
-switch (ch) {
-case KEY_UP:
-// Move tank up
-mvprintw(10, 10, "KEYUP");
-moveGraphicByVal(&tankObject, 1, 0);
-break;
-case KEY_DOWN:
-// Move tank down
-moveGraphicByVal(&tankObject, -1, 0);
-break;
-case KEY_LEFT:
-// Move tank left
-moveGraphicByVal(&tankObject, 0, 1);
-break;
-case KEY_RIGHT:
-// Move tank right
-moveGraphicByVal(&tankObject, 0, -1);
-break;
-case ' ':
-// Spacebar: Fire!
-break;
-case ERR:
-// No key was pressed (only happens if nodelay or timeout is set)
-break;
-}
+  refresh();
+  switch (ch) {
+  case KEY_UP:
+  // Move tank up
+  mvprintw(10, 10, "KEYUP");
+  moveGraphicByVal(&tankObject, 1, 0);
+  break;
+  case KEY_DOWN:
+  // Move tank down
+  moveGraphicByVal(&tankObject, -1, 0);
+  break;
+  case KEY_LEFT:
+  // Move tank left
+  moveGraphicByVal(&tankObject, 0, 1);
+  break;
+  case KEY_RIGHT:
+  // Move tank right
+  moveGraphicByVal(&tankObject, 0, -1);
+  break;
+  case ' ':
+  // Spacebar: Fire!
+  break;
+  case ERR:
+  // No key was pressed (only happens if nodelay or timeout is set)
+  break;
+  }
 
-update(&tankObject);
+  update(&tankObject);
 
-*/
+  */
 
   // renderFrame(&tank, 0, 10);
 

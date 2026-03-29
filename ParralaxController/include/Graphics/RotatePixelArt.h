@@ -3,6 +3,7 @@
 #define ROTATE_PIXEL_ART
 
 #include <Graphics/PixelDataFrame.h>
+#include <wchar.h>
 
 #define CENTER_GRAPHIC_PIXEL_MAX 8
 #define SPARSE_PIXEL_MAX 32
@@ -22,6 +23,7 @@ struct SparseElement {
   unsigned char _value;
 };
 
+#ifdef SIMULATION_SCREEN
 // using a sparse matrix
 struct RotatingSprite {
   struct PixelDataRGB_8bit *rotateSpace;
@@ -29,6 +31,7 @@ struct RotatingSprite {
   struct SparseElement centerGraphic[CENTER_GRAPHIC_PIXEL_MAX];
   int angleDegrees;
 };
+#endif
 
 // TODO:refactor as a transformation struct like SparsePointTrasnformation
 // potentially isolate sprite tranbsformation as seperate structure
@@ -42,7 +45,7 @@ struct SparsePointSprite {
 
   // TODO: at some point refactor with unsigned short
   int screenLocationX;
-  int screenLoactaionY;
+  int screenLocationY;
 };
 
 // TODO: repeat this constructor with dynamic arrays and malloc, for now build
@@ -66,7 +69,9 @@ void updateRotateSprite(struct RotatingSprite *self);
 //----------------sparse point struct, goal to support rotations in screen space
 void constructSparseMatrixSprite(struct SparsePointSprite *self);
 void extractSparseMatrix(struct SparsePointSprite *self,
-                         unsigned char sourceGrid[16][16]);
+                         unsigned char *sourceGrid, int spriteFlatLength);
+void extractLargeSparseMatrix(struct SparsePointSprite *self,
+                              unsigned char sourceGrid[1024]);
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle);
 
 void reverseRotationSparsePointSprite(struct SparsePointSprite *self);
