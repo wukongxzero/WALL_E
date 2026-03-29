@@ -1,6 +1,6 @@
 #ifndef ST7796S_H
 #define ST7796S_H
-
+#ifndef SIMULATION_SCREEN
 #include <propeller.h>
 
 // Screen Dimensions
@@ -33,4 +33,5 @@ void tft_writeString(int x, int y, const char *str, unsigned short color,
 
 void tft_fillRect(int x, int y, int w, int h, unsigned short color);
 void tft_fillScreenByBlock(unsigned short color);
+#endif
 #endif

@@ -4,13 +4,14 @@ PROP_LIB= "./build/include/"
 SIMPLE_IDE_LIB = "./Simple-Libraries/Learn/Simple Libraries/"
 TANK_BOT_LIB= ./include/
 UNITY_TEST_LIB=./test/Unity/src/
-PORT= /dev/ttyUSB0
+PORT= /dev/ttyUSB2
 BIN_PROP=main.o
-BAUD=156200
+BAUD=115200
 SRCDIR = ./src
 CC=clang
 INC_FLAGS += -I$(abspath ./build/include)
 SAMPLE_DATA =  -D "INCLUDE_SAMPLES" 
+BAUD = 115200
 
 
 # Target binaries
@@ -27,11 +28,11 @@ TEST_SOURCES = $(wildcard $(TESTDIR)/Test*.c)
 all: $(TARGET) $(SIM_TARGET)
 
 $(TARGET): $(SRC)
-	$(FC) -I $(TANK_BOT_LIB) $(SAMPLE_DATA) $(CFILES) $(SRC)main.c -o $(SRC)$(TARGET)
+	$(FC) -I $(TANK_BOT_LIB)  $(CFILES) $(SRC)main.c -o $(SRC)$(TARGET)
 
 load:
 	#./build/bin/proploader -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200 -t
-	$(PROP_LOADER) -p $(PORT) $(SRC)$(TARGET) -D baudrate=156200 -t
+	$(PROP_LOADER) -p $(PORT) $(SRC)$(TARGET) -D baudrate=$(BAUD) -t
 
 
 run-simulation:

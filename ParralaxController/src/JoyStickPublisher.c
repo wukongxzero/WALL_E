@@ -46,8 +46,8 @@ void calibrateCenter(struct JoyStickPublisher *self) {
   self->trimX = self->_centerX - CENTER_JOYSTICK;
   self->trimY = self->_centerY - CENTER_JOYSTICK;
 
-  printf("calibrate joystick Center{%i}{%i}", self->trimX, self->trimY);
-  printf("calibrate joystick done{%i}{%i}", sumX / samples, sumY / samples);
+  // printf("calibrate joystick Center{%i}{%i}", self->trimX, self->trimY);
+  // printf("calibrate joystick done{%i}{%i}", sumX / samples, sumY / samples);
 }
 // TODO:read joystick x and y and update
 void readJoystick(struct JoyStickPublisher *self) {
@@ -78,9 +78,9 @@ void readJoystick(struct JoyStickPublisher *self) {
 
   self->publisher->_localStatus.driveLeft = CLAMP_JOYSTICK(scaled_charY);
 
-  printf("xaxis %d|yaxis %d | driveX %d | driveY %d \n", scaled_charX,
-         scaled_charY, xRead, yRead);
-  // notify(self->publisher);
+  // printf("xaxis %d|yaxis %d | driveX %d | driveY %d \n", scaled_charX,
+  //        scaled_charY, xRead, yRead);
+  //  notify(self->publisher);
 }
 #endif
 

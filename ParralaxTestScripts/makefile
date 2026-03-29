@@ -17,7 +17,7 @@ INC_FLAGS += -I$(abspath ../ParralaxController/build/include)
 #           $(LIB_ROOT)/Utility/libsimpletools/libsimpletools.c \
 #           $(LIB_ROOT)/TextDevices/libsimpletext/simpletext.c \
 #           $(LIB_ROOT)/TextDevices/libsimpletext/safe_printf.c
-
+HC05_MAC = 00:25:08:E0:1F:66
 # --- 3. Project Files ---
 TARGET = TestJoyStick.elf
 SRCS = TestJoyStick.c
@@ -58,7 +58,7 @@ upload-HC05:
 ubuntu-install-dep:
 	sudo apt-get install libbluetooth-dev
 open-bt-terminal:
-	./bt_term.o 00:25:08:E0:1F:EF
+	./bt_term.o $(HC05_MAC)
 find-bt-mac-hc05:
 	bluetoothctl menu scan
 	namepattern HC-05
