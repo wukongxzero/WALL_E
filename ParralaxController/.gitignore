@@ -2,5 +2,7 @@ build
 *.binary
 *.dat
 *.pasm
+*.o
+*.elf
 
 
