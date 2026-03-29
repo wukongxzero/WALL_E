@@ -3,53 +3,64 @@
 // this would be to have a eeprom array data
 #include "pixelArtSampleData.h"
 #include "simpletools.h"
+#include <stdlib.h>
 
 #define START_LOCATION 32768
 #define BAUD 115200
-unsigned char buffer[1024];
-unsigned char beam[256];
-unsigned char anim[256];
-unsigned char anim2[256];
+// unsigned char buffer[1024];
+// unsigned char beam[256];
+//  unsigned char anim[256];
+//  unsigned char anim2[256];
+unsigned char buffer;
 
 int main() {
   print("trying to read");
-
-  ee_getStr(buffer, 1024, START_LOCATION);
-  ee_getStr(beam, 256, START_LOCATION + 1024);
-  ee_getStr(anim, 256, START_LOCATION + 1024 + 256);
-  ee_getStr(anim2, 256, START_LOCATION + 1024 + 256 + 256);
-  // TODO: add tank sprite in
-  // ee_putStr(&samplePixelSprite1, 256, START_LOCATION + 1024 + 256);
-  //
+  //**************GEAR*********************************
+  // unsigned char *buffer = malloc(1024);
+  // ee_getStr(buffer, 1024, START_LOCATION);
   print("startforloop");
   for (int i = 0; i < 1024; i++) {
     if (i % 32 == 0) {
       print("\n");
     }
-    print("%u ", buffer[i]);
+    ee_getStr(&buffer, 1, START_LOCATION + i);
+    print("%c", buffer);
+    // print("%u", buffer[i]);
   }
+  //  free(buffer);
+  //**************GEAR*********************************
+  //**************BEAM*********************************
+  // unsigned char *beam = malloc(256);
 
   print("\ntestBeam\n");
   for (int i = 0; i < 256; i++) {
     if (i % 16 == 0) {
       print("\n");
     }
-    print("%u ", beam[i]);
+    ee_getStr(&buffer, 1, START_LOCATION + 1024 + i);
+    print("%c", buffer);
   }
-
-  print("\nanim\n");
-  for (int i = 0; i < 256; i++) {
-    if (i % 16 == 0) {
-      print("\n");
-    }
-    print("%u ", anim[i]);
-  }
-
+  // free(beam);
+  //**************BEAM*********************************
+  //**************ANIM*********************************
+  //
   print("\ntestBeam\n");
   for (int i = 0; i < 256; i++) {
     if (i % 16 == 0) {
       print("\n");
     }
-    print("%u ", anim2[i]);
+    ee_getStr(&buffer, 1, START_LOCATION + 1024 + 256 + i);
+    print("%c", buffer);
   }
+  //**************ANIM*********************************
+  //**************ANIM2*********************************
+  print("\ntestBeam\n");
+  for (int i = 0; i < 256; i++) {
+    if (i % 16 == 0) {
+      print("\n");
+    }
+    ee_getStr(&buffer, 1, START_LOCATION + 1024 + 256 + 256 + i);
+    print("%c", buffer);
+  }
+  //**************ANIM2*********************************
 }

@@ -12,6 +12,33 @@ int main() {
   ee_putStr(&samplePixelSprite1, 256, START_LOCATION + 1024 + 256);
   ee_putStr(&samplePixelSprite2, 256, START_LOCATION + 1024 + 256 + 256);
   print("flashed");
+
+  unsigned char beam[256];
+  ee_getStr(beam, 256, START_LOCATION + 1024);
+  for (int i = 0; i < 256; i++) {
+    if (i % 16 == 0) {
+      print("\n");
+    }
+    print("%u", beam[i]);
+  }
+
+  unsigned char animTank[256];
+  ee_getStr(animTank, 256, START_LOCATION + 1024 + 256);
+  for (int i = 0; i < 256; i++) {
+    if (i % 16 == 0) {
+      print("\n");
+    }
+    print("%u", animTank[i]);
+  }
+
+  unsigned char animTank2[256];
+  ee_getStr(animTank2, 256, START_LOCATION + 1024 + 256 + 256);
+  for (int i = 0; i < 256; i++) {
+    if (i % 16 == 0) {
+      print("\n");
+    }
+    print("%u", animTank2[i]);
+  }
   // TODO: add tank sprite in
   // ee_putStr(&samplePixelSprite1, 256, START_LOCATION + 1024 + 256);
 }
