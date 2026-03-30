@@ -6,7 +6,8 @@
 #include <wchar.h>
 
 #define CENTER_GRAPHIC_PIXEL_MAX 8
-#define SPARSE_PIXEL_MAX 32
+// Note.
+#define SPARSE_PIXEL_MAX 288
 #define PI 3.14159265359
 #define PIXEL_DATA_FRAME_MIDPOINT 7
 
@@ -18,12 +19,11 @@
 // unsigned short get565Color(unsigned char value);
 
 struct SparseElement {
-  int _row;
-  int _col;
+  unsigned short _row;
+  unsigned short _col;
   unsigned char _value;
 };
 
-#ifdef SIMULATION_SCREEN
 // using a sparse matrix
 struct RotatingSprite {
   struct PixelDataRGB_8bit *rotateSpace;
@@ -31,7 +31,6 @@ struct RotatingSprite {
   struct SparseElement centerGraphic[CENTER_GRAPHIC_PIXEL_MAX];
   int angleDegrees;
 };
-#endif
 
 // TODO:refactor as a transformation struct like SparsePointTrasnformation
 // potentially isolate sprite tranbsformation as seperate structure
@@ -72,8 +71,11 @@ void extractSparseMatrix(struct SparsePointSprite *self,
                          unsigned char *sourceGrid, int spriteFlatLength);
 void extractLargeSparseMatrix(struct SparsePointSprite *self,
                               unsigned char sourceGrid[1024]);
+void extractEEPROMSparseMatrix(struct SparsePointSprite *self,
+                               unsigned int eepromAddr, short spriteFlatLength);
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle);
-
+void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
+                                         int angle, int color, short scale);
 void reverseRotationSparsePointSprite(struct SparsePointSprite *self);
 
 #endif

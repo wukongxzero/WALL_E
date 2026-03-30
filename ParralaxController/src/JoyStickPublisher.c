@@ -12,7 +12,6 @@
 
 void calibrateCenter(struct JoyStickPublisher *self) {
 
-  print("calibrate joystick");
   unsigned long sumX = 0;
   unsigned long sumY = 0;
   int samples = 64;
@@ -22,7 +21,6 @@ void calibrateCenter(struct JoyStickPublisher *self) {
 
     int xRead = (adc_in((int)self->_channelX));
     int yRead = (adc_in((int)self->_channelY));
-    printf("reading{%i}{%i}\n", xRead, yRead);
 
     sumX += xRead;
     sumY += yRead;
@@ -94,7 +92,10 @@ void constructJoystick(struct JoyStickPublisher *self, unsigned char channelX,
   self->trimX = 0;
   self->trimY = 0;
   self->publisher = localPublisher;
+  self->publisher->subscriberCount = 0;
+
   constructTankStatus(&(localPublisher->_localStatus));
+  constructTankStatusPublisher(self->publisher);
 }
 
 void applyDeadzone(int *input, int rangeHigh, int rangeLow) {

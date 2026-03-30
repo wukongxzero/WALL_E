@@ -13,6 +13,15 @@
 #define HC05_EN 12
 #define HC05_BAUD 9600 // 115200
 // HC05_DATA_BAUD
+// define where eeprom sprites are stored
+#define BIT32_SPRITE_SIZE 1024
+#define BIT16_SPRITE_SIZE 256
+
+#define GEAR_LOCATION 32768
+#define BEAM_LOCATION GEAR_LOCATION + BIT32_SPRITE_SIZE
+#define TANK_ANIMATION_F1_LOCATION BEAM_LOCATION + BIT16_SPRITE_SIZE
+#define TANK_ANIMATION_F2_LOCATION                                             \
+  TANK_ANIMATION_F1_LOCATION + BIT16_SPRITE_SIZE
 
 #ifndef SIMULATION_SCREEN
 #include "simpletools.h"
@@ -29,15 +38,9 @@
 #include <TankStatusBTAdopt.h>
 #include <propeller.h>
 
-#include <Graphics/pixelArtSampleData.h>
 #include <math.h>
 // NOTE: not using the heap allows better preformance
 //
-unsigned char lastX = 0;
-unsigned char lastY = 0;
-int lastEulerY = 0;
-unsigned char isStationary;
-
 struct JoyStickPublisher wheelDriver;
 struct TankStatusPublisher tsPublisher; // legacy for config 1
 
@@ -56,47 +59,59 @@ struct CoreMapping graphicsCoreWheelLeft;
 struct CoreMapping graphicsCoreWheelRight;
 //
 unsigned int cogStackBTRead[128];
-unsigned int cogDisplay[128];
+unsigned int cogDisplay[512];
+volatile int spriteLock;
 
-TankStatusBTAdopter hc05ToTankStatus;
-
-struct GroupMapping gm;
-struct DriveLeftMapping wlLeft;
-struct DriveRightMapping wlright;
-struct AngleMapping beamMiddle;
-
-int config1();
+// int config1();
 
 int main(void) {
+  spriteLock = locknew();
+
+  TankStatusBTAdopter hc05ToTankStatus;
+
+  struct GroupMapping gm;
+  struct DriveLeftMapping wlLeft;
+  struct DriveRightMapping wlright;
+  struct AngleMapping beamMiddle;
   // return config1(); //exists for code refrence without switching branches
-  test_adc_heartbeat();
+  // test_adc_heartbeat();
   // initialize hardware peripherals(adc tftscreen  spi hc05 usart )
   // //TODO: declare pins with macro...
   adc_init(21, 20, 19, 18);
-  tft_init(0, 4, 3, 2, 1);
-  tft_fillScreen(RGB565(0, 0, 0));
+  waitcnt(CNT + CLKFREQ / 2); // Wait 0.5 seconds for ADC to stabilize
+  // tft_init(0, 4, 3, 2, 1);
+  // tft_fillScreen(RGB565(0, 0, 0));
+
   hc05_t btModule;
-  hc05_init(&btModule, HC05_RX, HC05_TX, HC05_EN, HC05_DATA_BAUD);
-  printTankStatus(
-      &displayTankStatus); // should have update tank status based on cog
-                           // publishing/updating  this subscriber
+  // hc05_init(&btModule, HC05_RX, HC05_TX, HC05_EN, HC05_DATA_BAUD);
+  //  printTankStatus(
+  //       &displayTankStatus); // should have update tank status based on cog
+  //  publishing/updating  this subscriber
 
   constructTankStatus(&displayTankStatus);
+  constructTankStatusPublisher(&tsPublisher);
   constructJoystick(&wheelDriver, 0, 2, &tsPublisher);
 
   constructTankStatusBTAdopter(&hc05ToTankStatus, &btLocalStatus, &tsPublisher,
                                &btModule);
-  // Graphics construction
+  //  Program Size is 14840
+  //  Graphics construction
 
-  constructCoreMap(&graphicsCoreBeam, &beamMiddle, 256, &displayTankStatus);
-  constructCoreMap(&graphicsCoreWheelLeft, &gear32x32_slim, 1024,
+  constructCoreMap(&graphicsCoreBeam, BEAM_LOCATION, BIT16_SPRITE_SIZE,
                    &displayTankStatus);
-  constructCoreMap(&graphicsCoreWheelRight, &gear32x32_slim, 1024,
+  constructCoreMap(&graphicsCoreWheelLeft, GEAR_LOCATION, BIT32_SPRITE_SIZE,
+                   &displayTankStatus);
+  constructCoreMap(&graphicsCoreWheelRight, GEAR_LOCATION, BIT32_SPRITE_SIZE,
                    &displayTankStatus);
 
   constructAngleMapping(&beamMiddle, &graphicsCoreBeam);
+  // print("beam%i\n", beamMiddle.sprite.elementCount);
   constructDriveLeftMapping(&wlLeft, &graphicsCoreWheelLeft);
+  // print("gearSprite%i\n", wlLeft.sprite.elementCount);
   constructDriveRightMapping(&wlright, &graphicsCoreWheelRight);
+  // print("gearSprite%i\n", wlright.sprite.elementCount);
+
+  ///* Program size is 15880 bytes
 
   gm.leftCtrl = &wlLeft;
   gm.rightCtrl = &wlright;
@@ -105,47 +120,72 @@ int main(void) {
   gm.leftCtrl->sprite.screenLocationY = 10;
   gm.leftCtrl->sprite.screenLocationX = 10;
 
-  gm.rightCtrl->sprite.screenLocationY = TFT_HEIGHT - 45;
-  gm.rightCtrl->sprite.screenLocationX = TFT_WIDTH - 45;
+  gm.rightCtrl->sprite.screenLocationY = TFT_HEIGHT - 100;
+  gm.rightCtrl->sprite.screenLocationX = TFT_WIDTH - 100;
 
   gm.angleCtrl->sprite.screenLocationY = TFT_WIDTH / 2 - 45;
   gm.angleCtrl->sprite.screenLocationX = TFT_HEIGHT / 2 - 45;
   // print("Subscriber TankStatus for display : time 1");
-  subscribe(hc05ToTankStatus.publisher,
-            &displayTankStatus); // in this configuration the bluetooth recv is
-                                 // directly publishing to the display status
+  // subscribe(hc05ToTankStatus.publisher,
+  //          &displayTankStatus); // in this configuration the bluetooth recv
+  calibrateCenter(&wheelDriver);
 
+  subscribe(&tsPublisher, &displayTankStatus);
+  subscribe(wheelDriver.publisher, &tsPublisher._localStatus);
+
+  // directly publishing to the display status
   //
   //
   // print("testing publisher");
   // removing from blocking thread
   //  readTankStatusBT(&hc05ToTankStatus); // should also notify publisher
   //  directly
-  int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
-                        cogStackBTRead, sizeof(cogStackBTRead));
-  int cog_id_2 = cogstart(AsyncStartTankStatusRenderMap, (void *)&gm,
-                          cogDisplay, sizeof(cogDisplay));
-  renderSparsePointSpriteColor(
+  // int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
+  //                      cogStackBTRead, sizeof(cogStackBTRead));
+  /*renderSparsePointSpriteColor(
       &gm.angleCtrl->sprite, gm.angleCtrl->sprite.screenLocationX,
-      gm.angleCtrl->sprite.screenLocationY, 1, RGB565(255, 255, 255));
+      gm.angleCtrl->sprite.screenLocationY, 2, RGB565(255, 255, 255));
   renderSparsePointSpriteColor(
       &gm.leftCtrl->sprite, gm.leftCtrl->sprite.screenLocationX,
-      gm.leftCtrl->sprite.screenLocationY, 1, RGB565(0, 0, 255));
+      gm.leftCtrl->sprite.screenLocationY, 2, RGB565(0, 0, 255));
   renderSparsePointSpriteColor(
       &gm.rightCtrl->sprite, gm.rightCtrl->sprite.screenLocationX,
-      gm.rightCtrl->sprite.screenLocationY, 1, RGB565(0, 0, 255));
+      gm.rightCtrl->sprite.screenLocationY, 2, RGB565(0, 0, 255));
+*/
 
-  print("gearSprite count %i", gm.rightCtrl->sprite.elementCount);
+  int cog_id_2 = cogstart(AsyncStartTankStatusRenderMap, (void *)&gm,
+                          cogDisplay, sizeof(cogDisplay));
+  // Add to main():
+  // print("Publisher RAM Address: %p\n", wheelDriver.publisher);
 
+  pause(10000);
   // start display status
-
   // add delay between start cog and cog 0 print
   while (1) {
+
     waitcnt(CNT + CLKFREQ);
     readJoystick(&wheelDriver);
-    notify(&wheelDriver);
-    // print("Subscriber TankStatus for display : time 2,euler Y%f \n",
-    //       displayTankStatus.eulerY);
+    notify(wheelDriver.publisher);
+    while (lockset(spriteLock))
+      ;
+
+    //
+    //  reverseRotationSparsePointSprite(&gm.rightCtrl->sprite);
+    //  ClearSparseSprite(&gm.rightCtrl->sprite,
+    //                   gm.rightCtrl->sprite.screenLocationX,
+    //                   gm.rightCtrl->sprite.screenLocationY, 2);
+    // rotateSparsePointSprite(&gm.rightCtrl->sprite, 10);
+    // renderSparsePointSpriteColor(
+    //    &gm.rightCtrl->sprite, gm.rightCtrl->sprite.screenLocationX,
+    //    gm.leftCtrl->sprite.screenLocationX, 2, RGB565(255, 0, 0));
+    lockclr(spriteLock);
+    wheelDriver.publisher->_localStatus.eulerY += 10;
+
+    print("%u\n", wheelDriver.publisher->_localStatus.driveRight);
+    print("%u\n", displayTankStatus.driveRight);
+
+    // Send the new positions to the render Cog
+    notify(wheelDriver.publisher);
   }
 
   // printTankStatus(
@@ -154,6 +194,7 @@ int main(void) {
   //
 
   // TODO: need to map balance beam to euler Y
+  return 0;
 }
 
 #else
@@ -176,6 +217,11 @@ int main(void) {
 #ifndef SIMULATION_SCREEN
 
 int config1() {
+  unsigned char lastX = 0;
+  unsigned char lastY = 0;
+  int lastEulerY = 0;
+  unsigned char isStationary;
+
   test_adc_heartbeat();
   adc_init(21, 20, 19, 18);
 
