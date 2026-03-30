@@ -273,6 +273,47 @@ void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
                  color);
   }
 }
+void rotateSparsePointSpriteRenderEmbeddedColor(struct SparsePointSprite *self,
+                                                int angle, short scale) {
+  // self->angleDegrees = SNAP_MULTIPLE(angle % 360, 10);
+  self->angleDegrees = angle;
+
+  // TODO: issue: because of weird rounding error should be able to have
+  // angle be an even multiple of something(90 and 45 work)
+  float rad = self->angleDegrees * (PI / 180.0f);
+  float s = sinf(rad);
+  float c = cosf(rad);
+
+  for (int i = 0; i < self->elementCount; i++) {
+    double x =
+        (double)self->vertexes[i]._col - (double)self->centerRotatePointX;
+    double y =
+        (double)self->vertexes[i]._row - (double)self->centerRotatePointY;
+
+    // 2. Rotate around (0,0)
+    double rotX = (x * c) - (y * s);
+    double rotY = (x * s) + (y * c);
+    int finalX = self->screenLocationX + (int)roundf(rotX * scale) +
+                 self->centerRotatePointX;
+    int finalY = self->screenLocationY + (int)roundf(rotY * scale) +
+                 self->centerRotatePointY;
+
+    switch (self->vertexes[i]._value) {
+    case 219:
+      tft_fillRect(finalX - (scale / 2), finalY - (scale / 2), scale, scale,
+                   RGB565(200, 200, 200));
+      break;
+    case 210:
+      tft_fillRect(finalX - (scale / 2), finalY - (scale / 2), scale, scale,
+                   RGB565(255, 165, 0));
+      break;
+    case 200:
+      tft_fillRect(finalX - (scale / 2), finalY - (scale / 2), scale, scale,
+                   RGB565(50, 50, 50));
+      break;
+    }
+  }
+}
 
 void clearSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
                                         int angle, short scale) {

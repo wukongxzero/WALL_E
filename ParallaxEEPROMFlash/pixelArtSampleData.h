@@ -6,6 +6,8 @@
 
 #define _ 32  // Background
 #define X 219 // Outline/Color
+#define O 210 // 2ndColor
+#define W 200 // thirdColor
 unsigned char beam_16x16[256] = {
     _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, // Row 0
     _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, // Row 1
@@ -37,11 +39,11 @@ unsigned char samplePixelSprite1[256] = {
     _, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _, // Row 8
     _, _, _, X, _, _, _, _, _, _, _, _, X, _, _, _, // Row 9
     _, _, _, X, _, _, _, _, _, _, _, _, X, _, _, _, // Row 10
-    X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, // Row 11
-    X, X, _, _, X, _, _, _, _, _, _, X, _, _, X, X, // Row 12
-    _, X, X, X, X, X, _, _, _, _, X, X, X, X, X, _, // Row 13
-    _, _, X, _, X, _, _, _, _, _, _, X, X, X, _, _, // Row 14
-    _, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _  // Row 15
+    O, O, O, O, O, O, O, O, O, O, O, O, O, O, O, O, // Row 11
+    O, X, _, _, W, _, _, _, _, _, _, W, _, _, X, O, // Row 12
+    _, O, X, W, W, W, _, _, _, _, W, W, W, X, O, _, // Row 13
+    _, _, O, _, W, _, _, _, _, _, _, W, X, O, _, _, // Row 14
+    _, _, _, O, O, O, O, O, O, O, O, O, O, _, _, _  // Row 15
 };
 
 // 256-byte array for samplePixelSprite2
@@ -57,11 +59,11 @@ unsigned char samplePixelSprite2[256] = {
     _, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _, // Row 8
     _, _, _, X, _, _, _, _, _, _, _, _, X, _, _, _, // Row 9
     _, _, _, X, _, _, _, _, _, _, _, _, X, _, _, _, // Row 10
-    X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, X, // Row 11
-    X, X, _, X, _, X, _, _, _, _, X, _, X, _, X, X, // Row 12
-    _, X, X, _, X, _, _, _, _, _, _, X, _, X, X, _, // Row 13
-    _, _, X, X, _, X, _, _, _, _, X, _, X, X, _, _, // Row 14
-    _, _, _, X, X, X, X, X, X, X, X, X, X, _, _, _  // Row 15
+    O, O, O, O, O, O, O, O, O, O, O, O, O, O, O, O, // Row 11
+    O, X, _, X, _, X, _, _, _, _, X, _, X, _, X, O, // Row 12
+    _, O, X, _, X, _, _, _, _, _, _, X, _, X, O, _, // Row 13
+    _, _, O, X, _, X, _, _, _, _, X, _, X, O, _, _, // Row 14
+    _, _, _, O, O, O, O, O, O, O, O, O, O, _, _, _  // Row 15
 };
 
 unsigned char gear32x32_slim[1024] = {
