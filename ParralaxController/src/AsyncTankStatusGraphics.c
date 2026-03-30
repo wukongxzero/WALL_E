@@ -143,8 +143,7 @@ void AsyncStartTankStatusRenderMap(void *arg) {
                                       RGB565(255, 255, 255), SCREEN_SCALAR);
   rotateSparsePointSpriteRenderNColor(&group->leftCtrl->sprite, 0,
                                       RGB565(255, 255, 255), SCREEN_SCALAR);
-  rotateSparsePointSpriteRenderNColor(&group->tankBase->sprite, 180,
-                                      RGB565(100, 100, 100), 15);
+  rotateSparsePointSpriteRenderEmbeddedColor(&group->tankBase->sprite, 180, 15);
 
   waitcnt(CNT + CLKFREQ);
 
@@ -152,9 +151,9 @@ void AsyncStartTankStatusRenderMap(void *arg) {
 
     // print("heartbeat");
     // waitcnt(CNT + CLKFREQ / 10);
-    rotateSparsePointSpriteRenderNColor(&group->tankBase->sprite, 180,
-                                        RGB565(100, 100, 100), 15);
 
+    rotateSparsePointSpriteRenderEmbeddedColor(&group->tankBase->sprite, 180,
+                                               15);
     startRenderDriveLeftSubscribe(group->leftCtrl);
     startRenderDriveRightSubscribe(group->rightCtrl);
     startRenderAngleSubscribe(group->angleCtrl);
