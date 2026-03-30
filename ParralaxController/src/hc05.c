@@ -24,7 +24,6 @@ static char usart_rx_blocking(hc05_t *bt) {
 
 static void rx_cog_loop(void *arg) {
   hc05_t *bt = (hc05_t *)arg;
-  print("block exec\n");
   while (1) {
     char c = usart_rx_blocking(bt);
     int next_head = (bt->head + 1) % RX_BUFFER_SIZE;
