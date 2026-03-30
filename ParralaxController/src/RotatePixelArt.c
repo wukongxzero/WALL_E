@@ -1,3 +1,4 @@
+#include "Propellor/ST7796S.h"
 #include <Graphics/PixelDataFrame.h>
 #include <Graphics/RotatePixelArt.h>
 #include <math.h>
@@ -252,15 +253,14 @@ void rotateSparsePointSprite(struct SparsePointSprite *self, int angle) {
 void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
                                          int angle, int color, short scale) {
 
-  clearSparsePointSpriteColor(self, self->screenLocationX,
-                              self->screenLocationY, scale);
-  self->angleDegrees = SNAP_MULTIPLE(angle % 360, 10);
+  // self->angleDegrees = SNAP_MULTIPLE(angle % 360, 10);
+  self->angleDegrees = angle;
 
   // TODO: issue: because of weird rounding error should be able to have
   // angle be an even multiple of something(90 and 45 work)
   float rad = self->angleDegrees * (PI / 180.0f);
-  float s = sin(rad);
-  float c = cos(rad);
+  float s = sinf(rad);
+  float c = cosf(rad);
 
   for (int i = 0; i < self->elementCount; i++) {
     double x =
@@ -271,12 +271,26 @@ void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
     // 2. Rotate around (0,0)
     double rotX = (x * c) - (y * s);
     double rotY = (x * s) + (y * c);
+    int finalX = self->screenLocationX + (int)roundf(rotX * scale) +
+                 self->centerRotatePointX;
+    int finalY = self->screenLocationY + (int)roundf(rotY * scale) +
+                 self->centerRotatePointY;
 
-    renderSparsePointSpriteColor(self, self->screenLocationX,
-                                 self->screenLocationY, scale, color);
+    // tft_fillRect(finalX, finalY, scale, scale, color);
+    tft_fillRect(finalX - (scale / 2), finalY - (scale / 2), scale, scale,
+                 color);
   }
 }
 
+void clearSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
+                                        int angle, short scale) {
+
+  tft_fillRect(self->screenLocationX + 25 - scale * 50 / 2,
+               self->screenLocationY + 30 - scale * 50 / 2, scale * 50,
+               scale * 50,
+
+               RGB565(0, 0, 0));
+}
 void reverseRotationSparsePointSprite(struct SparsePointSprite *self) {
   rotateSparsePointSprite(self, -self->angleDegrees);
 }

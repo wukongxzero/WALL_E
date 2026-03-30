@@ -76,6 +76,9 @@ void extractEEPROMSparseMatrix(struct SparsePointSprite *self,
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle);
 void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
                                          int angle, int color, short scale);
+
+void clearSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
+                                        int angle, short scale);
 void reverseRotationSparsePointSprite(struct SparsePointSprite *self);
 
 #endif

@@ -56,38 +56,18 @@ void startRenderAngleSubscribe(void *arg) {
 
   struct AngleMapping *angleMap = (struct AngleMapping *)arg;
   if (angleMap->lastAngle != angleMap->overlapMap->_localSubscriber->eulerY) {
+
+    clearSparsePointSpriteRenderNColor(&angleMap->sprite, angleMap->lastAngle,
+                                       SCREEN_SCALAR * 2);
     angleMap->lastAngle = angleMap->overlapMap->_localSubscriber->eulerY;
-
-    ClearSparseSprite(&(angleMap->sprite), angleMap->sprite.screenLocationX,
-                      angleMap->sprite.screenLocationY, SCREEN_SCALAR);
-    // rotateSpriteHardModify(&balanceBeamAngle, 10);
-    reverseRotationSparsePointSprite(&(angleMap->sprite));
-    rotateSparsePointSprite(&angleMap->sprite,
-                            angleMap->overlapMap->_localSubscriber->eulerY);
-
     int heatMap = angleMap->overlapMap->_localSubscriber->eulerY;
     int invHeatMap = 255 - heatMap;
-    renderSparsePointSpriteColor(
-        &angleMap->sprite, angleMap->sprite.screenLocationX,
-        angleMap->sprite.screenLocationY, SCREEN_SCALAR,
-        RGB565(255, invHeatMap, invHeatMap));
-    angleMap->overlapMap->isStationary = 0;
-  } else {
-    if ((abs(angleMap->sprite.angleDegrees % 360) < 4) ==
-        !angleMap->overlapMap->isStationary) {
-      ClearSparseSprite(&angleMap->sprite, angleMap->sprite.screenLocationX,
-                        angleMap->sprite.screenLocationY, SCREEN_SCALAR);
-      //      extractSparseMatrix(&angleMap->sprite,
-      //      angleMap->overlapMap->original,
-      //                          angleMap->overlapMap->originalSize);
-      // extractEEPROMSparseMatrix(&angleMap->sprite,
-      //                          angleMap->overlapMap->originalAddress,
-      //                          angleMap->overlapMap->originalSize);
+    // TODO:need a rotation rate
+    rotateSparsePointSpriteRenderNColor(
+        &angleMap->sprite, (int)angleMap->overlapMap->_localSubscriber->eulerY,
+        RGB565(255, invHeatMap, invHeatMap), SCREEN_SCALAR * 2);
 
-      renderSparseSprite(&angleMap->sprite, angleMap->sprite.screenLocationX,
-                         angleMap->sprite.screenLocationY, SCREEN_SCALAR);
-      angleMap->overlapMap->isStationary = 1;
-    }
+    angleMap->overlapMap->isStationary = 0;
   }
 }
 void startRenderDriveLeftSubscribe(void *arg) {
@@ -98,42 +78,16 @@ void startRenderDriveLeftSubscribe(void *arg) {
     driveLeftMap->lastAngleSpeedL =
         driveLeftMap->overlapMap->_localSubscriber->driveLeft;
 
-    ClearSparseSprite(&(driveLeftMap->sprite),
-                      driveLeftMap->sprite.screenLocationX,
-                      driveLeftMap->sprite.screenLocationY, SCREEN_SCALAR);
-    // rotateSpriteHardModify(&balanceBeamAngle, 10);
-    reverseRotationSparsePointSprite(&(driveLeftMap->sprite));
-
-    rotateSparsePointSprite(
-        &driveLeftMap->sprite,
-        driveLeftMap->overlapMap->_localSubscriber->driveLeft /
-            ANIMATION_DRIVE_SCALAR);
-
+    clearSparsePointSpriteRenderNColor(
+        &driveLeftMap->sprite, driveLeftMap->lastAngleSpeedL, SCREEN_SCALAR);
     int heatMap = driveLeftMap->overlapMap->_localSubscriber->driveLeft;
     int invHeatMap = 255 - heatMap;
-    renderSparsePointSpriteColor(&driveLeftMap->sprite,
-                                 driveLeftMap->sprite.screenLocationX,
-                                 driveLeftMap->sprite.screenLocationY,
-                                 SCREEN_SCALAR, RGB565(heatMap, 0, invHeatMap));
-    driveLeftMap->overlapMap->isStationary = 0;
-  } else {
-    if ((abs(driveLeftMap->sprite.angleDegrees % 360) < 4) ==
-        !driveLeftMap->overlapMap->isStationary) {
-      ClearSparseSprite(&driveLeftMap->sprite,
-                        driveLeftMap->sprite.screenLocationX,
-                        driveLeftMap->sprite.screenLocationY, SCREEN_SCALAR);
-      //      extractSparseMatrix(&driveLeftMap->sprite,
-      //                         driveLeftMap->overlapMap->original,
-      //                         driveLeftMap->overlapMap->originalSize);
-      // extractEEPROMSparseMatrix(&driveLeftMap->sprite,
-      //                          driveLeftMap->overlapMap->originalAddress,
-      //                          driveLeftMap->overlapMap->originalSize);
+    // TODO:need a rotation rate
+    rotateSparsePointSpriteRenderNColor(&driveLeftMap->sprite, heatMap,
+                                        RGB565(invHeatMap, 0, heatMap),
+                                        SCREEN_SCALAR);
 
-      renderSparseSprite(&driveLeftMap->sprite,
-                         driveLeftMap->sprite.screenLocationX,
-                         driveLeftMap->sprite.screenLocationY, SCREEN_SCALAR);
-      driveLeftMap->overlapMap->isStationary = 1;
-    }
+    driveLeftMap->overlapMap->isStationary = 0;
   }
 }
 void startRenderDriveRightSubscribe(void *arg) {
@@ -143,42 +97,17 @@ void startRenderDriveRightSubscribe(void *arg) {
     driveRightMap->lastAngleSpeedR =
         driveRightMap->overlapMap->_localSubscriber->driveRight;
 
-    ClearSparseSprite(&(driveRightMap->sprite),
-                      driveRightMap->sprite.screenLocationX,
-                      driveRightMap->sprite.screenLocationY, SCREEN_SCALAR);
-    // rotateSpriteHardModify(&balanceBeamAngle, 10);
-    reverseRotationSparsePointSprite(&(driveRightMap->sprite));
-
-    rotateSparsePointSprite(
-        &driveRightMap->sprite,
-        driveRightMap->overlapMap->_localSubscriber->driveRight /
-            ANIMATION_DRIVE_SCALAR);
+    clearSparsePointSpriteRenderNColor(
+        &driveRightMap->sprite, driveRightMap->lastAngleSpeedR, SCREEN_SCALAR);
 
     int heatMap = driveRightMap->overlapMap->_localSubscriber->driveRight;
     int invHeatMap = 255 - heatMap;
-    renderSparsePointSpriteColor(&driveRightMap->sprite,
-                                 driveRightMap->sprite.screenLocationX,
-                                 driveRightMap->sprite.screenLocationY,
-                                 SCREEN_SCALAR, RGB565(heatMap, 0, invHeatMap));
-    driveRightMap->overlapMap->isStationary = 0;
-  } else {
-    if ((abs(driveRightMap->sprite.angleDegrees % 360) < 4) ==
-        !driveRightMap->overlapMap->isStationary) {
-      ClearSparseSprite(&driveRightMap->sprite,
-                        driveRightMap->sprite.screenLocationX,
-                        driveRightMap->sprite.screenLocationY, SCREEN_SCALAR);
-      // extractSparseMatrix(&driveRightMap->sprite,
-      //                     driveRightMap->overlapMap->original,
-      //                     driveRightMap->overlapMap->originalSize);
-      // extractEEPROMSparseMatrix(&driveRightMap->sprite,
-      //                           driveRightMap->overlapMap->originalAddress,
-      //                           driveRightMap->overlapMap->originalSize);
+    // TODO:need a rotation rate
+    rotateSparsePointSpriteRenderNColor(&driveRightMap->sprite, heatMap,
+                                        RGB565(invHeatMap, 0, heatMap),
+                                        SCREEN_SCALAR);
 
-      renderSparseSprite(&driveRightMap->sprite,
-                         driveRightMap->sprite.screenLocationX,
-                         driveRightMap->sprite.screenLocationY, SCREEN_SCALAR);
-      driveRightMap->overlapMap->isStationary = 1;
-    }
+    driveRightMap->overlapMap->isStationary = 0;
   }
 }
 
@@ -188,28 +117,22 @@ void AsyncStartTankStatusRenderMap(void *arg) {
   tft_init(0, 4, 3, 2, 1);
   tft_fillScreen(RGB565(0, 0, 0));
   // Add to Render Cog (before the while loop):
-  print("Subscriber RAM Address: %p\n",
-        group->rightCtrl->overlapMap->_localSubscriber);
+  rotateSparsePointSpriteRenderNColor(&group->angleCtrl->sprite, 0,
+                                      RGB565(0, 0, 255), SCREEN_SCALAR * 2);
 
-  renderSparsePointSpriteColor(
-      &group->angleCtrl->sprite, group->angleCtrl->sprite.screenLocationX,
-      group->angleCtrl->sprite.screenLocationY, 2, RGB565(255, 255, 255));
-  renderSparsePointSpriteColor(
-      &group->leftCtrl->sprite, group->leftCtrl->sprite.screenLocationX,
-      group->leftCtrl->sprite.screenLocationY, 2, RGB565(0, 0, 255));
-  renderSparsePointSpriteColor(
-      &group->rightCtrl->sprite, group->rightCtrl->sprite.screenLocationX,
-      group->rightCtrl->sprite.screenLocationY, 2, RGB565(0, 0, 255));
+  rotateSparsePointSpriteRenderNColor(&group->rightCtrl->sprite, 0,
+                                      RGB565(255, 255, 255), SCREEN_SCALAR);
+  rotateSparsePointSpriteRenderNColor(&group->leftCtrl->sprite, 0,
+                                      RGB565(255, 255, 255), SCREEN_SCALAR);
+
+  waitcnt(CNT + CLKFREQ);
 
   while (1) {
-    while (lockset(spriteLock))
-      ;
+
+    // print("heartbeat");
+    // waitcnt(CNT + CLKFREQ / 10);
     startRenderDriveLeftSubscribe(group->leftCtrl);
     startRenderDriveRightSubscribe(group->rightCtrl);
     startRenderAngleSubscribe(group->angleCtrl);
-    print("cogTankStatus%u\n",
-          group->rightCtrl->overlapMap->_localSubscriber->driveRight);
-    lockclr(spriteLock);
-    waitcnt(CNT + CLKFREQ / 100);
   }
 }

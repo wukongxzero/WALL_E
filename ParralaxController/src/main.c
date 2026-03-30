@@ -58,8 +58,8 @@ struct CoreMapping graphicsCoreBeam;
 struct CoreMapping graphicsCoreWheelLeft;
 struct CoreMapping graphicsCoreWheelRight;
 //
-unsigned int cogStackBTRead[128];
-unsigned int cogDisplay[512];
+// unsigned int cogStackBTRead[128];
+unsigned int cogDisplay[800];
 volatile int spriteLock;
 
 // int config1();
@@ -89,6 +89,7 @@ int main(void) {
   //  publishing/updating  this subscriber
 
   constructTankStatus(&displayTankStatus);
+  displayTankStatus.eulerY = 0;
   constructTankStatusPublisher(&tsPublisher);
   constructJoystick(&wheelDriver, 0, 2, &tsPublisher);
 
@@ -117,14 +118,14 @@ int main(void) {
   gm.rightCtrl = &wlright;
   gm.angleCtrl = &beamMiddle;
 
-  gm.leftCtrl->sprite.screenLocationY = 10;
-  gm.leftCtrl->sprite.screenLocationX = 10;
+  gm.leftCtrl->sprite.screenLocationY = 30;
+  gm.leftCtrl->sprite.screenLocationX = 20;
 
-  gm.rightCtrl->sprite.screenLocationY = TFT_HEIGHT - 100;
-  gm.rightCtrl->sprite.screenLocationX = TFT_WIDTH - 100;
+  gm.rightCtrl->sprite.screenLocationY = TFT_HEIGHT - 70;
+  gm.rightCtrl->sprite.screenLocationX = 20; // TFT_WIDTH - 100;
 
-  gm.angleCtrl->sprite.screenLocationY = TFT_WIDTH / 2 - 45;
-  gm.angleCtrl->sprite.screenLocationX = TFT_HEIGHT / 2 - 45;
+  gm.angleCtrl->sprite.screenLocationY = TFT_HEIGHT / 2 - 20;
+  gm.angleCtrl->sprite.screenLocationX = TFT_WIDTH / 2;
   // print("Subscriber TankStatus for display : time 1");
   // subscribe(hc05ToTankStatus.publisher,
   //          &displayTankStatus); // in this configuration the bluetooth recv
@@ -158,34 +159,28 @@ int main(void) {
   // Add to main():
   // print("Publisher RAM Address: %p\n", wheelDriver.publisher);
 
-  pause(10000);
+  pause(1000);
   // start display status
   // add delay between start cog and cog 0 print
   while (1) {
 
     waitcnt(CNT + CLKFREQ);
     readJoystick(&wheelDriver);
-    notify(wheelDriver.publisher);
+
     while (lockset(spriteLock))
       ;
 
-    //
-    //  reverseRotationSparsePointSprite(&gm.rightCtrl->sprite);
-    //  ClearSparseSprite(&gm.rightCtrl->sprite,
-    //                   gm.rightCtrl->sprite.screenLocationX,
-    //                   gm.rightCtrl->sprite.screenLocationY, 2);
-    // rotateSparsePointSprite(&gm.rightCtrl->sprite, 10);
-    // renderSparsePointSpriteColor(
-    //    &gm.rightCtrl->sprite, gm.rightCtrl->sprite.screenLocationX,
-    //    gm.leftCtrl->sprite.screenLocationX, 2, RGB565(255, 0, 0));
-    lockclr(spriteLock);
     wheelDriver.publisher->_localStatus.eulerY += 10;
+    notify(wheelDriver.publisher);
 
-    print("%u\n", wheelDriver.publisher->_localStatus.driveRight);
-    print("%u\n", displayTankStatus.driveRight);
+    lockclr(spriteLock);
+
+    print("e%u\n", round(displayTankStatus.driveRight));
+    print("e%u\n", round(displayTankStatus.driveLeft));
+
+    //    print("%u\n", wheelDriver.publisher->_localStatus.driveRight);
 
     // Send the new positions to the render Cog
-    notify(wheelDriver.publisher);
   }
 
   // printTankStatus(
