@@ -13,9 +13,9 @@ struct TankStatus {
   // for the non decimal portion range would be +/- 128.(0-255) degrees/radians
   // and only transmit as 2 bytes
   // radians would be more compressed for bit streamuing
-  volatile float eulerX; // 4 byte 32 bit
-  volatile float eulerY; // 4 byte
-  volatile float eulerZ; // 4 byte
+  volatile short eulerX; // 4 byte 32 bit
+  volatile short eulerY; // 4 byte
+  volatile char eulerZ;  // 4 byte
   volatile int lockID;
   volatile unsigned char changeFlag;
   // unsigned char isLocked; // adding a pthreads equivelent of a thread lock
