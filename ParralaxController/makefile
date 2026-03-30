@@ -76,8 +76,8 @@ install-simple-ide:
 compile: $(BIN_PROP)
 	./build/bin/flexspin main.cpp
 
-set-port:
-	echo ($(FLEXSPIN) -P)
+port:
+	$(PROP_LOADER) -P
 
 upload:
 

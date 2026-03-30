@@ -13,4 +13,7 @@ void renderSparsePointSpriteColor(struct SparsePointSprite *self, int screenX,
 
 void ClearSparseSprite(struct SparsePointSprite *self, int screenX, int screenY,
                        int scale);
+
+void clearSparsePointSpriteColor(struct SparsePointSprite *self, int screenX,
+                                 int screenY, int scale);
 #endif

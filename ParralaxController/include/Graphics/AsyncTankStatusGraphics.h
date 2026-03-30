@@ -15,7 +15,7 @@
 // not changing like rotation data
 struct CoreMapping {
   struct TankStatus *_localSubscriber;
-  unsigned int original;
+  unsigned int originalAddress;
   unsigned char isStationary; // is a bool
   unsigned int originalSize;
 };
@@ -42,8 +42,8 @@ struct GroupMapping {
   struct AngleMapping *angleCtrl;
 };
 
-void constructCoreMap(struct CoreMapping *self, unsigned char *src, int srcSize,
-                      struct TankStatus *tsSub);
+void constructCoreMap(struct CoreMapping *self, unsigned int srcAddr,
+                      int srcSize, struct TankStatus *tsSub);
 void constructAngleMapping(struct AngleMapping *self,
                            struct CoreMapping *spriteMap);
 void constructDriveLeftMapping(struct DriveLeftMapping *self,

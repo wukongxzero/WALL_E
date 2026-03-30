@@ -2,6 +2,9 @@
 #include <Graphics/RotatePixelArt.h>
 #include <math.h>
 #include <string.h>
+// Regret doing this but for speed/memory/pixel accuracy, I am breaking the
+// decoupling
+#include <SPIRendering.h>
 
 #define SNAP_MULTIPLE(a, b) ((a) - ((a) % (b)))
 
@@ -102,8 +105,40 @@ static void autoFindCenterPoint(struct SparsePointSprite *self) {
   self->centerRotatePointX = x / self->elementCount;
   self->centerRotatePointY = y / self->elementCount;
 }
+void extractEEPROMSparseMatrix(struct SparsePointSprite *self,
+                               unsigned int eepromAddr, int spriteFlatLength) {
+  self->elementCount = 0;
+  unsigned int x = 0;
+  unsigned int y = 0;
 
-void constructSparseMatrixSprite(struct SparsePointSprite *self) {}
+  // unsigned char *charBuffer = malloc(spriteFlatLength);
+  // ee_getStr(charBuffer, spriteFlatLength, eepromAddr);
+  unsigned char charBuffer;
+  for (int r = 0; r < spriteFlatLength; r++) {
+
+    ee_getStr(&charBuffer, 1, eepromAddr + r);
+    // if (charBuffer[r] != _) {
+    if (charBuffer != _) {
+      // Ensure we don't overflow the provided sparse array
+      if (self->elementCount < spriteFlatLength) {
+
+        x += r % 32;
+        y += 0 + ((int)(r / 32));
+        self->vertexes[self->elementCount]._row = r % 32;
+        self->vertexes[self->elementCount]._col = 0 + ((int)(r / 32));
+        // self->vertexes[self->elementCount]._value = charBuffer[r];
+        self->vertexes[self->elementCount]._value = charBuffer;
+        self->elementCount++;
+      }
+    }
+  }
+  self->centerRotatePointY =
+      (x + (self->elementCount / 2)) / self->elementCount;
+  self->centerRotatePointX =
+      (y + (self->elementCount / 2)) / self->elementCount;
+  // free(charBuffer);
+}
+
 void extractSparseMatrix(struct SparsePointSprite *self,
                          unsigned char *sourceGrid, int spriteFlatLength) {
   self->elementCount = 0;
@@ -132,6 +167,7 @@ void extractSparseMatrix(struct SparsePointSprite *self,
       (x + (self->elementCount / 2)) / self->elementCount;
   self->centerRotatePointX =
       (y + (self->elementCount / 2)) / self->elementCount;
+  // need to update when actually assigning this value
   self->screenLocationX = self->centerRotatePointX * 2;
   self->screenLocationY = self->centerRotatePointY * 2;
 }
@@ -179,8 +215,9 @@ void extractLargeSparseMatrix(struct SparsePointSprite *self,
 //     double rotX = (cx * radiansCos) - (cy * radiansSin);
 //     double rotY = (cx * radiansSin) + (cy * radiansCos);
 //
-//     self->vertexes[i]._row = (int)round((rotX + self->centerRotatePointX));
-//     self->vertexes[i]._col = (int)round((rotY + self->centerRotatePointY));
+//     self->vertexes[i]._row = (int)round((rotX +
+//     self->centerRotatePointX)); self->vertexes[i]._col = (int)round((rotY
+//     + self->centerRotatePointY));
 //   }
 //   autoFindCenterPoint(self);
 // }
@@ -188,8 +225,8 @@ void extractLargeSparseMatrix(struct SparsePointSprite *self,
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle) {
   self->angleDegrees = SNAP_MULTIPLE(angle % 360, 10);
 
-  // TODO: issue: because of weird rounding error should be able to have angle
-  // be an even multiple of something(90 and 45 work)
+  // TODO: issue: because of weird rounding error should be able to have
+  // angle be an even multiple of something(90 and 45 work)
   float rad = self->angleDegrees * (PI / 180.0f);
   float s = sin(rad);
   float c = cos(rad);
@@ -211,8 +248,33 @@ void rotateSparsePointSprite(struct SparsePointSprite *self, int angle) {
     self->vertexes[i]._row =
         (short)round(rotY + (double)self->centerRotatePointY);
   }
-  // DO NOT call autoFindCenterPoint(self) here if you want it to stay in one
-  // place!
+}
+void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
+                                         int angle, int color, short scale) {
+
+  clearSparsePointSpriteColor(self, self->screenLocationX,
+                              self->screenLocationY, scale);
+  self->angleDegrees = SNAP_MULTIPLE(angle % 360, 10);
+
+  // TODO: issue: because of weird rounding error should be able to have
+  // angle be an even multiple of something(90 and 45 work)
+  float rad = self->angleDegrees * (PI / 180.0f);
+  float s = sin(rad);
+  float c = cos(rad);
+
+  for (int i = 0; i < self->elementCount; i++) {
+    double x =
+        (double)self->vertexes[i]._col - (double)self->centerRotatePointX;
+    double y =
+        (double)self->vertexes[i]._row - (double)self->centerRotatePointY;
+
+    // 2. Rotate around (0,0)
+    double rotX = (x * c) - (y * s);
+    double rotY = (x * s) + (y * c);
+
+    renderSparsePointSpriteColor(self, self->screenLocationX,
+                                 self->screenLocationY, scale, color);
+  }
 }
 
 void reverseRotationSparsePointSprite(struct SparsePointSprite *self) {
