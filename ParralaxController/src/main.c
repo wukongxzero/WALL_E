@@ -57,22 +57,31 @@ struct TankStatus
 struct CoreMapping graphicsCoreBeam;
 struct CoreMapping graphicsCoreWheelLeft;
 struct CoreMapping graphicsCoreWheelRight;
+struct CoreMapping graphicsCoreBody;
+
 //
 // unsigned int cogStackBTRead[128];
 unsigned int cogDisplay[800];
 volatile int spriteLock;
 
+TankStatusBTAdopter hc05ToTankStatus;
+
+struct GroupMapping gm;
+struct DriveLeftMapping wlLeft;
+struct DriveRightMapping wlright;
+struct AngleMapping beamMiddle;
+struct StaticNoMapping tankBody;
+
+// NOTE:so cool thing is apparently I can share allocated memory for same
+// sprited
+struct SparseElement wheelLeftStack[288];
+// struct SparseElement wheelRightStack[288];
+struct SparseElement beamStack[32];
+struct SparseElement tankStack[72];
 // int config1();
 
 int main(void) {
   spriteLock = locknew();
-
-  TankStatusBTAdopter hc05ToTankStatus;
-
-  struct GroupMapping gm;
-  struct DriveLeftMapping wlLeft;
-  struct DriveRightMapping wlright;
-  struct AngleMapping beamMiddle;
   // return config1(); //exists for code refrence without switching branches
   // test_adc_heartbeat();
   // initialize hardware peripherals(adc tftscreen  spi hc05 usart )
@@ -83,7 +92,7 @@ int main(void) {
   // tft_fillScreen(RGB565(0, 0, 0));
 
   hc05_t btModule;
-  // hc05_init(&btModule, HC05_RX, HC05_TX, HC05_EN, HC05_DATA_BAUD);
+  hc05_init(&btModule, HC05_RX, HC05_TX, HC05_EN, HC05_DATA_BAUD);
   //  printTankStatus(
   //       &displayTankStatus); // should have update tank status based on cog
   //  publishing/updating  this subscriber
@@ -95,28 +104,30 @@ int main(void) {
 
   constructTankStatusBTAdopter(&hc05ToTankStatus, &btLocalStatus, &tsPublisher,
                                &btModule);
-  //  Program Size is 14840
-  //  Graphics construction
 
   constructCoreMap(&graphicsCoreBeam, BEAM_LOCATION, BIT16_SPRITE_SIZE,
                    &displayTankStatus);
+  constructCoreMap(&graphicsCoreBody, TANK_ANIMATION_F1_LOCATION,
+                   BIT16_SPRITE_SIZE, &displayTankStatus);
+
   constructCoreMap(&graphicsCoreWheelLeft, GEAR_LOCATION, BIT32_SPRITE_SIZE,
                    &displayTankStatus);
   constructCoreMap(&graphicsCoreWheelRight, GEAR_LOCATION, BIT32_SPRITE_SIZE,
                    &displayTankStatus);
 
-  constructAngleMapping(&beamMiddle, &graphicsCoreBeam);
+  constructAngleMapping(&beamMiddle, &graphicsCoreBeam, beamStack);
   // print("beam%i\n", beamMiddle.sprite.elementCount);
-  constructDriveLeftMapping(&wlLeft, &graphicsCoreWheelLeft);
+  constructDriveLeftMapping(&wlLeft, &graphicsCoreWheelLeft, wheelLeftStack);
   // print("gearSprite%i\n", wlLeft.sprite.elementCount);
-  constructDriveRightMapping(&wlright, &graphicsCoreWheelRight);
+  constructDriveRightMapping(&wlright, &graphicsCoreWheelRight, wheelLeftStack);
   // print("gearSprite%i\n", wlright.sprite.elementCount);
-
+  constructStaticSpriteNoMap(&tankBody, &graphicsCoreBody, tankStack);
   ///* Program size is 15880 bytes
 
   gm.leftCtrl = &wlLeft;
   gm.rightCtrl = &wlright;
   gm.angleCtrl = &beamMiddle;
+  gm.tankBase = &tankBody;
 
   gm.leftCtrl->sprite.screenLocationY = 30;
   gm.leftCtrl->sprite.screenLocationX = 20;
@@ -124,8 +135,12 @@ int main(void) {
   gm.rightCtrl->sprite.screenLocationY = TFT_HEIGHT - 70;
   gm.rightCtrl->sprite.screenLocationX = 20; // TFT_WIDTH - 100;
 
-  gm.angleCtrl->sprite.screenLocationY = TFT_HEIGHT / 2 - 20;
+  gm.angleCtrl->sprite.screenLocationY = TFT_HEIGHT / 2 - 15;
   gm.angleCtrl->sprite.screenLocationX = TFT_WIDTH / 2;
+
+  gm.tankBase->sprite.screenLocationY = TFT_HEIGHT / 2 - 20;
+  gm.tankBase->sprite.screenLocationX = 60;
+
   // print("Subscriber TankStatus for display : time 1");
   // subscribe(hc05ToTankStatus.publisher,
   //          &displayTankStatus); // in this configuration the bluetooth recv
@@ -134,31 +149,11 @@ int main(void) {
   subscribe(&tsPublisher, &displayTankStatus);
   subscribe(wheelDriver.publisher, &tsPublisher._localStatus);
 
-  // directly publishing to the display status
-  //
-  //
-  // print("testing publisher");
-  // removing from blocking thread
   //  readTankStatusBT(&hc05ToTankStatus); // should also notify publisher
-  //  directly
   // int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
-  //                      cogStackBTRead, sizeof(cogStackBTRead));
-  /*renderSparsePointSpriteColor(
-      &gm.angleCtrl->sprite, gm.angleCtrl->sprite.screenLocationX,
-      gm.angleCtrl->sprite.screenLocationY, 2, RGB565(255, 255, 255));
-  renderSparsePointSpriteColor(
-      &gm.leftCtrl->sprite, gm.leftCtrl->sprite.screenLocationX,
-      gm.leftCtrl->sprite.screenLocationY, 2, RGB565(0, 0, 255));
-  renderSparsePointSpriteColor(
-      &gm.rightCtrl->sprite, gm.rightCtrl->sprite.screenLocationX,
-      gm.rightCtrl->sprite.screenLocationY, 2, RGB565(0, 0, 255));
-*/
 
   int cog_id_2 = cogstart(AsyncStartTankStatusRenderMap, (void *)&gm,
                           cogDisplay, sizeof(cogDisplay));
-  // Add to main():
-  // print("Publisher RAM Address: %p\n", wheelDriver.publisher);
-
   pause(1000);
   // start display status
   // add delay between start cog and cog 0 print
@@ -170,13 +165,13 @@ int main(void) {
     while (lockset(spriteLock))
       ;
 
-    wheelDriver.publisher->_localStatus.eulerY += 10;
+    wheelDriver.publisher->_localStatus.eulerY += 1;
     notify(wheelDriver.publisher);
 
     lockclr(spriteLock);
 
-    print("e%u\n", round(displayTankStatus.driveRight));
-    print("e%u\n", round(displayTankStatus.driveLeft));
+    // print("e%u\n", round(displayTankStatus.driveRight));
+    // print("e%u\n", round(displayTankStatus.driveLeft));
 
     //    print("%u\n", wheelDriver.publisher->_localStatus.driveRight);
 
@@ -211,120 +206,6 @@ int main(void) {
 
 #ifndef SIMULATION_SCREEN
 
-int config1() {
-  unsigned char lastX = 0;
-  unsigned char lastY = 0;
-  int lastEulerY = 0;
-  unsigned char isStationary;
-
-  test_adc_heartbeat();
-  adc_init(21, 20, 19, 18);
-
-  tft_init(0, 4, 3, 2, 1);
-  tft_fillScreen(RGB565(0, 0, 0));
-
-  constructTankStatus(&printTankStatusVar);
-  constructJoystick(&wheelDriver, 0, 2, &tsPublisher);
-
-  subscribe(wheelDriver.publisher, &printTankStatusVar);
-
-  calibrateCenter(&wheelDriver);
-
-  struct SparsePointSprite rotateBeamSparseSprite;
-  struct GraphicsObject rotationTransformHandler;
-  struct RotatingSprite balanceBeamAngle;
-  struct PixelDataRGB_8bit transparentSpriteContainer;
-  constructGraphicsObject(&rotationTransformHandler, 0, 0, 0, 0);
-  // construct must come first
-  constructGraphicsSpriteRotatableWOrigin(&balanceBeamAngle,
-                                          &transparentSpriteContainer);
-  extractForegroundFromSprite(&balanceBeamAngle, sampleRotateBeam, 16);
-
-  // rotateSpriteHardModify(&balanceBeamAngle, 10);
-
-  constructSparseMatrixSprite(&rotateBeamSparseSprite);
-  extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16, 256);
-  rotateSparsePointSprite(&rotateBeamSparseSprite, 90);
-
-  print("rotateBeam rotated 90 %i elementCount\n",
-        rotateBeamSparseSprite.elementCount);
-  print("rotateBeam rotated 90 %i|%i centerPoint\n",
-        rotateBeamSparseSprite.centerRotatePointX,
-        rotateBeamSparseSprite.centerRotatePointY);
-
-  renderSparsePointSprite(&rotateBeamSparseSprite, 200, 100, 10);
-
-  waitcnt(CNT + CLKFREQ / 1);
-
-  ClearSparseSprite(&rotateBeamSparseSprite, 200, 100, 10);
-
-  while (1) {
-    // print("newline\n");
-    int rawX = adc_in(0); // Joystick X
-    int rawY = adc_in(2); // Joystick Y
-
-    // Use (double) cast for printf compatibility with --printf=float
-    printf("X: %1.2fV (%4d) | Y: %1.2fV (%4d)\r", (double)adc_volts(0), rawX,
-           (double)adc_volts(1), rawY);
-
-    // test on this thread
-
-    readJoystick(&wheelDriver);
-    notify(wheelDriver.publisher);
-
-    if (lastEulerY != printTankStatusVar.driveLeft) {
-      lastEulerY = printTankStatusVar.driveLeft;
-
-      ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
-      // rotateSpriteHardModify(&balanceBeamAngle, 10);
-      reverseRotationSparsePointSprite(&rotateBeamSparseSprite);
-      rotateSparsePointSprite(&rotateBeamSparseSprite,
-                              printTankStatusVar.driveLeft - 128);
-
-      tft_fillRect(rotateBeamSparseSprite.centerRotatePointX + 100,
-                   rotateBeamSparseSprite.centerRotatePointY + 250, 1, 1,
-                   RGB565(255, 0, 0));
-
-      renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
-      isStationary = 0;
-    } else {
-      if ((abs((lastEulerY - 128) % 360) < 4) == !isStationary) {
-        ClearSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
-        extractSparseMatrix(&rotateBeamSparseSprite, beam_16x16, 256);
-        renderSparseSprite(&rotateBeamSparseSprite, 100, 250, 10);
-        isStationary = 1;
-      }
-    }
-
-    if (lastX != wheelDriver.publisher->_localStatus.driveLeft ||
-        lastY != wheelDriver.publisher->_localStatus.driveRight) {
-      tft_fillRect(lastX, lastY + 10, 30, 30, RGB565(0, 0, 0));
-
-      tft_fillRect(wheelDriver.publisher->_localStatus.driveLeft,
-                   wheelDriver.publisher->_localStatus.driveRight + 10, 10, 10,
-                   RGB565(0, 0, 255));
-      lastX = wheelDriver.publisher->_localStatus.driveLeft;
-      lastY = wheelDriver.publisher->_localStatus.driveRight;
-
-      tft_fillRect(printTankStatusVar.driveLeft,
-                   printTankStatusVar.driveRight + 10, 10, 10,
-                   RGB565(0, 255, 0));
-      // tft_fillRect(printTankStatusVar.driveRight,
-      // printTankStatusVar.driveLeft,
-      //              40, 40, RGB565(0, 0, 0));
-
-      // notify(wheelDriver.publisher);
-      //  printTankStatus(&printTankStatusVar);
-
-      //  tft_fillRect(printTankStatusVar.driveRight,
-      //  printTankStatusVar.driveLeft, 40,
-      //               40, RGB565(0, 0, 0));
-    }
-
-    waitcnt(CNT + CLKFREQ / 10);
-  }
-  return 0;
-}
 #else
 
 int configSimulation() {

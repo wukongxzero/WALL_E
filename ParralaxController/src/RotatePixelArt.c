@@ -95,19 +95,10 @@ void rotateSpriteHardModify(struct RotatingSprite *self, signed int angle) {
 
 void updateRotateSprite(struct RotatingSprite *self);
 //----------------sparse point struct, goal to support rotations in screen space
-static void autoFindCenterPoint(struct SparsePointSprite *self) {
 
-  unsigned int x = 0;
-  unsigned int y = 0;
-  for (int i = 0; i < self->elementCount; i++) {
-    x += self->vertexes[i]._row;
-    y += self->vertexes[i]._col;
-  }
-  self->centerRotatePointX = x / self->elementCount;
-  self->centerRotatePointY = y / self->elementCount;
-}
 void extractEEPROMSparseMatrix(struct SparsePointSprite *self,
-                               unsigned int eepromAddr, int spriteFlatLength) {
+                               unsigned int eepromAddr, int spriteWidth,
+                               int spriteFlatLength) {
   self->elementCount = 0;
   unsigned int x = 0;
   unsigned int y = 0;
@@ -118,15 +109,16 @@ void extractEEPROMSparseMatrix(struct SparsePointSprite *self,
   for (int r = 0; r < spriteFlatLength; r++) {
 
     ee_getStr(&charBuffer, 1, eepromAddr + r);
+    int pixelCount = spriteWidth; // sqrt(spriteFlatLength);
     // if (charBuffer[r] != _) {
     if (charBuffer != _) {
       // Ensure we don't overflow the provided sparse array
       if (self->elementCount < spriteFlatLength) {
 
-        x += r % 32;
-        y += 0 + ((int)(r / 32));
-        self->vertexes[self->elementCount]._row = r % 32;
-        self->vertexes[self->elementCount]._col = 0 + ((int)(r / 32));
+        x += r % pixelCount;
+        y += 0 + ((int)(r / pixelCount));
+        self->vertexes[self->elementCount]._row = r % pixelCount;
+        self->vertexes[self->elementCount]._col = 0 + ((int)(r / pixelCount));
         // self->vertexes[self->elementCount]._value = charBuffer[r];
         self->vertexes[self->elementCount]._value = charBuffer;
         self->elementCount++;

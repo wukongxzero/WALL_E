@@ -18,6 +18,11 @@ struct CoreMapping {
   unsigned int originalAddress;
   unsigned char isStationary; // is a bool
   unsigned int originalSize;
+  unsigned short pixelCount;
+};
+struct StaticNoMapping {
+  struct CoreMapping *overlapMap;
+  struct SparsePointSprite sprite;
 };
 struct AngleMapping {
   struct CoreMapping *overlapMap;
@@ -40,16 +45,23 @@ struct GroupMapping {
   struct DriveLeftMapping *leftCtrl;
   struct DriveRightMapping *rightCtrl;
   struct AngleMapping *angleCtrl;
+  struct StaticNoMapping *tankBase;
 };
 
 void constructCoreMap(struct CoreMapping *self, unsigned int srcAddr,
                       int srcSize, struct TankStatus *tsSub);
 void constructAngleMapping(struct AngleMapping *self,
-                           struct CoreMapping *spriteMap);
+                           struct CoreMapping *spriteMap,
+                           struct SparseElement *stack);
 void constructDriveLeftMapping(struct DriveLeftMapping *self,
-                               struct CoreMapping *spriteMap);
+                               struct CoreMapping *spriteMap,
+                               struct SparseElement *stack);
 void constructDriveRightMapping(struct DriveRightMapping *self,
-                                struct CoreMapping *spriteMap);
+                                struct CoreMapping *spriteMap,
+                                struct SparseElement *stack);
+void constructStaticSpriteNoMap(struct StaticNoMapping *self,
+                                struct CoreMapping *spriteMap,
+                                struct SparseElement *stack);
 
 void startRenderAngleSubscribe(void *arg);
 void startRenderDriveLeftSubscribe(void *arg);

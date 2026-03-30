@@ -37,7 +37,7 @@ struct RotatingSprite {
 struct SparsePointSprite {
   int angleDegrees;
   unsigned short elementCount;
-  struct SparseElement vertexes[SPARSE_PIXEL_MAX];
+  struct SparseElement *vertexes;
 
   int centerRotatePointX;
   int centerRotatePointY;
@@ -72,7 +72,9 @@ void extractSparseMatrix(struct SparsePointSprite *self,
 void extractLargeSparseMatrix(struct SparsePointSprite *self,
                               unsigned char sourceGrid[1024]);
 void extractEEPROMSparseMatrix(struct SparsePointSprite *self,
-                               unsigned int eepromAddr, short spriteFlatLength);
+                               unsigned int eepromAddr, int spriteWidth,
+                               unsigned short spriteFlatLength);
+
 void rotateSparsePointSprite(struct SparsePointSprite *self, int angle);
 void rotateSparsePointSpriteRenderNColor(struct SparsePointSprite *self,
                                          int angle, int color, short scale);
