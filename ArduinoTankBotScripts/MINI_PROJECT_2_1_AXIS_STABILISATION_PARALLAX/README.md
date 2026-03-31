@@ -75,15 +75,11 @@ Parallax Controller
 
 ### Plant Model (from Lagrangian mechanics)
 
-Your platform is modeled as an inverted pendulum on a moving cart:
-
 ```
 Equation of motion:
   ml²α̈ = τ + mglα - ml²φ̈
 
 Linearized state space:
-  ẋ = Ax + Bu
-
   A = [  0      1   ]     B = [    0      ]
       [ g/l     0   ]         [ 1/(ml²)   ]
 
@@ -91,18 +87,18 @@ States:  x = [α, α̇]   (platform angle, angular rate)
 Input:   u = τ         (servo torque)
 ```
 
-Open loop eigenvalues = ±√(g/l) = ±11.84 rad/s
+Open loop eigenvalues = ±√(g/l) = ±15.7 rad/s
 → positive eigenvalue confirms instability → controller needed
 
-### Your Parameters (UPDATE THESE after measuring)
+### Measured Parameters
 
 ```
-m = 0.50 kg   ← platform plate + payload mass (weigh with scale)
-l = 0.07 m    ← servo shaft to combined CoM   (measure with ruler)
+m = 0.261 kg  ← platform + payload (weigh with scale)
+l = 0.04  m   ← servo shaft to combined CoM (measure with ruler)
 ```
 
-To update gains after measuring:
-1. Edit lines 8-9 in validate_controllers.py
+To update gains after re-measuring:
+1. Edit m and l in validate_controllers.py
 2. Run: python3 validate_controllers.py
 3. Copy new K values into UNO sketch #defines
 
@@ -110,38 +106,37 @@ To update gains after measuring:
 
 ## Controllers
 
-### Approach 1 — Pole Placement
-Manually places closed loop poles 2-3x faster than instability rate.
+### Pole Placement
 ```
-Poles: [-23.68, -35.51]
-K0 = 2.4034   (angle gain)
-K1 = 0.1450   (rate damping)
-Settle time: 0.138s    Peak torque: 0.42 N·m ✓
+K0 = 0.7169   K1 = 0.0327
+Poles: [-31.4, -47.1]
+Conservative. Start here.
 ```
-Start here. Most conservative. Easiest to tune.
 
-### Approach 2 — LQR
-Optimal gains from minimizing cost function J = ∫(200α² + α̇² + 5τ²)dt
+### LQR
 ```
-K0 = 6.6772   (angle gain)
-K1 = 0.4824   (rate damping)
-Settle time: 0.169s    Peak torque: 1.17 N·m ✓
+K0 = 2.1050   K1 = 0.1475
+Q = diag[200,1]   R = 50
+More aggressive. Use for rough terrain.
 ```
-Use this for rough terrain. More aggressive correction.
 
-### Approach 3 — LQG (Kalman + LQR)
-Same K gains as LQR but Kalman filter estimates states from noisy IMU.
+### LQG (Kalman + LQR)
 ```
-K0 = 6.6772,  K1 = 0.4824  (same as LQR)
-L0 = 0.9929   (Kalman angle correction)
-L1 = 10.030   (Kalman rate correction)
+K0 = 2.1050   K1 = 0.1475   (same as LQR)
+L0 = 0.9929   L1 = 10.300
+Use when tread vibration causes IMU noise.
 ```
-Use this if IMU is noisy/jittery on real hardware.
 
-### Switching Controllers (UNO sketch)
-Change one line at top of WALL_E_UNO.ino:
+### Switch controllers live in test3 (Serial monitor):
+```
+Type '0' → Pole Placement
+Type '1' → LQR
+Type '2' → LQG
+```
+
+### Switch in final UNO sketch (reflash required):
 ```cpp
-#define CONTROLLER_MODE 0   // Pole Placement ← start here
+#define CONTROLLER_MODE 0   // Pole Placement
 #define CONTROLLER_MODE 1   // LQR
 #define CONTROLLER_MODE 2   // LQG
 ```
@@ -151,223 +146,174 @@ Change one line at top of WALL_E_UNO.ino:
 ## Data Flow
 
 ```
-Parallax joystick
+Parallax joystick  OR  laptop bt_controller.py
       ↓ Bluetooth (16-byte TankStatus packet)
-    HC-05
+    HC-05 on Mega
       ↓ Serial1 (9600 baud)
-  MEGA: parse driveLeft, driveRight
-      ↓
-  MEGA: drive L298N motors
+  MEGA: parse driveLeft, driveRight → drive motors
 
-  UNO: read MPU6050
-      ↓ complementary filter
-  UNO: α, α̇ (platform angle + rate)
-      ↓ LQR/PP/LQG controller
-  UNO: command DSServo (platform levels out)
-      ↓ Serial (115200 baud) "P:12.34\n"
-  MEGA: receives pitchDeg from Uno
-      ↓ packs into TankStatus eulerX
-  MEGA → HC-05 → BT → Parallax TFT displays pitch
+  UNO: MPU6050 → complementary filter → α, α̇
+      ↓ PP / LQR / LQG controller
+  UNO: command DSServo → platform levels out
+      ↓ Serial "P:12.34\n" to Mega
+  MEGA: pitch → TankStatus eulerX → BT → Parallax TFT
 ```
 
-### TankStatus Packet Format (16 bytes)
+### TankStatus Packet (16 bytes)
 ```
-Byte 0      driveLeft   int8   (-128 to +127)
-Byte 1      driveRight  int8   (-128 to +127)
-Bytes 2-3   padding     2 bytes
-Bytes 4-7   eulerX      float  (platform pitch α)
-Bytes 8-11  eulerY      float  (roll, always 0.0)
-Bytes 12-15 eulerZ      float  (yaw, always 90.0)
+Byte 0      driveLeft   int8
+Byte 1      driveRight  int8
+Bytes 2-3   padding
+Bytes 4-7   eulerX      float  ← platform pitch
+Bytes 8-11  eulerY      float  ← always 0.0
+Bytes 12-15 eulerZ      float  ← always 90.0
 ```
 
 ---
 
 ## File List
 
-### Python (run on laptop)
+### Python
 ```
-validate_controllers.py    Design all 3 controllers, plot step response
-payload_sensitivity.py     Check gains work across different payload weights
-```
-
-### Arduino UNO (IMU + Stabilizer)
-```
-test2_servo_imu.ino        Hardware check: IMU reads angle, servo moves
-test3_stabilizer_only.ino  Controller only: tilt platform, servo resists
-                           Switch PP/LQR/LQG live via Serial monitor
-WALL_E_UNO.ino             FINAL: full stabilizer, sends pitch to Mega
+validate_controllers.py        Design controllers, plot step response
+payload_sensitivity.py         Check gains across payload weights
+bt_controller.py               Drive bot from laptop over BT (no Parallax)
 ```
 
-### Arduino MEGA (Motors + BT)
+### Arduino UNO
 ```
-test1_motors.ino           Hardware check: motors spin, encoders count
-test4_full_system.ino      Full system via Serial (no Parallax needed)
-                           Drive with w/a/s/d, switch controllers 0/1/2
-WALL_E_MEGA.ino            FINAL: BT receive, motors, telemetry to Parallax
+test2_servo_imu.ino            Hardware check: IMU + servo
+test3_stabilizer_only.ino      Controller test: tilt → servo resists
+                               Switch PP/LQR/LQG live, no motors needed
+WALL_E_UNO.ino                 FINAL: stabilizer + sends pitch to Mega
+```
+
+### Arduino MEGA
+```
+test1_motors.ino               Hardware check: motors + encoders
+mega_motor_test_sequence.ino   5s countdown → Fwd 3min → Left 2s → Right 2s → Stop
+test4_full_system.ino          Full system via Serial (no Parallax, no BT)
+WALL_E_MEGA.ino                FINAL: BT receive + motors + telemetry
 ```
 
 ---
 
-## Testing Order — Follow This Exactly
+## Testing Order
 
-### Step 0 — Run Python simulation first
+### Step 0 — Python simulation
 ```bash
-cd your_project_folder
-source ~/venv_controls/bin/activate    # activate virtual env
-python3 validate_controllers.py        # generates controller_validation.png
-python3 payload_sensitivity.py         # generates payload_sensitivity.png
-deactivate
+source ~/venv_controls/bin/activate
+python3 validate_controllers.py
+python3 payload_sensitivity.py
 ```
-Confirm all 9 plots are green (servo-feasible).
+All 9 plots should be green.
 
 ---
 
-### Step 1 — Test UNO hardware (test2_servo_imu.ino)
+### Step 1 — UNO hardware (test2_servo_imu.ino)
 ```
-Flash: test2_servo_imu.ino → Arduino UNO
-Open: Serial monitor at 115200 baud
-
-Type 't' → streaming on
-Tilt platform forward  → angle should go POSITIVE
-Tilt platform backward → angle should go NEGATIVE
-Flat on table          → angle should be ~0°
-
-Type '1' → servo moves to +10°
-Type 'a' → servo moves to -10°
-Type 'c' → servo centers
-
-Pass criteria:
-  □ Angle reads correctly when tilted
-  □ Servo physically moves both directions
-  □ Flat = 0° (within ±2°)
+t → stream on → tilt platform → angle changes?
+1/a → servo moves +/- direction?
+Pass: angle correct, servo moves both ways
 ```
 
 ---
 
-### Step 2 — Test MEGA motors (test1_motors.ino)
+### Step 2 — MEGA motors (test1_motors.ino)
 ```
-Flash: test1_motors.ino → Arduino MEGA
-Open: Serial monitor at 115200 baud
-
-Type 'f' → both wheels forward
-Type 'b' → both wheels backward
-Type 'l' → left turn
-Type 'r' → right turn
-Type 's' → stop
-Type '+' → increase speed
-Type '-' → decrease speed
-
-Pass criteria:
-  □ Both motors spin correct direction
-  □ Encoders count up as wheels turn
-  □ No one motor fighting the other
-  □ Speed ramps work
+f/b/l/r/s → motors respond?
+Encoders count when wheels spin?
+Pass: both motors correct direction, encoders count
 ```
 
 ---
 
-### Step 3 — Test controller alone on UNO (test3_stabilizer_only.ino)
+### Step 3 — Stabilizer only (test3_stabilizer_only.ino)
 ```
-Flash: test3_stabilizer_only.ino → Arduino UNO
-Open: Serial monitor at 115200 baud
-
-Type 'd' → debug stream on
-Tilt platform 10° → servo should push back to level
-Type '0' → Pole Placement mode
-Type '1' → LQR mode (more aggressive)
-Type '2' → LQG mode
-Type 'p' → print current state
-
-Pass criteria:
-  □ Platform tilts → servo actively resists
-  □ Platform returns to ~0° within 0.2s
-  □ No oscillation (if oscillating → increase K1)
-  □ All 3 modes switch cleanly
+Flash UNO. No motors, no BT needed.
+d → stream on → tilt platform → servo fights back?
+0/1/2 → switch controllers live
+Pass: platform returns to 0° within 0.2s, no oscillation
+Note: Pole Placement confirmed working.
 ```
 
 ---
 
-### Step 4 — Full system without Parallax (test4_full_system.ino)
+### Step 4 — Motor sequence without wires (mega_motor_test_sequence.ino)
 ```
-Flash: test4_full_system.ino → Arduino MEGA
-Connect: UNO TX (pin 1) → Mega RX2 (pin 17)
-Connect: GND → GND
-Open: Serial monitor on MEGA at 115200 baud
-
-Type 't' → telemetry stream on (CSV format)
-Type 'w' → forward
-Type 'a' → left
-Type 'd' → right
-Type 's' → backward
-Type 'x' → stop
-Type '0'/'1'/'2' → switch controllers
-Type 'p' → print full state
-
-Pass criteria:
-  □ Motors respond to wasd
-  □ Servo stabilizes while driving
-  □ Pitch value updates from Uno
-  □ Telemetry CSV shows reasonable numbers
-  □ Controller switch works live
+Flash MEGA. Power from battery. Remove USB after flash.
+5s countdown → Forward 3min → Left 2s → Right 2s → Stop
+Type 'stop' to abort, 'test' to repeat
+Pass: straight line forward, clean left/right turns
 ```
 
 ---
 
-### Step 5 — Flash final code
+### Step 5 — Full system via Serial (test4_full_system.ino)
 ```
-Flash: WALL_E_UNO.ino  → Arduino UNO
-Flash: WALL_E_MEGA.ino → Arduino MEGA
-
-Wire HC-05 to Mega (see wiring diagram above)
-
-Power on → Parallax connects via BT
-Joystick → bot drives
-Platform tilts → servo corrects
-TFT display shows live pitch angle
+Flash MEGA. Wire Uno TX → Mega RX2.
+w/a/s/d/x → drive motors
+0/1/2 → switch controllers
+t → telemetry CSV stream
+Pass: motors + servo working together
 ```
 
 ---
 
-## Tuning Guide (on real hardware)
+### Step 6 — Laptop BT terminal (bt_controller.py)
+```
+Use this to control bot wirelessly without Parallax.
 
-### If platform oscillates:
-```
-Symptom: servo hunts back and forth constantly
-Fix: increase K1 (rate damping)
-     lower COMP_ALPHA (trust accel more: 0.95 instead of 0.98)
-     increase low-pass filter weight (0.8 instead of 0.7)
-```
+One-time Ubuntu setup:
+  sudo apt install bluez
+  bluetoothctl
+    power on
+    scan on
+    pair XX:XX:XX:XX:XX:XX      ← HC-05 MAC address
+    trust XX:XX:XX:XX:XX:XX
+    quit
+  sudo rfcomm bind 0 XX:XX:XX:XX:XX:XX
+  sudo usermod -a -G dialout $USER   ← log out/in after this
 
-### If platform too slow to correct:
-```
-Symptom: platform drifts before servo catches it
-Fix: increase K0 (angle gain)
-     decrease R in Python script, rerun, get new gains
-```
+Run:
+  source ~/venv_controls/bin/activate
+  pip install pyserial
+  python3 bt_controller.py
 
-### If servo buzzes/jitters:
-```
-Symptom: servo making noise even when platform is level
-Fix: add deadband in applyServo():
-     if (abs(u) < 0.5) u = 0;   // ignore tiny commands
-     switch to LQG (Kalman filters IMU noise)
-```
+Keys:
+  w=forward  s=backward  a=left  d=right
+  x=stop     +=faster    -=slower
+  t=run 3-minute test sequence
+  q=quit
 
-### If 3° offset (your previous milestone bug):
-```
-Add trim variable in UNO sketch:
-     #define ANGLE_OFFSET_DEG  3.0f
-     float err = pitchDeg - ANGLE_OFFSET_DEG;
-Adjust sign until platform sits level at rest.
+Sends same 16-byte TankStatus as Parallax.
+Mega code unchanged — works with both.
 ```
 
-### Tuning order:
+---
+
+### Step 7 — Final code
 ```
-1. Fix offset (ANGLE_OFFSET_DEG)
-2. Tune K1 first (eliminate oscillation)
-3. Tune K0 second (improve response speed)
-4. Adjust low-pass filter weight last (smooth out noise)
+Flash WALL_E_UNO.ino  → UNO
+Flash WALL_E_MEGA.ino → MEGA
+Wire everything. Power from battery.
+Parallax connects via BT → full system running.
 ```
+
+---
+
+## Tuning Guide
+
+| Symptom | Fix |
+|---|---|
+| Oscillates | Increase K1 or increase R in Python |
+| Too slow to correct | Increase K0 or decrease R in Python |
+| Servo buzzes at rest | Add deadband: if(abs(u)<0.5) u=0 |
+| 3° offset at rest | Add: #define ANGLE_OFFSET_DEG 3.0f |
+| LQG gives NaN | Check l value — must be 0.03-0.06m |
+| LQR still slow after retuning | Try Q=diag[500,1] R=10 |
+
+Tuning order: fix offset → tune K1 → tune K0 → adjust filter weight
 
 ---
 
@@ -375,26 +321,26 @@ Adjust sign until platform sits level at rest.
 
 | Error | Cause | Fix |
 |---|---|---|
-| MPU6050 not found | Wrong I2C wiring | Check SDA=A4, SCL=A5, VCC=3.3V |
-| Servo doesn't move | Wrong pin or no power | Check pin 9, servo needs 5-6V |
-| Angle flipped | IMU mounted upside down | Flip sign: `accPitch = -accPitch` |
-| Motors wrong direction | IN1/IN2 swapped | Swap IN1↔IN2 in code or physically |
-| Encoders not counting | No INPUT_PULLUP | Already set in code, check wire |
-| HC-05 not connecting | Wrong baud or no divider | Default HC-05 = 9600 baud, add voltage divider on RX |
-| Uno pitch not reaching Mega | Missing GND wire | GND must be shared between boards |
+| MPU6050 not found | Wrong I2C wiring | SDA=A4, SCL=A5, VCC=3.3V |
+| Servo doesn't move | Wrong pin or no power | Pin 9, servo needs 5-6V |
+| Angle flipped | IMU upside down | accPitch = -accPitch |
+| Motors wrong direction | IN pins swapped | Swap IN1↔IN2 |
+| HC-05 not connecting | Wrong baud | Default 9600, add voltage divider |
+| Uno pitch not reaching Mega | Missing GND wire | Share GND between boards |
+| BT not pairing | Wrong PIN | Default PIN: 1234 |
+| rfcomm0 not found | BT not bound | sudo rfcomm bind 0 MAC |
 
 ---
 
-## Notes for Parallax Integration
+## Parallax Integration Notes
 
-Your teammate's Parallax code sends/receives the same 16-byte TankStatus struct.
-The Mega handles all BT parsing — your teammate does not need to change anything.
-
-The Mega sends back:
+Mega sends back to Parallax TFT:
 ```
-eulerX = pitchDeg  (platform pitch from UNO IMU)
-eulerY = 0.0       (roll, 1-axis bot)
-eulerZ = 90.0      (yaw default)
+eulerX = pitchDeg   (platform pitch from UNO)
+eulerY = 0.0        (roll — 1-axis bot)
+eulerZ = 90.0       (yaw default)
 ```
 
-These map directly to the telemetry fields the Parallax TFT displays.
+bt_controller.py sends the same 16-byte format as Parallax.
+Mega code works identically with either source.
+Parallax teammate does not need to change anything.
