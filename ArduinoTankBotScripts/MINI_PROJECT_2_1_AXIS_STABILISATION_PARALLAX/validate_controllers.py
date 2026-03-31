@@ -11,7 +11,7 @@ import matplotlib.gridspec as gridspec
 # ══════════════════════════════════════════════════════
 m   = 0.261    # kg  — platform + payload (MEASURE THIS)
 
-l   = 0.05    # m   — servo shaft to CoM (MEASURE THIS)
+l   = 0.04    # m   — servo shaft to CoM (MEASURE THIS)
 g   = 9.81
 dt  = 1.0/200 # 200Hz (your existing loop rate)
 SERVO_MAX_DEG = 25.0  # CMD_LIMIT from your code
@@ -66,7 +66,7 @@ print(f"  Closed loop poles: {np.linalg.eigvals(A_cl_pp).real.round(3)}")
 #  Constraint: peak torque must stay within DSServo 25kg = 2.45 N·m
 # ══════════════════════════════════════════════════════
 Q = np.diag([200, 1])
-R = np.array([[5.0]])
+R = np.array([[50.0]])
 P = solve_continuous_are(A, B, Q, R)
 K_lqr = np.linalg.inv(R) @ B.T @ P
 A_cl_lqr = A - B @ K_lqr
