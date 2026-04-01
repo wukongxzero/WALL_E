@@ -1,3 +1,4 @@
+#ifndef SIMULATION_SCREEN
 #include "Graphics/RotatePixelArt.h"
 #include "Propellor/ST7796S.h"
 #include <Graphics/AsyncTankStatusGraphics.h>
@@ -159,3 +160,4 @@ void AsyncStartTankStatusRenderMap(void *arg) {
     startRenderAngleSubscribe(group->angleCtrl);
   }
 }
+#endif

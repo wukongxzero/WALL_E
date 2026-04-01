@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   constructTankStatus(&dummyData2);
   dummyData.driveLeft = 130;
   dummyData.driveRight = 155;
-  dummyData.eulerY = 45; // for easy round animation
+  dummyData.eulerY = 24.5;
 
   // // Test bytre status again
 
@@ -90,9 +90,6 @@ int main(int argc, char **argv) {
       if (bytes_read > 0) {
         printf("tankstatusMode%s\n", tankStatusBufferOut);
         // write(s, buf, bytes_read);
-        dummyData.eulerY += 1;
-        makeByteTankStatus(tankStatusBufferOut, 16, &dummyData);
-
         write(s, tankStatusBufferOut, 16);
       }
     }
@@ -112,10 +109,8 @@ int main(int argc, char **argv) {
         }
         if (bitBackCounter == 16) {
           readByteTankStatus(&tankStatusBufferIn, 16, &dummyData2);
-          printTankStatus(&dummyData2);
+          bitBackCounter = 0;
         }
-
-        bitBackCounter %= 16;
 
       } else if (bytesReceived == 0) {
         printf("\nConnection closed by remote host.\n");
