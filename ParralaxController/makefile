@@ -4,7 +4,7 @@ PROP_LIB= "./build/include/"
 SIMPLE_IDE_LIB = "./Simple-Libraries/Learn/Simple Libraries/"
 TANK_BOT_LIB= ./include/
 UNITY_TEST_LIB=./test/Unity/src/
-PORT= /dev/ttyUSB2
+PORT= /dev/ttyUSB0
 BIN_PROP=main.o
 BAUD=115200
 SRCDIR = ./src
@@ -24,6 +24,8 @@ ALL_CFILES = $(wildcard $(SRCDIR)/*.c)
 CFILES = $(filter-out $(SRCDIR)/main.c, $(ALL_CFILES))
 UNITY_CFILE = test/Unity/src/unity.c
 TEST_SOURCES = $(wildcard $(TESTDIR)/Test*.c)
+CLIENT_CURSES = BT_SIM.o
+MAC_ADDRESS = 00:25:08:E0:20:04
 
 all: $(TARGET) $(SIM_TARGET)
 
@@ -75,6 +77,10 @@ install-simple-ide:
 	wget https://archive.org/download/simpleide-0.9.66-amd64-debian-linux/simpleide-0.9.66-amd64-debian-linux.deb -P ./build/
 compile: $(BIN_PROP)
 	./build/bin/flexspin main.cpp
+
+bluetooth-control:
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(SAMPLE_DATA) -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(CLIENT_CURSES) -D BLUETOOTH -lbluetooth && ./build/$(CLIENT_CURSES) $(MAC_ADDRESS)
+
 
 port:
 	$(PROP_LOADER) -P

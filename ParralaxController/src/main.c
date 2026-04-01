@@ -47,12 +47,12 @@ struct TankStatusPublisher tsPublisher; // legacy for config 1
 struct TankStatusPublisher tsPublisherJoystick;
 struct TankStatusPublisher tsPublisherhc05;
 
-struct TankStatus printTankStatusVar; // legacy...originally used to print but
-                                      // then I used to test joystick mapping
-struct TankStatus displayTankStatus;  // act as a subscriber for tft
+// then I used to test joystick mapping
+struct TankStatus displayTankStatus; // act as a subscriber for tft
 struct TankStatus
     btLocalStatus; // act as a subscriber for the bluetooth...the publisher
                    // structure status is in built into the tank status
+struct TankStatus btOutStatus;
 
 struct CoreMapping graphicsCoreBeam;
 struct CoreMapping graphicsCoreWheelLeft;
@@ -60,8 +60,9 @@ struct CoreMapping graphicsCoreWheelRight;
 struct CoreMapping graphicsCoreBody;
 
 //
-// unsigned int cogStackBTRead[128];
+unsigned int cogStackBTRead[800];
 unsigned int cogDisplay[800];
+// unsigned int cogStreamCmds[128];
 volatile int spriteLock;
 
 TankStatusBTAdopter hc05ToTankStatus;
@@ -82,22 +83,18 @@ struct SparseElement tankStack[72];
 
 int main(void) {
   spriteLock = locknew();
-  // return config1(); //exists for code refrence without switching branches
   // test_adc_heartbeat();
-  // initialize hardware peripherals(adc tftscreen  spi hc05 usart )
   // //TODO: declare pins with macro...
   adc_init(21, 20, 19, 18);
   waitcnt(CNT + CLKFREQ / 2); // Wait 0.5 seconds for ADC to stabilize
-  // tft_init(0, 4, 3, 2, 1);
-  // tft_fillScreen(RGB565(0, 0, 0));
 
   hc05_t btModule;
   hc05_init(&btModule, HC05_RX, HC05_TX, HC05_EN, HC05_DATA_BAUD);
-  //  printTankStatus(
-  //       &displayTankStatus); // should have update tank status based on cog
-  //  publishing/updating  this subscriber
 
   constructTankStatus(&displayTankStatus);
+  constructTankStatus(&btLocalStatus);
+  constructTankStatus(&btOutStatus);
+
   displayTankStatus.eulerY = 0;
   constructTankStatusPublisher(&tsPublisher);
   constructJoystick(&wheelDriver, 0, 2, &tsPublisher);
@@ -142,52 +139,46 @@ int main(void) {
   gm.tankBase->sprite.screenLocationX = 60;
 
   // print("Subscriber TankStatus for display : time 1");
-  // subscribe(hc05ToTankStatus.publisher,
-  //          &displayTankStatus); // in this configuration the bluetooth recv
   calibrateCenter(&wheelDriver);
 
-  subscribe(&tsPublisher, &displayTankStatus);
-  subscribe(wheelDriver.publisher, &tsPublisher._localStatus);
+  // subscribe(&tsPublisher, &displayTankStatus);
+  subscribe(wheelDriver.publisher, &btLocalStatus);
+  subscribe(hc05ToTankStatus.publisher,
+            &displayTankStatus); // in this configuration the bluetooth recv
 
-  //  readTankStatusBT(&hc05ToTankStatus); // should also notify publisher
-  // int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
-
+  // readTankStatusBT(&hc05ToTankStatus); // should also notify publisher
+  int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
+                        cogStackBTRead, sizeof(cogStackBTRead));
   int cog_id_2 = cogstart(AsyncStartTankStatusRenderMap, (void *)&gm,
                           cogDisplay, sizeof(cogDisplay));
   pause(1000);
   // start display status
   // add delay between start cog and cog 0 print
   while (1) {
-
-    waitcnt(CNT + CLKFREQ);
+    waitcnt(CNT + CLKFREQ / 10);
     readJoystick(&wheelDriver);
 
-    while (lockset(spriteLock))
-      ;
-
-    wheelDriver.publisher->_localStatus.eulerY += 1;
+    // btLocalStatus.driveLeft = 250;
     notify(wheelDriver.publisher);
 
-    lockclr(spriteLock);
+    unsigned char txBuffer[TANKSTATUS_PACKET_LENGTH];
 
-    // print("e%u\n", round(displayTankStatus.driveRight));
-    // print("e%u\n", round(displayTankStatus.driveLeft));
+    makeByteTankStatus(txBuffer, TANKSTATUS_PACKET_LENGTH,
+                       &(wheelDriver.publisher->_localStatus));
 
-    //    print("%u\n", wheelDriver.publisher->_localStatus.driveRight);
+    //    hc05_tx(&btModule, 0xFF);
 
-    // Send the new positions to the render Cog
+    for (int i = 0; i < TANKSTATUS_PACKET_LENGTH; i++) {
+      hc05_tx(&btModule, txBuffer[i]);
+    }
   }
 
-  // printTankStatus(
-  //    &displayTankStatus); // should have update tank status based on cog
-  // publishing/updating  this subscriber
-  //
-
-  // TODO: need to map balance beam to euler Y
   return 0;
 }
 
 #else
+
+#ifndef BLUETOOTH
 #include <Graphics/NcursesScreenImpl.h>
 #include <Graphics/PixelDataFrame.h>
 #include <Graphics/pixelArtSampleData.h>
@@ -201,16 +192,7 @@ int main(void) {
   configSimulation();
   return 0;
 }
-
-#endif
-
-#ifndef SIMULATION_SCREEN
-
-#else
-
 int configSimulation() {
-#ifdef PROPELLOR rdlong atomicLong;
-#endif
   startCurse();
   //  init_pair(1, COLOR_GREEN, COLOR_WHITE);
   // start_color();
@@ -340,59 +322,57 @@ int configSimulation() {
   noecho();             // 2. Don't print the character back to the screen
   keypad(stdscr, TRUE); // 3. Enable Arrow keys and Function keys
                         //
-  struct TankStatusPublisher virtJoyStickStatus;
-  constructVirtualJoystick(&virtJoyStickStatus);
+  //// FIX 1: Initialize the actual global joystick you are trying to use!
+  constructVirtualJoystick(&virtualJoystickOne);
+
   struct TankStatus mainTankStatus;
   constructTankStatus(&mainTankStatus);
+
+  // Now this is safe because virtualJoystickOne actually exists in memory.
   subscribe(virtualJoystickOne.tankPub, &mainTankStatus);
+
+  timeout(50);
 
   int ch;
   for (int i = 0; i < 3; i++) {
     erase();
     while ((ch = getch()) != 'q') {
-      // Clear the previous line and print the new values
-      clearRenderedFrame(tankSpriteControl.boundingBox._x,
-                         tankSpriteControl.boundingBox._y);
 
-      if (ch == 'd') {
-        // moveGraphicByVal(&tankSpriteControl, 1, 0);
-        // moveGraphicByVal(&rotationTransformHandler, 1, 0);
-        virtualJoystickOne.virtJoystickX += 1;
-      }
-      if (ch == 'a') {
-        // moveGraphicByVal(&tankSpriteControl, -1, 0);
-
-        // moveGraphicByVal(&rotationTransformHandler, -1, 0);
-        virtualJoystickOne.virtJoystickX -= 1;
-      }
-
-      if (ch == 'w') {
-        // moveGraphicByVal(&tankSpriteControl, 0, -1);
-        // moveGraphicByVal(&rotationTransformHandler, 0, -1);
-        virtualJoystickOne.virtJoyStickY -= 1;
-      }
-      if (ch == 's') {
-        // moveGraphicByVal(&rotationTransformHandler, 0, 1);
-        // moveGraphicAbsveGraphicByVal(&tankSpriteControl, 0, 1);
-        virtualJoystickOne.virtJoyStickY += 1;
-      }
-      if (ch == 'r') {
-        angleToTurn += 5;
-        virtualJoystickOne.tankPub->_localStatus.eulerY = angleToTurn;
-      }
-
-      if (ch == 'e') {
-        angleToTurn -= 5;
-        virtualJoystickOne.tankPub->_localStatus.eulerY = angleToTurn;
+      // NEW: If no key was pressed, ERR is returned.
+      // We don't want to process WASD, but we DO want to render and read BT!
+      if (ch != ERR) {
+        if (ch == 'd') {
+          virtualJoystickOne.virtJoystickX += 1;
+        }
+        if (ch == 'a') {
+          virtualJoystickOne.virtJoystickX -= 1;
+        }
+        if (ch == 'w') {
+          virtualJoystickOne.virtJoyStickY -= 1;
+        }
+        if (ch == 's') {
+          virtualJoystickOne.virtJoyStickY += 1;
+        }
+        if (ch == 'r') {
+          angleToTurn += 5;
+        }
+        if (ch == 'e') {
+          angleToTurn -= 5;
+        }
       }
 
       virtualJoystickOne.tankPub->_localStatus.driveLeft =
           virtualJoystickOne.virtJoystickX;
-
       virtualJoystickOne.tankPub->_localStatus.driveRight =
           virtualJoystickOne.virtJoyStickY;
-
       virtualJoystickOne.tankPub->_localStatus.eulerY = angleToTurn;
+
+      notify(virtualJoystickOne.tankPub);
+
+      // Force update our local struct for rendering
+      mainTankStatus.driveLeft = virtualJoystickOne.virtJoystickX;
+      mainTankStatus.driveRight = virtualJoystickOne.virtJoyStickY;
+      mainTankStatus.eulerY = angleToTurn;
 
       notify(virtualJoystickOne.tankPub);
 
@@ -444,7 +424,8 @@ int configSimulation() {
                        tankSpriteControl.boundingBox._x,
                        tankSpriteControl.boundingBox._y);
 
-  pthread_join(thread_id, NULL);
+  // pthread_join(thread_id, NULL);
+
   // TODO:test button on seperate pthread.h
   /*
   animatedTankSpriteObject.spriteAnimation->isAnimated = false;
@@ -514,5 +495,6 @@ int configSimulation() {
 
   endCurse();
 }
+#endif
 
 #endif

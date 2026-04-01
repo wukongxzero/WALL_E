@@ -48,31 +48,17 @@ void readTankStatusBT(void *arg) {
     if (incoming != -1) {
       unsigned char c = (unsigned char)incoming;
       self->bufferRead[self->bitCountElement] = c;
-
-      // print("bufferRead%X bitsatus %i| saved ts buffer %c <-should be same "
-      //       "num\n",
-      //     c, totalStatus, tsUsartBuffer[totalStatus]);
-      // print("bufferRead %02X | status %i | saved ts buffer %02X <-should be "
-      //      "same num\n",
-      // c, self->bitCountElement, self->bufferRead[self->bitCountElement]);
-
       self->bitCountElement++;
     }
     if (self->bitCountElement == TANKSTATUS_PACKET_LENGTH) {
-      // hc05_print(&bt, "start");
-      // for (int i = 0; i < TANKSTATUS_PACKET_LENGTH; i++) {
-
-      // hc05_tx(self->btInterface, self->bufferRead[i]);
-
-      // print("[%u]", self->bufferRead[i]);
-      //   hc05_print(&bt, &tsUsartBuffer[i]);
-      //}
 
       readByteTankStatus(self->bufferRead, TANKSTATUS_PACKET_LENGTH,
                          &(self->publisher->_localStatus));
       notify(self->publisher);
+
+      self->bitCountElement = 0;
     }
-    self->bitCountElement %= TANKSTATUS_PACKET_LENGTH;
+
   } // write tank status
 }
 void writeTankStatusBT(TankStatusBTAdopter *self) {}
