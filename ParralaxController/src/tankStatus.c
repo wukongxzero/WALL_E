@@ -13,7 +13,7 @@ void constructTankStatus(struct TankStatus *self) {
   self->changeFlag = 0;
   // self->isLocked = 0;
 }
-// note: memcopy ignores the locked boolean/byte
+
 void makeByteTankStatus(unsigned char *buffer, int byteLength,
                         struct TankStatus *ts) {
   // Safety check: ensure buffer is large enough
@@ -23,7 +23,6 @@ void makeByteTankStatus(unsigned char *buffer, int byteLength,
 
   int offset = 0;
 
-  // Copying field by field ensures we control the exact byte order
   memcpy(buffer + offset, (const void *)&ts->driveLeft, sizeof(ts->driveLeft));
   offset += sizeof(ts->driveLeft);
 
@@ -31,9 +30,7 @@ void makeByteTankStatus(unsigned char *buffer, int byteLength,
          sizeof(ts->driveRight));
   offset += sizeof(ts->driveRight);
 
-  // Skip 2 bytes of padding if your hardware requires 4-byte alignment for
-  // floats This aligns with your #define TANKSTATUS_PACKET_LENGTH 16
-  offset += 2;
+  // Padding REMOVED. Packing shoulder-to-shoulder!
 
   memcpy(buffer + offset, (const void *)&ts->eulerX, sizeof(ts->eulerX));
   offset += sizeof(ts->eulerX);
@@ -44,9 +41,6 @@ void makeByteTankStatus(unsigned char *buffer, int byteLength,
   memcpy(buffer + offset, (const void *)&ts->eulerZ, sizeof(ts->eulerZ));
 }
 
-/**
- * Deserializes a byte sequence from a buffer back into a TankStatus struct.
- */
 void readByteTankStatus(unsigned char *buffer, int byteLength,
                         struct TankStatus *ts) {
   // Safety check
@@ -62,8 +56,7 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
   memcpy((void *)&ts->driveRight, buffer + offset, sizeof(ts->driveRight));
   offset += sizeof(ts->driveRight);
 
-  // Skip the 2 bytes of padding used to reach the 16-byte alignment
-  offset += 2;
+  // Padding REMOVED.
 
   memcpy((void *)&ts->eulerX, buffer + offset, sizeof(ts->eulerX));
   offset += sizeof(ts->eulerX);
@@ -73,3 +66,14 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
 
   memcpy((void *)&ts->eulerZ, buffer + offset, sizeof(ts->eulerZ));
 }
+/*
+float getEulerfloat(short data) {
+  // data should be a byte FF where first is the char, second half is the dec
+  // float dec = data & 0xFF >> 8; // decimal portion
+  float dec = (data & 0xFF) / 256.0f;
+  float dataOut = data >> 8; // integer portion
+  return dataOut + dec;
+}
+
+int makeEulerInt(float data);
+*/

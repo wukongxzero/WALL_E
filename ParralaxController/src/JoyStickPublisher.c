@@ -57,8 +57,8 @@ void readJoystick(struct JoyStickPublisher *self) {
   applyDeadzone(&xRead, self->_rangeXHigh, self->_rangeXLow);
   applyDeadzone(&yRead, self->_rangeYHigh, self->_rangeYLow);
 
-  unsigned char scaled_charX = (unsigned char)((xRead * 255) / 4096);
-  unsigned char scaled_charY = (unsigned char)((yRead * 255) / 4096);
+  unsigned char scaled_charX = CLAMP_JOYSTICK((unsigned char)(xRead >> 4));
+  unsigned char scaled_charY = CLAMP_JOYSTICK((unsigned char)(yRead >> 4));
 
   // Note:I added trim after I forgot that I cleared the deadzone....
   //  so the reason for the self trim being here is that these would have been

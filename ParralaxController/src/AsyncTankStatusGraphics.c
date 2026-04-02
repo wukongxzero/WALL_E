@@ -73,19 +73,21 @@ void constructStaticSpriteNoMap(struct StaticNoMapping *self,
 void startRenderAngleSubscribe(void *arg) {
 
   struct AngleMapping *angleMap = (struct AngleMapping *)arg;
-  if (angleMap->lastAngle != angleMap->overlapMap->_localSubscriber->eulerY) {
+  int angleRead =
+      (int)DECODE_SHORT(angleMap->overlapMap->_localSubscriber->eulerY);
 
-    rotateSparsePointSpriteRenderNColor(
-        &angleMap->sprite, (int)angleMap->overlapMap->_localSubscriber->eulerY,
-        RGB565(0, 0, 0), SCREEN_SCALAR * 8);
+  if (angleMap->lastAngle != angleRead) {
 
-    angleMap->lastAngle = angleMap->overlapMap->_localSubscriber->eulerY;
+    clearSparsePointSpriteRenderNColor(&angleMap->sprite, angleRead,
+                                       SCREEN_SCALAR);
+
+    angleMap->lastAngle = angleRead;
     int heatMap = angleMap->overlapMap->_localSubscriber->eulerY;
     int invHeatMap = 255 - heatMap;
     // TODO:need a rotation rate
-    rotateSparsePointSpriteRenderNColor(
-        &angleMap->sprite, (int)angleMap->overlapMap->_localSubscriber->eulerY,
-        RGB565(255, invHeatMap, invHeatMap), SCREEN_SCALAR * 4);
+    rotateSparsePointSpriteRenderNColor(&angleMap->sprite, angleRead,
+                                        RGB565(255, invHeatMap, invHeatMap),
+                                        SCREEN_SCALAR * 4);
 
     angleMap->overlapMap->isStationary = 0;
   }
