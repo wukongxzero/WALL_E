@@ -28,6 +28,7 @@
 #include <Graphics/ARendederSubscriber.h>
 #include <Graphics/AsyncTankStatusGraphics.h>
 #include <JoyStickPublisher.h>
+#include <Propellor/FlexSpinSDWrite.h>
 #include <Propellor/PrintStatusSubscriber.h>
 #include <Propellor/SPI.h>
 #include <Propellor/ST7796S.h>
@@ -53,6 +54,7 @@ struct TankStatus
     btLocalStatus; // act as a subscriber for the bluetooth...the publisher
                    // structure status is in built into the tank status
 struct TankStatus btOutStatus;
+struct TankStatus sdCardWriter;
 
 struct CoreMapping graphicsCoreBeam;
 struct CoreMapping graphicsCoreWheelLeft;
@@ -62,7 +64,7 @@ struct CoreMapping graphicsCoreBody;
 //
 unsigned int cogStackBTRead[800];
 unsigned int cogDisplay[800];
-// unsigned int cogStreamCmds[128];
+unsigned int sdWriteBuffer[64];
 volatile int spriteLock;
 
 TankStatusBTAdopter hc05ToTankStatus;
@@ -94,6 +96,7 @@ int main(void) {
   constructTankStatus(&displayTankStatus);
   constructTankStatus(&btLocalStatus);
   constructTankStatus(&btOutStatus);
+  constructTankStatus(&sdCardWriter);
 
   displayTankStatus.eulerY = 0;
   constructTankStatusPublisher(&tsPublisher);
@@ -145,6 +148,7 @@ int main(void) {
   subscribe(wheelDriver.publisher, &btLocalStatus);
   subscribe(hc05ToTankStatus.publisher,
             &displayTankStatus); // in this configuration the bluetooth recv
+  subscribe(hc05ToTankStatus.publisher, &sdCardWriter);
 
   // readTankStatusBT(&hc05ToTankStatus); // should also notify publisher
   int cog_id = cogstart(readTankStatusBT, (void *)&hc05ToTankStatus,
@@ -154,6 +158,7 @@ int main(void) {
   pause(1000);
   // start display status
   // add delay between start cog and cog 0 print
+  sdCardWriter.changeFlag = 1;
   while (1) {
     waitcnt(CNT + CLKFREQ / 10);
     readJoystick(&wheelDriver);
@@ -170,6 +175,13 @@ int main(void) {
 
     for (int i = 0; i < TANKSTATUS_PACKET_LENGTH; i++) {
       hc05_tx(&btModule, txBuffer[i]);
+    }
+    static unsigned char frameCount = 10;
+    // every 10 frame
+    if (++frameCount > 10 && sdCardWriter.changeFlag) {
+      frameCount = 0;
+      int cog_id_3 = cogstart(asyncLogTankStatusToCSV, (void *)&sdCardWriter,
+                              sdWriteBuffer, sizeof(sdWriteBuffer));
     }
   }
 

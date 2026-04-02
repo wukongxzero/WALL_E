@@ -85,9 +85,9 @@ bluetooth-control:
 port:
 	$(PROP_LOADER) -P
 
-upload:
+flash:
 
-	$(PROP_LOADER) -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200
+	$(PROP_LOADER) -p $(PORT) -e $(SRCDIR)/$(TARGET) -D baudrate=156200
 
 clean:
 	rm -r ./build/*;rm $(TARGET);rm *.pasm;*.
