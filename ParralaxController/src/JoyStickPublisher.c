@@ -51,7 +51,9 @@ void calibrateCenter(struct JoyStickPublisher *self) {
 void readJoystick(struct JoyStickPublisher *self) {
 
   int xRead = adc_in((int)self->_channelX) - self->trimX;
+  //int xRead = adc_in((int)self->_channelX);
   int yRead = adc_in((int)self->_channelY) - self->trimY;
+  //int yRead = adc_in((int)self->_channelY);
 
   // (4096 * 255) / 4096 = 255
   applyDeadzone(&xRead, self->_rangeXHigh, self->_rangeXLow);
