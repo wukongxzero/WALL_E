@@ -3,8 +3,7 @@
 #define USART_BYTE_PUBLISHER
 
 #include "ATankStatusPublisher.h"
-#include "BTUSART.h"
-#include "TankStatus.h"
+#include <TankStatus/TankStatus.h>
 #include <simpletools.h>
 // BT hc-06
 // https://www.parallax.com/multiple-serial-port-16-object/
