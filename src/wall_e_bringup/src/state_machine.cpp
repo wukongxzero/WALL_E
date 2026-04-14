@@ -30,8 +30,9 @@ public:
         state_pub_ = create_publisher<std_msgs::msg::String>("/wall_e/state", 10);
 
         // Publish state at 1Hz for LCD
-        create_wall_timer(std::chrono::seconds(1),
+        state_timer_ = create_wall_timer(std::chrono::seconds(1),
             std::bind(&StateMachine::publish_state, this));
+        
 
         RCLCPP_INFO(get_logger(), "State machine ready — MANUAL mode");
     }
@@ -55,6 +56,10 @@ private:
         } else if (state_ == State::AUTONOMOUS) {
             state_ = State::MANUAL;
             RCLCPP_INFO(get_logger(), "→ MANUAL");
+        } else if (state_ == State::IDLE) {
+            // Toggle from IDLE always goes back to MANUAL
+            state_ = State::MANUAL;
+            RCLCPP_INFO(get_logger(), "→ MANUAL (recovered from IDLE)");
         }
         publish_state();
     }
@@ -73,7 +78,10 @@ private:
         switch (state_) {
             case State::MANUAL:     msg.data = "MANUAL";     break;
             case State::AUTONOMOUS: msg.data = "AUTONOMOUS"; break;
-            case State::IDLE:       msg.data = "IDLE";       break;
+            case State::IDLE:       
+            msg.data = "IDLE";
+            cmd_pub_->publish(geometry_msgs::msg::Twist());
+            break;
         }
         state_pub_->publish(msg);
     }
@@ -83,6 +91,7 @@ private:
     rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr toggle_sub_, estop_sub_;
     rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr cmd_pub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr state_pub_;
+    rclcpp::TimerBase::SharedPtr state_timer_;
 };
 
 int main(int argc, char **argv) {
