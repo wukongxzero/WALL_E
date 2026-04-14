@@ -2,6 +2,7 @@ FC="./build/bin/flexspin"
 PROP_LOADER ="./build/bin/proploader"
 PROP_LIB= "./build/include/"
 SIMPLE_IDE_LIB = "./Simple-Libraries/Learn/Simple Libraries/"
+TANK_STATUS_INC = $(LIB_DIR)/TankStatus/include
 TANK_BOT_LIB= ./include/
 UNITY_TEST_LIB=./test/Unity/src/
 PORT= /dev/ttyUSB0
@@ -10,8 +11,11 @@ BAUD=115200
 SRCDIR = ./src
 CC=clang
 INC_FLAGS += -I$(abspath ./build/include)
+INC_FLAGS += -I$(TANK_BOT_LIB)
 SAMPLE_DATA =  -D "INCLUDE_SAMPLES" 
 BAUD = 115200
+LIB_DIR = ./lib
+LIB_CFILES = $(wildcard $(LIB_DIR)/TankStatus/*.c)
 
 
 # Target binaries
@@ -30,7 +34,7 @@ MAC_ADDRESS = 00:25:08:E0:20:04
 all: $(TARGET) $(SIM_TARGET)
 
 $(TARGET): $(SRC)
-	$(FC) -I $(TANK_BOT_LIB)  $(CFILES) $(SRC)main.c -o $(SRC)$(TARGET)
+	$(FC) -I $(TANK_BOT_LIB) -I $(LIB_DIR) $(CFILES) $(LIB_CFILES) $(SRC)main.c -o $(SRC)$(TARGET)
 
 load:
 	#./build/bin/proploader -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200 -t
@@ -38,7 +42,7 @@ load:
 
 
 run-simulation:
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(SAMPLE_DATA) -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(SIM_TARGET) && ./build/$(SIM_TARGET)
+	$(CC) -I$(TANK_BOT_LIB) -I$(LIB_CFILES) $(CFILES) $(SAMPLE_DATA) $(LIB_CFILES) -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(SIM_TARGET) && ./build/$(SIM_TARGET)
 
 
 install-flexspin:
@@ -49,15 +53,15 @@ install-flexspin:
 test-clang:
 	#src/tankStatus.c test/unity/unity.c test/test_tankStatus.c
 
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestTankStatus.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I $(LIB_DIR) $(LIB_CFILES) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestTankStatus.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestGraphicsNoRender.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) $(LIB_CFILES) -I$(LIB_DIR) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestGraphicsNoRender.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestRenderCurses.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) $(LIB_CFILES) -I$(LIB_DIR) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestRenderCurses.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN"  $(TESTFLAGS) ./test/TestPubSubTankStatus.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) $(LIB_CFILES) -I$(LIB_DIR) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN"  $(TESTFLAGS) ./test/TestPubSubTankStatus.c -o ./build/test.o
 	./build/test.o
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestRotateSprite.c -o ./build/test.o
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(UNITY_CFILE) $(LIB_CFILES) -I$(LIB_DIR) -I$(UNITY_TEST_LIB)* -D "INCLUDE_SAMPLES" -D "SIMULATION_SCREEN" $(TESTFLAGS) ./test/TestRotateSprite.c -o ./build/test.o
 	./build/test.o
 
 #	setup $(TEST_SOURCES)
@@ -79,7 +83,8 @@ compile: $(BIN_PROP)
 	./build/bin/flexspin main.cpp
 
 bluetooth-control:
-	$(CC) -I$(TANK_BOT_LIB) $(CFILES) $(SAMPLE_DATA) -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(CLIENT_CURSES) -D BLUETOOTH -lbluetooth && ./build/$(CLIENT_CURSES) $(MAC_ADDRESS)
+	$(CC) -I$(TANK_BOT_LIB) $(CFILES) -I$(LIB_CFILES) $(SAMPLE_DATA) -D "SIMULATION_SCREEN" -lncurses -lm src/main.c -o ./build/$(CLIENT_CURSES) -D BLUETOOTH -lbluetooth && ./build/$(CLIENT_CURSES) $(MAC_ADDRESS)
+
 
 
 port:
