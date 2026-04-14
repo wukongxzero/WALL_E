@@ -15,7 +15,7 @@
 #include <string.h>
 
 // ── TANKSTATUS STRUCT (from TankStatus.h) ──
-#define TANKSTATUS_PACKET_LENGTH 16
+#define TANKSTATUS_PACKET_LENGTH 8
 // ── STATE (add these) ──
 int lastLeftRaw  = 0;
 int lastRightRaw = 0;
@@ -26,8 +26,7 @@ struct TankStatus {
     volatile unsigned char driveRight;
     volatile short eulerX;
     volatile short eulerY;
-    volatile char  eulerZ;
-    volatile int   lockID;
+    volatile short  eulerZ;
     volatile unsigned char changeFlag;
 };
 
