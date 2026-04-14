@@ -1,7 +1,7 @@
 #ifndef TANKSTATUS_PUBLISH
 #define TANKSTATUS_PUBLISH
 
-#include "TankStatus.h"
+#include <TankStatus/TankStatus.h>
 //
 // class ATankStatusPublisher {
 // private:
