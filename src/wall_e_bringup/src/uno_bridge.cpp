@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <thread>
 #include <string>
+#include <chrono>
 
 #define SERIAL_PORT "/dev/ttyUSB1"
 #define BAUD B115200
@@ -31,6 +32,7 @@ public:
 
     ~UnoBridge() {
         running_ = false;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
         close(fd_);
     }
 

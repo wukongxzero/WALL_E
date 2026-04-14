@@ -10,12 +10,15 @@ find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
 
-add_executable(mega_bridge src/mega_bridge.cpp)
-ament_target_dependencies(mega_bridge rclcpp geometry_msgs std_msgs)
+add_executable(mega_node src/mega_node.cpp)
+ament_target_dependencies(mega_node rclcpp geometry_msgs nav_msgs tf2 tf2_ros)
 
 add_executable(uno_bridge src/uno_bridge.cpp)
-ament_target_dependencies(uno_bridge rclcpp geometry_msgs std_msgs)
+ament_target_dependencies(uno_bridge rclcpp std_msgs)
 
 add_executable(state_machine src/state_machine.cpp)
 ament_target_dependencies(state_machine rclcpp geometry_msgs std_msgs)
@@ -24,7 +27,7 @@ add_executable(controller_node src/controller_node.cpp)
 ament_target_dependencies(controller_node rclcpp geometry_msgs std_msgs)
 
 install(TARGETS
-  mega_bridge
+  mega_node
   uno_bridge
   state_machine
   controller_node
