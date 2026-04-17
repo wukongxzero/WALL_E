@@ -1,3 +1,7 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -70,6 +74,70 @@ app.MapGet(
     )
     .WithName("GetTestTank")
     .WithOpenApi();
+
+app.MapPost(
+    "/update-eulerY",
+    async (float eulerY) =>
+    {
+        // This constructor arbitrarily assigns the local port number.
+        UdpClient udpClient = new UdpClient();
+        udpClient.Connect("127.0.0.1", 8881);
+
+        // Sends a message to the host to which you have connected.
+        Byte[] sendBytes = Encoding.ASCII.GetBytes("Is anybody there?");
+
+        udpClient.Send(sendBytes, sendBytes.Length);
+
+        udpClient.Close();
+    }
+);
+
+app.MapGet(
+    "/dump-test",
+    async () =>
+    {
+        string targetIp = "10.98.48.5";
+        int targetPort = 8881;
+
+        // Initialize the UDP client
+        using UdpClient udpClient = new UdpClient();
+
+        Console.WriteLine($"Starting UDP dump to {targetIp}:{targetPort}...");
+        Console.WriteLine("Press Ctrl+C to stop.");
+
+        float throttleValue = 0.0f;
+
+        try
+        {
+            while (true)
+            {
+                // Convert float to 4-byte array
+                byte[] byteData = BitConverter.GetBytes(throttleValue);
+
+                // Send the packet
+                await udpClient.SendAsync(byteData, byteData.Length, targetIp, targetPort);
+
+                // Print the value and the raw hex bytes for debugging
+                string hexString = BitConverter.ToString(byteData).Replace("-", "");
+                Console.WriteLine($"Sent float: {throttleValue:F2} ({hexString})");
+
+                // Increment value and wrap around
+                throttleValue += 0.1f;
+                if (throttleValue > 1.0f)
+                {
+                    throttleValue = 0.0f;
+                }
+
+                // Wait 500ms before sending the next packet
+                await Task.Delay(500);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"\nError during UDP send: {ex.Message}");
+        }
+    }
+);
 
 app.Run();
 

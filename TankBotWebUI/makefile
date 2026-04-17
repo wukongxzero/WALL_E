@@ -5,8 +5,8 @@ CERT_FOLDER =./TankUI/certs/
 CONTAINER_NAME?=tankstatus-server-image
 
 
-
-all: set-up-certs build run open
+.PHONY: all build run set-up-certs clean open
+all: clean set-up-certs build run open
 
 build:
 	dotnet publish --os linux /t:PublishContainer
@@ -28,8 +28,6 @@ clean:
 	podman-compose down
 	dotnet dev-certs https --clean
 	dotnet clean
-	cmake clean
-	#rm -f ~/.dotnet/corefx/cryptography/x509stores/my/A74EE7832659BB6E8A8E1316420C98A4D8C7B885*
 
 open:
-	xdg-open https://localhost:7288/weatherforecast
+	xdg-open https://localhost:7288/test-tank
