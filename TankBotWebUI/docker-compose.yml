@@ -1,0 +1,19 @@
+services:
+    partywantedserver:
+      image: tankstatus-server-image
+      volumes:
+      - type: bind
+        source: ./TankUI/wwwroot/
+        target: /app/wwwroot:z
+      - type: bind
+        source: ./TankUI/certs/
+        target: /app/certs:z
+      ports:
+        - 5252:8080
+        - 7288:7288
+      environment:
+        - ASPNETCORE_URLS=https://+:7288;http://+:8080
+        # Use curly braces for Compose variables
+        - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_FOLD}${CERT_NAME}.pfx
+        - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
+

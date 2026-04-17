@@ -19,7 +19,10 @@ find_package(pybind11 REQUIRED)
 
 
 # Add your C source file as a library
-add_library(tankstatus_lib STATIC lib/TankStatus.h lib/TankStatus.c)
+add_library(tankstatus_lib SHARED lib/TankStatus.h lib/TankStatus.c)
+set_target_properties(tankstatus_lib PROPERTIES CXX_VISIBILITY_PRESET hidden)
+
+
 
 # Create the Python module
 pybind11_add_module(tankstatus_wrapper tankstatuswrapper.cpp TankStatusClass.h TankStatusClass.cpp)
