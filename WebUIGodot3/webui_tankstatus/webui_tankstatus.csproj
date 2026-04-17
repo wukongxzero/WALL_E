@@ -1,0 +1,17 @@
+<Project Sdk="Godot.NET.Sdk/3.3.0">
+<ItemGroup>
+
+    <None Include="../../TankStatusProtocol/builds/libtankstatus_lib.so">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+  </None>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+</Project>
+
+
+
+
