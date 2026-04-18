@@ -65,7 +65,7 @@ def main():
                 simulated_euler_x = 0.0
 
             # Wait 500ms before sending the next packet
-            time.sleep(0.5)
+            time.sleep(0.125)
 
     except KeyboardInterrupt:
         print("\nUDP dump stopped by user.")
