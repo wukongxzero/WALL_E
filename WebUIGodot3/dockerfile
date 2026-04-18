@@ -1,35 +1,13 @@
 # Use a lightweight Ubuntu base image
 FROM ubuntu:22.04
-
-# Set up variables for Godot versions to easily update later
-ENV GODOT_VERSION="3.5.3"
-ENV GODOT_RELEASE="stable"
-
-# Install required tools
-RUN apt-get update && \
-  apt-get install -y --no-install-recommends \
-  ca-certificates \
-  wget \
-  unzip \
-  && rm -rf /var/lib/apt/lists/*
-
-# 1. Download and install the Godot Headless binary
-RUN wget -q https://downloads.godotengine.org/${GODOT_VERSION}/Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux_headless.64.zip && \
-  unzip Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux_headless.64.zip && \
-  mv Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux_headless.64 /usr/local/bin/godot && \
-  rm Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_linux_headless.64.zip
-
-# 2. Download and install the Godot Export Templates
-# Godot strictly expects these to be in ~/.local/share/godot/templates/<version>.<release>/
-RUN wget -q https://downloads.godotengine.org/${GODOT_VERSION}/Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_export_templates.tpz && \
-  mkdir -p ~/.local/share/godot/templates/${GODOT_VERSION}.${GODOT_RELEASE} && \
-  unzip Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_export_templates.tpz && \
-  mv templates/* ~/.local/share/godot/templates/${GODOT_VERSION}.${GODOT_RELEASE}/ && \
-  rm -rf templates Godot_v${GODOT_VERSION}-${GODOT_RELEASE}_export_templates.tpz
+FROM barichello/godot-ci:mono-3.6
 
 # Set up the working directory where we will mount the project
 WORKDIR /app
 
-# The default command simply prints the Godot version to verify it works
-ENTRYPOINT ["godot"]
-CMD ["--version"]
+# 4. Create an output directory for the HTML5 build inside the container
+RUN mkdir -p /app/build/html5
+
+# 5. Set the default command to execute the HTML5 export
+# This assumes you have an export preset named exactly "HTML5" in your Godot project.
+CMD ["godot", "--export", "HTML5", "/app/build/html5/index.html"]

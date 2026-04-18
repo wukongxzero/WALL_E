@@ -1,0 +1,59 @@
+# =========================
+# Godot 3.x Specific
+# =========================
+# Godot's imported resource cache
+.import/
+# Godot 4.x cache (just in case you ever upgrade)
+.godot/
+# Godot user-specific editor settings
+*.user
+project.godot.user
+editor_layout.cfg
+
+# =========================
+# C# / Mono / .NET
+# =========================
+# Godot-Mono build cache
+.mono/
+# Standard .NET build folders
+bin/
+obj/
+# IDE/Visual Studio/Rider user settings
+*.userprefs
+*.csproj.user
+*.sln.user
+.idea/
+.vscode/
+
+# =========================
+# Build Outputs
+# =========================
+# Ignore the build folders where you export the game
+build/
+# Ignore standalone Godot export archives
+*.pck
+*.zip
+*.apk
+*.exe
+*.x86_64
+
+# =========================
+# Docker & Make
+# =========================
+# NEVER commit .env files! They often contain passwords/secrets.
+# (Even if yours just has image names right now, it's best practice).
+.env
+
+# =========================
+# OS / System Files
+# =========================
+# Mac
+.DS_Store
+.AppleDouble
+.LSOverride
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.cab
