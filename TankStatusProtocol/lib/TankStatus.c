@@ -73,3 +73,8 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
 
   memcpy((void *)&ts->eulerZ, buffer + offset, sizeof(ts->eulerZ));
 }
+
+// exists for other modules looking in
+int get_tankstatus_packet_length() { return TANKSTATUS_PACKET_LENGTH; }
+float getDecodedShortToFloat(short data) { return DECODE_SHORT(data); }
+short getEncodedShortToFloat(float reading) { return ENCODE_SHORT(reading); }

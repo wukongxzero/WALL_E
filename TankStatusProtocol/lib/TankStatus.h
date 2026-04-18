@@ -2,7 +2,11 @@
 #define TANKSTATUS_SYNC_STRUCT
 
 #define TANKSTATUS_PACKET_LENGTH                                               \
-  8 // bytes,1 +1+4+4+4 + 2 bits for extra room/ keep as multiple of 8
+  16 // bytes,1 +1+4+4+4 + 2 bits for extra room/ keep as multiple of 8, adding
+     // 8 extra bytes of padding
+// floating point arithmitic
+#define DECODE_SHORT(data) ((float)(data) / 256.0f)
+#define ENCODE_SHORT(reading) ((short)((reading) * 256.0f))
 
 // todo: rename file as from ITankStatus to tankStatus
 struct TankStatus {
@@ -22,4 +26,9 @@ void makeByteTankStatus(unsigned char *buffer, int byteLength,
 // TODO: should take a buffer array and package it into a TankStatus structure
 void readByteTankStatus(unsigned char *buffer, int byteLength,
                         struct TankStatus *ts);
+
+int get_tankstatus_packet_length();
+float getDecodedShortToFloat(short data);
+short getEncodedFloatToShort(float reading);
+
 #endif

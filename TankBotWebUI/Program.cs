@@ -2,6 +2,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
+float simulatedEulerY = 0;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -105,32 +107,44 @@ app.MapGet(
         Console.WriteLine($"Starting UDP dump to {targetIp}:{targetPort}...");
         Console.WriteLine("Press Ctrl+C to stop.");
 
-        float throttleValue = 0.0f;
-
         try
         {
-            while (true)
+            // 1. Create a fresh TankStatus struct
+            TankStatus ts = new TankStatus();
+
+            // Call the C constructor to set any defaults
+            TankStatusNative.constructTankStatus(ref ts);
+
+            // 2. Simulate changing data
+            ts.driveLeft = 127; // Half speed
+            ts.driveRight = 255; // Full speed
+            ts.eulerX = TankStatusNative.getEncodedFloatToShort(simulatedEulerY);
+            ts.eulerY = TankStatusNative.getEncodedFloatToShort(90);
+            ts.eulerZ = TankStatusNative.getEncodedFloatToShort(-45);
+            ts.changeFlag = 1;
+
+            // 3. Prepare the byte buffer (8 bytes)
+            byte[] byteData = new byte[TankStatusNative.get_tankstatus_packet_length()];
+
+            // 4. Let the C library pack the struct into the byte array!
+            TankStatusNative.makeByteTankStatus(byteData, byteData.Length, ref ts);
+
+            // 5. Send the full packet to Godot
+            await udpClient.SendAsync(byteData, byteData.Length, targetIp, targetPort);
+
+            // Print the struct data and the raw hex bytes for debugging
+            string hexString = BitConverter.ToString(byteData).Replace("-", "");
+            Console.WriteLine($"Sent EulerX: {ts.eulerX, 4} | Hex: {hexString}");
+
+            // Increment the simulated value and wrap around at 360 degrees
+            simulatedEulerY += 10;
+            if (simulatedEulerY > 360)
             {
-                // Convert float to 4-byte array
-                byte[] byteData = BitConverter.GetBytes(throttleValue);
-
-                // Send the packet
-                await udpClient.SendAsync(byteData, byteData.Length, targetIp, targetPort);
-
-                // Print the value and the raw hex bytes for debugging
-                string hexString = BitConverter.ToString(byteData).Replace("-", "");
-                Console.WriteLine($"Sent float: {throttleValue:F2} ({hexString})");
-
-                // Increment value and wrap around
-                throttleValue += 0.1f;
-                if (throttleValue > 1.0f)
-                {
-                    throttleValue = 0.0f;
-                }
-
-                // Wait 500ms before sending the next packet
-                await Task.Delay(500);
+                simulatedEulerY = 0;
             }
+
+            // Wait 500ms before sending the next packet
+            await Task.Delay(500);
         }
         catch (Exception ex)
         {
