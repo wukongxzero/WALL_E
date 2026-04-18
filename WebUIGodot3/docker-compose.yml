@@ -1,0 +1,8 @@
+services:
+  export-linux:
+    image: godot-builder:3.5
+    volumes:
+      # Mounts the current directory to /app with SELinux permissions
+      - .:/app:z
+    # This appends directly to the ENTRYPOINT ["godot"] in your Dockerfile
+    command: --export "Linux/X11" ./build/linux/mygame.x86_64
