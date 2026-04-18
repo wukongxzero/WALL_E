@@ -118,9 +118,10 @@ app.MapGet(
             // 2. Simulate changing data
             ts.driveLeft = 127; // Half speed
             ts.driveRight = 255; // Full speed
+
             ts.eulerX = TankStatusNative.getEncodedFloatToShort(simulatedEulerY);
-            ts.eulerY = TankStatusNative.getEncodedFloatToShort(90);
-            ts.eulerZ = TankStatusNative.getEncodedFloatToShort(-45);
+            ts.eulerY = TankStatusNative.getEncodedFloatToShort(90.0f);
+            ts.eulerZ = TankStatusNative.getEncodedFloatToShort(-45.0f);
             ts.changeFlag = 1;
 
             // 3. Prepare the byte buffer (8 bytes)

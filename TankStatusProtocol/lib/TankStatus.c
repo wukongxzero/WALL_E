@@ -77,4 +77,4 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
 // exists for other modules looking in
 int get_tankstatus_packet_length() { return TANKSTATUS_PACKET_LENGTH; }
 float getDecodedShortToFloat(short data) { return DECODE_SHORT(data); }
-short getEncodedShortToFloat(float reading) { return ENCODE_SHORT(reading); }
+short getEncodedFloatToShort(float reading) { return ENCODE_SHORT(reading); }
