@@ -1,4 +1,4 @@
-#include "TankStatusClass.h"
+#include "lib/TankStatusClass.h"
 #include <pybind11/pybind11.h>
 
 extern "C" {

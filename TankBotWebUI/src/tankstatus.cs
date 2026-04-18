@@ -28,4 +28,15 @@ public static class TankStatusNative
     // void readByteTankStatus(unsigned char *buffer, int byteLength, struct TankStatus *ts);
     [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
     public static extern void readByteTankStatus(byte[] buffer, int byteLength, ref TankStatus ts);
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern int get_tankstatus_packet_length();
+
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern float getDecodedShortToFloat(short data);
+
+    // Note: The C function name says "ShortToFloat" but it takes a float and returns a short.
+    // You might want to rename this in C to "getEncodedFloatToShort"!
+    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern short getEncodedFloatToShort(float reading);
 }

@@ -22,10 +22,13 @@ find_package(pybind11 REQUIRED)
 add_library(tankstatus_lib SHARED lib/TankStatus.h lib/TankStatus.c)
 set_target_properties(tankstatus_lib PROPERTIES CXX_VISIBILITY_PRESET hidden)
 
+add_library(tankstatus_class SHARED lib/TankStatusClass.h lib/TankStatusClass.cpp)
+link_libraries(tankstatus_class tankstatus_lib)
+
 
 
 # Create the Python module
-pybind11_add_module(tankstatus_wrapper tankstatuswrapper.cpp TankStatusClass.h TankStatusClass.cpp)
+pybind11_add_module(tankstatus_wrapper tankstatuswrapper.cpp lib/TankStatusClass.h lib/TankStatusClass.cpp)
 
 # Link your C library to the Python module
 target_link_libraries(tankstatus_wrapper PRIVATE tankstatus_lib)

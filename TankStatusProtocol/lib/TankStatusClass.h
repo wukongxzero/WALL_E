@@ -1,6 +1,6 @@
 
 extern "C" {
-#include "lib/TankStatus.h"
+#include "TankStatus.h"
 }
 
 class TankStatusClass {
