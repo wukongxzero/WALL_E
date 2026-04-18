@@ -34,7 +34,7 @@ MAC_ADDRESS = 00:25:08:E0:20:04
 all: $(TARGET) $(SIM_TARGET)
 
 $(TARGET): $(SRC)
-	$(FC) -I $(TANK_BOT_LIB) -I $(LIB_DIR) $(CFILES) $(LIB_CFILES) $(SRC)main.c -o $(SRC)$(TARGET)
+	$(FC) -O2 -I $(TANK_BOT_LIB) -I $(LIB_DIR) $(CFILES) $(LIB_CFILES) $(SRC)main.c -o $(SRC)$(TARGET)
 
 load:
 	#./build/bin/proploader -p $(PORT) $(SRCDIR)/$(TARGET) -D baudrate=156200 -t
