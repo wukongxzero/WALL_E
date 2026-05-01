@@ -110,8 +110,10 @@ private:
                 // Sync on 0xAA 0xBB header
                 if (idx >= 2) {
                     if (buf[idx-2] == 0xAA && buf[idx-1] == 0xBB) {
+                        buf[0] = 0xAA;
+                        buf[1] = 0xBB;
                         idx = 2;
-                    }
+                        }
                 }
 
                 if (idx >= ODOM_LEN) {
