@@ -20,7 +20,8 @@ public:
         }
         configure_serial(fd_);
         RCLCPP_INFO(get_logger(), "Uno connected on %s", SERIAL_PORT);
-
+        roll_pub_ = create_publisher<std_msgs::msg::Float32>(
+        "/wall_e/roll", 10);
         pitch_pub_ = create_publisher<std_msgs::msg::Float32>(
             "/wall_e/pitch", 10);
 
@@ -53,16 +54,23 @@ private:
     }
 
     void parse_line(const std::string &line) {
-        if (line.rfind("P:", 0) == 0) {
-            try {
-                float pitch = std::stof(line.substr(2));
-                auto msg = std_msgs::msg::Float32();
-                msg.data = pitch;
-                pitch_pub_->publish(msg);
-            } catch (...) {
-                RCLCPP_WARN(get_logger(), "Bad line: %s", line.c_str());
-            }
+    if (line.rfind("P:", 0) != 0) return;
+    auto comma = line.find(",R:");
+    try {
+        float pitch = std::stof(line.substr(2, comma - 2));
+        auto pmsg = std_msgs::msg::Float32();
+        pmsg.data = pitch;
+        pitch_pub_->publish(pmsg);
+
+        if (comma != std::string::npos) {
+            float roll = std::stof(line.substr(comma + 3));
+            auto rmsg = std_msgs::msg::Float32();
+            rmsg.data = roll;
+            roll_pub_->publish(rmsg);
         }
+    } catch (...) {
+        RCLCPP_WARN(get_logger(), "Bad line: %s", line.c_str());
+    }
     }
 
     void configure_serial(int fd) {
@@ -86,6 +94,7 @@ private:
     bool running_ = true;
     std::thread read_thread_;
     rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr pitch_pub_;
+    rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr roll_pub_;
 };
 
 int main(int argc, char **argv) {
