@@ -30,20 +30,28 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # ── SERIAL BRIDGES ──
+        # ── TEMP: static odom→base_footprint for testing without Mega ──
         Node(
-            package='wall_e_bringup',
-            executable='mega_node',
-            name='mega_node',
-            output='screen'
+            package='tf2_ros',
+            executable='static_transform_publisher',
+            name='odom_to_base',
+            arguments=['0', '0', '0', '0', '0', '0', 'odom', 'base_footprint']
         ),
 
-        Node(
-            package='wall_e_bringup',
-            executable='uno_bridge',
-            name='uno_bridge',
-            output='screen'
-        ),
+        # ── SERIAL BRIDGES ──
+        # Node(
+        #     package='wall_e_bringup',
+        #     executable='mega_node',
+        #     name='mega_node',
+        #     output='screen'
+        # ),
+
+        # Node(
+        #     package='wall_e_bringup',
+        #     executable='uno_bridge',
+        #     name='uno_bridge',
+        #     output='screen'
+        # ),
 
         # ── STATE MACHINE ──
         Node(
@@ -54,30 +62,30 @@ def generate_launch_description():
         ),
 
         # ── CONTROLLER ──
-        Node(
-            package='wall_e_bringup',
-            executable='controller_node',
-            name='controller_node',
-            output='screen'
-        ),
+        # Node(
+        #     package='wall_e_bringup',
+        #     executable='controller_node',
+        #     name='controller_node',
+        #     output='screen'
+        # ),
 
         # ── D435 REALSENSE ──
-        Node(
-            package='realsense2_camera',
-            executable='realsense2_camera_node',
-            name='realsense2_camera',
-            parameters=[{
-                'depth_module.profile': '640x480x30',
-                'rgb_camera.profile':   '640x480x30',
-                'align_depth.enable':   True,
-                'pointcloud.enable':    True,
-            }],
-            output='screen'
-        ),
+        # Node(
+        #     package='realsense2_camera',
+        #     executable='realsense2_camera_node',
+        #     name='realsense2_camera',
+        #     parameters=[{
+        #         'depth_module.profile': '640x480x30',
+        #         'rgb_camera.profile':   '640x480x30',
+        #         'align_depth.enable':   True,
+        #         'pointcloud.enable':    True,
+        #     }],
+        #     output='screen'
+        # ),
 
         # ── RTAB-MAP ──
         Node(
-            package='rtabmap_ros',
+            package='rtabmap_slam',
             executable='rtabmap',
             name='rtabmap',
             output='screen',
@@ -89,20 +97,6 @@ def generate_launch_description():
                 ('odom',            '/odom'),
             ],
             arguments=['--delete_db_on_start']
-        ),
-
-        # ── RTAB-MAP VIZ ──
-        Node(
-            package='rtabmap_ros',
-            executable='rtabmapviz',
-            name='rtabmapviz',
-            output='screen',
-            parameters=[rtabmap_params],
-            remappings=[
-                ('rgb/image',       '/camera/color/image_raw'),
-                ('rgb/camera_info', '/camera/color/camera_info'),
-                ('depth/image',     '/camera/aligned_depth_to_color/image_raw'),
-            ],
         ),
 
         # ── NAV2 ──
