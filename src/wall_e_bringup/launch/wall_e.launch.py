@@ -60,6 +60,13 @@ def generate_launch_description():
             name='state_machine',
             output='screen'
         ),
+        # ── YOLO NAV ──
+        Node(
+            package='wall_e_bringup',
+            executable='yolo_nav_node.py',
+            name='yolo_nav_node',
+            output='screen'
+        ),
 
         # ── CONTROLLER ──
         # Node(
