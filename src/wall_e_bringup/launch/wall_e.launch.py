@@ -107,6 +107,7 @@ def generate_launch_description():
             launch_arguments={
                 'params_file':   nav2_params,
                 'use_sim_time':  'false',
+                'map':           '/home/vk-jn-or/WALL_E_ROS2/maps/test_map.yaml',
             }.items()
         ),
 
