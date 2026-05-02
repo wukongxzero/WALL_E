@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 
 // Matches the 'struct TankStatus' from C
@@ -14,29 +15,66 @@ public struct TankStatus
 
 public static class TankStatusNative
 {
-    // Define the library name once so you don't have to type it everywhere
-    private const string LibName = "libtankstatus_lib.so";
+    public const int PacketLength = 16;
 
-    // void constructTankStatus(struct TankStatus *self);
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void constructTankStatus(ref TankStatus self);
+    public static void constructTankStatus(ref TankStatus self)
+    {
+        self.driveLeft = 0;
+        self.driveRight = 0;
+        self.eulerX = 0;
+        self.eulerY = 0;
+        self.eulerZ = 90;
+        self.changeFlag = 0;
+    }
 
-    // void makeByteTankStatus(unsigned char *buffer, int byteLength, struct TankStatus *ts);
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void makeByteTankStatus(byte[] buffer, int byteLength, ref TankStatus ts);
+    public static void makeByteTankStatus(byte[] buffer, int byteLength, ref TankStatus ts)
+    {
+        if (byteLength < PacketLength || buffer == null || buffer.Length < PacketLength) return;
 
-    // void readByteTankStatus(unsigned char *buffer, int byteLength, struct TankStatus *ts);
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern void readByteTankStatus(byte[] buffer, int byteLength, ref TankStatus ts);
+        buffer[0] = ts.driveLeft;
+        buffer[1] = ts.driveRight;
+        
+        // Offset 2 and 3 are padding, skip them
+        
+        byte[] ex = BitConverter.GetBytes(ts.eulerX);
+        buffer[4] = ex[0];
+        buffer[5] = ex[1];
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern int get_tankstatus_packet_length();
+        byte[] ey = BitConverter.GetBytes(ts.eulerY);
+        buffer[6] = ey[0];
+        buffer[7] = ey[1];
 
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern float getDecodedShortToFloat(short data);
+        byte[] ez = BitConverter.GetBytes(ts.eulerZ);
+        buffer[8] = ez[0];
+        buffer[9] = ez[1];
+    }
 
-    // Note: The C function name says "ShortToFloat" but it takes a float and returns a short.
-    // You might want to rename this in C to "getEncodedFloatToShort"!
-    [DllImport(LibName, CallingConvention = CallingConvention.Cdecl)]
-    public static extern short getEncodedFloatToShort(float reading);
+    public static void readByteTankStatus(byte[] buffer, int byteLength, ref TankStatus ts)
+    {
+        if (byteLength < PacketLength || buffer == null || buffer.Length < PacketLength) return;
+
+        ts.driveLeft = buffer[0];
+        ts.driveRight = buffer[1];
+        
+        // Offset 2 and 3 are padding, skip them
+        
+        ts.eulerX = BitConverter.ToInt16(buffer, 4);
+        ts.eulerY = BitConverter.ToInt16(buffer, 6);
+        ts.eulerZ = BitConverter.ToInt16(buffer, 8);
+    }
+
+    public static int get_tankstatus_packet_length()
+    {
+        return PacketLength;
+    }
+
+    public static float getDecodedShortToFloat(short data)
+    {
+        return (float)data / 256.0f;
+    }
+
+    public static short getEncodedFloatToShort(float reading)
+    {
+        return (short)(reading * 256.0f);
+    }
 }
