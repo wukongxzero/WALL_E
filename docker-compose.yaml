@@ -1,4 +1,4 @@
-version: '3.8'
+ersion: '3.8'
 
 services:
 
@@ -19,9 +19,10 @@ services:
       bash -c "
         source /opt/ros/humble/setup.bash &&
         apt-get update -q &&
+        apt-get install -y python3-pip ros-humble-xacro ros-humble-robot-state-publisher ros-humble-nav2-bringup ros-humble-navigation2 ros-humble-rtabmap-slam ros-humble-realsense2-camera ros-humble-tf2-ros ros-humble-cv-bridge python3-opencv &&
         rosdep update &&
         rosdep install --from-paths src --ignore-src -r -y &&
-        pip3 install ollama &&
+        pip3 install ollama ultralytics &&
         colcon build --packages-select wall_e_bringup &&
         source install/setup.bash &&
         echo 'Waiting for Ollama...' &&
@@ -34,19 +35,21 @@ services:
       - /dev/ttyUSB1:/dev/ttyUSB1
       - /dev/rfcomm0:/dev/rfcomm0
 
+
   ollama:
-    image: ollama/ollama
-    container_name: ollama
-    network_mode: host
-    volumes:
-      - ollama_models:/root/.ollama
-    environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      image: ollama/ollama
+      container_name: ollama
+      network_mode: host
+      volumes:
+        - ollama_models:/root/.ollama
+      environment:
+        - NVIDIA_VISIBLE_DEVICES=all
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:11434"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
 
 volumes:
   ollama_models:
+

@@ -38,6 +38,8 @@ install(PROGRAMS
   src/llama_interpreter_node.py
   src/llama_nav_node.py
   src/fake_odom.py
+  src/udp_godot_bridge.py
+  src/yolo_nav_node.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
