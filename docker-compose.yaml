@@ -1,0 +1,45 @@
+wall_e_ros2:
+    image: ros:humble
+    container_name: wall_e_ros2
+    network_mode: host
+    privileged: true
+    environment:
+      - ROS_DOMAIN_ID=0
+    volumes:
+      - ~/WALL_E_ROS2:/ros2_ws
+      - /dev:/dev
+    working_dir: /ros2_ws
+    depends_on:
+      - ollama
+    command: >
+      bash -c "
+        source /opt/ros/humble/setup.bash &&
+        apt-get update -q &&
+        rosdep update &&
+        rosdep install --from-paths src --ignore-src -r -y &&
+        pip3 install ollama &&
+        colcon build --packages-select wall_e_bringup &&
+        source install/setup.bash &&
+        ros2 launch wall_e_bringup wall_e.launch.py
+      "
+    devices:
+      - /dev/ttyUSB0:/dev/ttyUSB0
+      - /dev/ttyUSB1:/dev/ttyUSB1
+      - /dev/rfcomm0:/dev/rfcomm0
+
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    network_mode: host
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ollama_models:
