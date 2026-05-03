@@ -40,6 +40,7 @@ install(PROGRAMS
   src/fake_odom.py
   src/udp_godot_bridge.py
   src/yolo_nav_node.py
+  src/webrtc_video_bridge.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
