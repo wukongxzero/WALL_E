@@ -30,6 +30,10 @@ public class Client : Node
 	private float _camRotationY = 0f;
 	private float _mouseSensitivity = 0.005f;
 
+	// Chat state
+	private RichTextLabel _chatHistory;
+	private LineEdit _chatInput;
+
 	public override void _Ready()
 	{
 		TankStatusNative.constructTankStatus(ref localTankSubscriber);
@@ -125,6 +129,38 @@ public class Client : Node
 		btnStop.Text = "Stop";
 		btnStop.Connect("pressed", this, nameof(OnBtnStopPressed));
 		hboxControls.AddChild(btnStop);
+
+		// Chat Space UI
+		VBoxContainer chatContainer = new VBoxContainer();
+		chatContainer.AnchorLeft = 1;
+		chatContainer.AnchorRight = 1;
+		chatContainer.AnchorBottom = 1;
+		chatContainer.MarginLeft = -320;
+		chatContainer.MarginTop = -220; 
+		chatContainer.MarginRight = -20;
+		chatContainer.MarginBottom = -20;
+		canvasLayer.AddChild(chatContainer);
+
+		_chatHistory = new RichTextLabel();
+		_chatHistory.SizeFlagsVertical = (int)Control.SizeFlags.ExpandFill;
+		_chatHistory.ScrollActive = true;
+		_chatHistory.BbcodeEnabled = true;
+		_chatHistory.BbcodeText = "[color=yellow]Chat Space Initialized[/color]\n";
+		chatContainer.AddChild(_chatHistory);
+
+		HBoxContainer chatInputBox = new HBoxContainer();
+		chatContainer.AddChild(chatInputBox);
+
+		_chatInput = new LineEdit();
+		_chatInput.SizeFlagsHorizontal = (int)Control.SizeFlags.ExpandFill;
+		_chatInput.PlaceholderText = "Type message...";
+		_chatInput.Connect("text_entered", this, nameof(OnChatEntered));
+		chatInputBox.AddChild(_chatInput);
+
+		Button btnSendChat = new Button();
+		btnSendChat.Text = "Send";
+		btnSendChat.Connect("pressed", this, nameof(OnBtnSendChatPressed));
+		chatInputBox.AddChild(btnSendChat);
 	}
 
 	public override void _Process(float delta)
@@ -281,5 +317,20 @@ public class Client : Node
 	private void OnBtnStopPressed()
 	{
 		SendDriveCommand(127, 127);
+	}
+
+	private void OnBtnSendChatPressed()
+	{
+		OnChatEntered(_chatInput.Text);
+	}
+
+	private void OnChatEntered(string newText)
+	{
+		if (string.IsNullOrEmpty(newText)) return;
+		
+		_chatHistory.BbcodeText += $"\n[color=lightblue]You:[/color] {newText}";
+		_chatInput.Text = "";
+		
+		// TODO: Send chat message over WebSocket to teammate's chat bot
 	}
 }
