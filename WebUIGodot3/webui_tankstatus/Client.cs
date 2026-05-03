@@ -22,6 +22,10 @@ public class Client : Node
 	private Label lblEuler;
 	private Label lblSpeed;
 
+	// Wheels
+	private CSGCylinder _leftWheel;
+	private CSGCylinder _rightWheel;
+
 	// Camera state
 	private Camera _camera;
 	private Spatial _cameraPivot;
@@ -45,6 +49,54 @@ public class Client : Node
 
 		puppetBase = GetNode<CSGBox>("BaseCSGBox");
 		puppetPlatform = GetNode<CSGBox>("BaseCSGBox").GetNode<CSGBox>("CSGPlatform");
+
+		// --- Make the bot look like a 2-wheel stabilizer ---
+		SpatialMaterial baseMaterial = new SpatialMaterial();
+		baseMaterial.AlbedoColor = new Color(0.2f, 0.4f, 0.2f); // Dark Green Base
+		puppetBase.Material = baseMaterial;
+		
+		SpatialMaterial platformMaterial = new SpatialMaterial();
+		platformMaterial.AlbedoColor = new Color(0.7f, 0.7f, 0.8f); // Silver/Grey Stabilizer
+		puppetPlatform.Material = platformMaterial;
+
+		SpatialMaterial wheelMaterial = new SpatialMaterial();
+		wheelMaterial.AlbedoColor = new Color(0.1f, 0.1f, 0.1f); // Dark Grey/Black
+
+		SpatialMaterial spokeMaterial = new SpatialMaterial();
+		spokeMaterial.AlbedoColor = new Color(0.8f, 0.2f, 0.2f); // Red spokes to see rotation
+
+		// Left Wheel
+		_leftWheel = new CSGCylinder();
+		_leftWheel.Radius = puppetBase.Depth / 1.5f; // Large wheel
+		_leftWheel.Height = 0.8f;
+		_leftWheel.RotationDegrees = new Vector3(0, 0, 90);
+		_leftWheel.Translation = new Vector3(-puppetBase.Width / 2 - 0.4f, 0, 0);
+		_leftWheel.Material = wheelMaterial;
+		puppetBase.AddChild(_leftWheel);
+
+		CSGBox leftSpoke = new CSGBox();
+		leftSpoke.Width = _leftWheel.Radius * 1.8f;
+		leftSpoke.Height = 0.9f; // Slightly wider than wheel thickness so it's visible
+		leftSpoke.Depth = 0.2f;
+		leftSpoke.Material = spokeMaterial;
+		_leftWheel.AddChild(leftSpoke);
+
+		// Right Wheel
+		_rightWheel = new CSGCylinder();
+		_rightWheel.Radius = puppetBase.Depth / 1.5f;
+		_rightWheel.Height = 0.8f;
+		_rightWheel.RotationDegrees = new Vector3(0, 0, 90);
+		_rightWheel.Translation = new Vector3(puppetBase.Width / 2 + 0.4f, 0, 0);
+		_rightWheel.Material = wheelMaterial;
+		puppetBase.AddChild(_rightWheel);
+
+		CSGBox rightSpoke = new CSGBox();
+		rightSpoke.Width = _rightWheel.Radius * 1.8f;
+		rightSpoke.Height = 0.9f;
+		rightSpoke.Depth = 0.2f;
+		rightSpoke.Material = spokeMaterial;
+		_rightWheel.AddChild(rightSpoke);
+		// --------------------------------------
 
 		// --- Setup Camera Pivot ---
 		_camera = GetNode<Camera>("Camera");
@@ -181,6 +233,17 @@ public class Client : Node
 		if (_cameraPivot != null && puppetBase != null)
 		{
 			_cameraPivot.Translation = puppetBase.Translation;
+		}
+
+		// Rotate the wheels based on motor speed
+		if (_leftWheel != null)
+		{
+			// local Y axis is the wheel's spin axis because it's rotated 90 on Z
+			_leftWheel.RotateY(-currentLeftMotor * 15.0f * delta); 
+		}
+		if (_rightWheel != null)
+		{
+			_rightWheel.RotateY(-currentRightMotor * 15.0f * delta);
 		}
 
 		puppetPlatform.RotationDegrees = new Vector3(
