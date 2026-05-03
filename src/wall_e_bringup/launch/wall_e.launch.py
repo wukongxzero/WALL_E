@@ -105,7 +105,13 @@ def generate_launch_description():
             ],
             arguments=['--delete_db_on_start']
         ),
-
+	# ── WEBRTC VIDEO BRIDGE ──
+	Node(
+    	     package='wall_e_bringup',
+    	     executable='webrtc_video_bridge.py',
+    	     name='webrtc_video_bridge',
+    	     output='screen'
+	),
         # ── NAV2 ──
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
