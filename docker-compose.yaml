@@ -1,4 +1,4 @@
-ersion: '3.8'
+version: '3.8'
 
 services:
 
@@ -37,18 +37,18 @@ services:
 
 
   ollama:
-      image: ollama/ollama
-      container_name: ollama
-      network_mode: host
-      volumes:
-        - ollama_models:/root/.ollama
-      environment:
-        - NVIDIA_VISIBLE_DEVICES=all
-      healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:11434"]
-        interval: 10s
-        timeout: 5s
-        retries: 5
+    image: ollama/ollama
+    container_name: ollama
+    network_mode: host
+    volumes:
+      - ollama_models:/root/.ollama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   ollama_models:
