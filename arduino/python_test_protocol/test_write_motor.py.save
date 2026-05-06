@@ -1,0 +1,101 @@
+"""
+ramp test — uses tankstatus_wrapper for both tx and rx.
+"""
+
+import serial
+import time
+import tankstatus_wrapper
+import struct
+# ── ramp profile ──
+THROTTLE_AMPLITUDE = 50      # signed offset from CENTER (start small)
+RAMP_UP_SEC        = 3.0
+HOLD_SEC           = 2.0
+RAMP_DOWN_SEC      = 3.0
+
+# ── port/timing ──
+PORT       = '/dev/ttyACM0'
+BAUD       = 115200
+PKT_LEN    = 8
+CMD_HZ     = 50
+CMD_PERIOD = 1.0 / CMD_HZ
+CENTER     = 127             # neutral byte (no throttle, no steering)
+
+
+def ramp_throttle(elapsed):
+    """Trapezoidal profile, returns signed throttle [-127, 127]."""
+    if elapsed < RAMP_UP_SEC:
+        return THROTTLE_AMPLITUDE * (elapsed / RAMP_UP_SEC)
+    elif elapsed < RAMP_UP_SEC + HOLD_SEC:
+        return THROTTLE_AMPLITUDE
+    elif elapsed < RAMP_UP_SEC + HOLD_SEC + RAMP_DOWN_SEC:
+        t = elapsed - RAMP_UP_SEC - HOLD_SEC
+        return THROTTLE_AMPLITUDE * (1.0 - t / RAMP_DOWN_SEC)
+    else:
+        return 0.0
+
+
+def main():
+    ser = serial.Serial(PORT, BAUD, timeout=0)
+    ser.reset_input_buffer()
+
+    rx = tankstatus_wrapper.TankStatusClass()
+    tx = tankstatus_wrapper.TankStatusClass()
+
+    # Initialize tx's internal buffer — the drive_left/drive_right setters
+    # are pointer-based and silently no-op if the underlying buffer hasn't
+    # been allocated yet. Seeding it with bytes ensures the pointers are valid.
+    tx.build_from_bytes(bytes([CENTER, CENTER, 0, 0, 0, 0, 0, 0]))
+
+    total_dur = RAMP_UP_SEC + HOLD_SEC + RAMP_DOWN_SEC + 0.5
+    start     = time.monotonic()
+    last_cmd  = 0.0
+
+    print(f"ramp test: amplitude={THROTTLE_AMPLITUDE}, "
+          f"{RAMP_UP_SEC}s up / {HOLD_SEC}s hold / {RAMP_DOWN_SEC}s down")
+    print("Ctrl+C to abort (Mega 500ms watchdog also stops motors on disconnect)\n")
+
+    try:
+        while True:
+            now     = time.monotonic()
+            elapsed = now - start
+
+            # ── send command at fixed rate ──
+            if now - last_cmd >= CMD_PERIOD:
+                last_cmd = now
+                throttle = ramp_throttle(elapsed)
+
+                # Mega convention: drive_right < 127 → forward
+                # (from `int throttle = -((int)(*rxStatus.driveRight) - 127);`)
+                tx.drive_right = max(0, min(255, CENTER - int(throttle)))
+                tx.drive_left  = CENTER         # no steering
+                ser.write(tx.make_into_bytes())
+
+            # ── read every odom packet that arrives ──
+            if ser.in_waiting >= PKT_LEN:
+                raw = ser.read(PKT_LEN)
+                rx.build_from_bytes(raw)
+                throttle_now = ramp_throttle(elapsed)
+                print(f"t={elapsed:5.2f}s  cmd={throttle_now:+6.1f}  "
+                      f"L={rx.eulerXFloat:+.3f} m/s  "
+                      f"R={rx.eulerYFloat:+.3f} m/s")
+
+            if elapsed > total_dur:
+                break
+
+            time.sleep(0.0005)
+
+    except KeyboardInterrupt:
+        print("\naborted")
+    finally:
+        # explicit stop — send a few in case one drops
+        tx.drive_right = CENTER
+        tx.drive_left  = CENTER
+        for _ in range(3):
+            ser.write(tx.make_into_bytes())
+            time.sleep(0.01)
+        ser.close()
+        print("stopped")
+
+
+if __name__ == "__main__":
+    main()
