@@ -4,6 +4,7 @@
 #include <string.h>
 #include "src/TankStatusClass/TankStatusClass.h"
 
+#define MAX_VELOCITY 4095 
 bool motorsHalted = false;
 
 // ── TCA9548A + AS5600 ─────────────────────────────────────────
@@ -38,7 +39,7 @@ uint16_t readAngle(uint8_t ch) {
 #define ENB     6
 #define IN3     25
 #define IN4     24
-#define MAX_PWM 200
+#define MAX_PWM 250
 #define LOOP_MS 5
 #define FLIP_THRESHOLD 150
 
@@ -50,8 +51,8 @@ uint16_t leftAnglePrev  = 0;
 uint16_t rightAnglePrev = 0;
 unsigned long lastEncTime = 0;
 
-float leftVel  = 0.0f;
-float rightVel = 0.0f;
+TankStatusClass tsLocalIn = TankStatusClass();
+TankStatusClass tsLocalOut = TankStatusClass();
 
 int16_t angleDiff(uint16_t curr, uint16_t prev) {
     int16_t diff = (int16_t)curr - (int16_t)prev;
@@ -78,8 +79,13 @@ void updateOdometry() {
     float leftDist  = (leftDiff  / CPR) * 2.0f * M_PI * WHEEL_RADIUS;
     float rightDist = (rightDiff / CPR) * 2.0f * M_PI * WHEEL_RADIUS;
 
-    leftVel  = leftDist  / dt;
-    rightVel = rightDist / dt;
+    int leftVel  = leftDist  / dt;
+    int rightVel = rightDist / dt;
+
+
+
+    tsLocal->driveLeftIn = static_cast<unsigned char>(map(leftVel,0,MAX_VELOCITY,0,MAX_PWM));
+    tsLocal->driveRightIn = static_cast<unsigned char>(map(rightDif,0,MAX_VELOCITY,0,MAX_PWM));
 }
 
 // ── MOTOR DRIVER ──────────────────────────────────────────────
@@ -119,8 +125,8 @@ unsigned long lastPktMs = 0;
 
 // ── DRIVE FROM TANKSTATUS ──────────────────────────────────────
 void driveMotors() {
-    int throttle = -((int)(*rxStatus.driveRight) - 127);
-    int steering = -((int)(*rxStatus.driveLeft)  - 127);
+    int throttle = -((int)(tsLocalIn->driveLeft) - 127);
+    int steering = -((int)(tsLocalIn->driveRight)  - 127);
 
     throttle = clampi(throttle, -124, 124);
     steering = clampi(steering, -124, 124);
@@ -173,18 +179,21 @@ void loop() {
         uint8_t c = Serial.read();
         pktBuf[pktIdx++] = c;
         if (pktIdx >= TANKSTATUS_PACKET_LENGTH) {
-            rxStatus.BuildFromBytes(pktBuf);
+            tsLocalIn.BuildFromBytes(pktBuf);
+            
             pktIdx    = 0;
             lastPktMs = millis();
         }
     }
 
+    /*
     if ((millis() - lastPktMs) > PKT_TIMEOUT_MS) {
         stopMotors();
         motorsHalted = true;
     } else {
         motorsHalted = false;
     }
+    */
 
     unsigned long now = millis();
     if ((now - lastLoop) < LOOP_MS) return;
@@ -196,9 +205,7 @@ void loop() {
     static int odomCount = 0;
     if (++odomCount >= 10) {
         odomCount = 0;
-        txStatus.eulerXFloat = leftVel;
-        txStatus.eulerYFloat = rightVel;
-        unsigned char* txBuffer = txStatus.MakeIntoBytes();
+        unsigned char* txBuffer = TankStatusClass.MakeIntoBytes();
         Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
     }
 }
