@@ -1,8 +1,10 @@
 #include "TankStatusClass.h"
 #include "TankStatus.h"
-
-#include <cstring> // Required for memcpy
-
+#ifndef ARDUINO
+	#include <cstring>
+#else
+#include <Arduino.h>
+#endif
 TankStatusClass::TankStatusClass() {
   this->ts.driveLeft = 0;
   this->ts.driveRight = 0;

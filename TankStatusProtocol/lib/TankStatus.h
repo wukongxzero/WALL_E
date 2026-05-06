@@ -2,7 +2,7 @@
 #define TANKSTATUS_SYNC_STRUCT
 
 #define TANKSTATUS_PACKET_LENGTH                                               \
-  16 // bytes,1 +1+4+4+4 + 2 bits for extra room/ keep as multiple of 8, adding
+  8 // bytes,1 +1+4+4+4 + 2 bits for extra room/ keep as multiple of 8, adding
      // 8 extra bytes of padding
 // floating point arithmitic
 #define DECODE_SHORT(data) ((float)(data) / 256.0f)
