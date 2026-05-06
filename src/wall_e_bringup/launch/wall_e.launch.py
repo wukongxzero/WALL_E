@@ -77,18 +77,18 @@ def generate_launch_description():
         # ),
 
         # ── D435 REALSENSE ──
-        # Node(
-        #     package='realsense2_camera',
-        #     executable='realsense2_camera_node',
-        #     name='realsense2_camera',
-        #     parameters=[{
-        #         'depth_module.profile': '640x480x30',
-        #         'rgb_camera.profile':   '640x480x30',
-        #         'align_depth.enable':   True,
-        #         'pointcloud.enable':    True,
-        #     }],
-        #     output='screen'
-        # ),
+         Node(
+             package='realsense2_camera',
+             executable='realsense2_camera_node',
+             name='realsense2_camera',
+             parameters=[{
+                 'depth_module.profile': '640x480x30',
+                 'rgb_camera.profile':   '640x480x30',
+                 'align_depth.enable':   True,
+                 'pointcloud.enable':    True,
+             }],
+             output='screen'
+         ),
 
         # ── RTAB-MAP ──
         Node(
@@ -98,9 +98,9 @@ def generate_launch_description():
             output='screen',
             parameters=[rtabmap_params],
             remappings=[
-                ('rgb/image',       '/camera/color/image_raw'),
-                ('rgb/camera_info', '/camera/color/camera_info'),
-                ('depth/image',     '/camera/aligned_depth_to_color/image_raw'),
+                ('rgb/image',       '/camera/realsense2_camera/color/image_raw'),
+                ('rgb/camera_info', '/camera/realsense2_camera/color/camera_info'),
+                ('depth/image',     '/camera/realsense2_camera/aligned_depth_to_color/image_raw'),
                 ('odom',            '/odom'),
             ],
             arguments=['--delete_db_on_start']
