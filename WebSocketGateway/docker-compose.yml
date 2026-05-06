@@ -1,7 +1,10 @@
 services:
   app:
+    build: .
     image: ${JUPYTER_LAB_CONTAINER}
     container_name: jupyter-lab-host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "8888:8888"
     volumes:
@@ -9,24 +12,28 @@ services:
     environment:
       - JUPYTER_TOKEN=${SECRET_PASSWORD}
       - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - NVIDIA_DRIVER_CAPABILITIES=all#compute,utility
     deploy:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: all
+            - driver: cdi
+              device_ids:
+                - nvidia.com/gpu=all
               capabilities: [gpu]
   ollama:
     image: ollama/ollama
+    network_mode: "host"
     container_name: ollama
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - /var/lib/ollama:/root/.ollama
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
       - OLLAMA_HOST=0.0.0.0
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      test: ["CMD", "curl", "-f", "http://host.docker.internal:11434"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,10 +41,18 @@ services:
       resources:
         reservations:
           devices:
-            - driver: nvidia
-              count: all
+            - driver: cdi                    # <-- Changed from nvidia to cdi
+              device_ids:                    # <-- Replaced 'count: all'
+                - nvidia.com/gpu=all         # <-- Added the CDI device ID
               capabilities: [gpu]
 
+   # deploy:
+   #   resources:
+   #     reservations:
+   #       devices:
+   #         - driver: nvidia
+   #           count: all
+   #           capabilities: [gpu]
 
   cloudflare-tunnel:
     image: cloudflare/cloudflared:latest              # Pull the latest version of the Cloudflare Tunnel image
@@ -48,8 +63,6 @@ services:
     environment:
       - TUNNEL_TOKEN=${SECRET_TOKEN}
 
-volumes:
-  ollama_models:
 
 
     

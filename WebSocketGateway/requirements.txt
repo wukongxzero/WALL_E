@@ -1,7 +1,5 @@
-jupyterlab
-numpy
 scipy
+pyserial
+sympy
 ollama
-asyncio
-websockets
-
+pybind11
