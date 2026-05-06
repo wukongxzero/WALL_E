@@ -84,8 +84,8 @@ void updateOdometry() {
 
 
 
-    tsLocal->driveLeftIn = static_cast<unsigned char>(map(leftVel,0,MAX_VELOCITY,0,MAX_PWM));
-    tsLocal->driveRightIn = static_cast<unsigned char>(map(rightDif,0,MAX_VELOCITY,0,MAX_PWM));
+    tsLocalIn.driveLeft = static_cast<unsigned char>(map(leftVel,0,MAX_VELOCITY,0,MAX_PWM));
+    tsLocalIn.driveRight = static_cast<unsigned char>(map(rightDiff,0,MAX_VELOCITY,0,MAX_PWM));
 }
 
 // ── MOTOR DRIVER ──────────────────────────────────────────────
@@ -125,8 +125,8 @@ unsigned long lastPktMs = 0;
 
 // ── DRIVE FROM TANKSTATUS ──────────────────────────────────────
 void driveMotors() {
-    int throttle = -((int)(tsLocalIn->driveLeft) - 127);
-    int steering = -((int)(tsLocalIn->driveRight)  - 127);
+    int throttle = -((int)(tsLocalIn.driveLeft) - 127);
+    int steering = -((int)(tsLocalIn.driveRight)  - 127);
 
     throttle = clampi(throttle, -124, 124);
     steering = clampi(steering, -124, 124);
@@ -205,7 +205,7 @@ void loop() {
     static int odomCount = 0;
     if (++odomCount >= 10) {
         odomCount = 0;
-        unsigned char* txBuffer = TankStatusClass.MakeIntoBytes();
+        unsigned char* txBuffer = tsLocalOut.MakeIntoBytes();
         Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
     }
 }
