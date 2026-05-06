@@ -1,0 +1,60 @@
+services:
+  app:
+    image: ${JUPYTER_LAB_CONTAINER}
+    container_name: jupyter-lab-host
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./projects:/app/projects
+    environment:
+      - JUPYTER_TOKEN=${SECRET_PASSWORD}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+  ollama:
+    image: ollama/ollama
+    container_name: ollama
+    volumes:
+      - /var/lib/ollama:/root/.ollama
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest              # Pull the latest version of the Cloudflare Tunnel image
+    container_name: cloudflare-tunnel                 # Name of the Cloudflare Tunnel container
+    hostname: cloudflare-tunnel                       # Hostname for the Cloudflare Tunnel container
+    restart: unless-stopped                           # Restart the container unless manually stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${SECRET_TOKEN}
+
+volumes:
+  ollama_models:
+
+
+    
+
+
+
+
+
