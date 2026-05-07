@@ -5,6 +5,10 @@ public class Client : Node
 {
 	private WebSocketClient _ws;
 	private string _wsUrl = "ws://127.0.0.1:8881";
+
+	private WebSocketClient _chatWs;
+	private string _chatWsUrl = "wss://socket.jordanirgangportfolio.com/ws/chat";
+
 	TankStatus localTankSubscriber;
 
 	CSGBox puppetPlatform;
@@ -36,6 +40,7 @@ public class Client : Node
 
 	// Chat state
 	private RichTextLabel _chatHistory;
+	private RichTextLabel _replyBox;
 	private LineEdit _chatInput;
 
 	public override void _Ready()
@@ -128,6 +133,22 @@ public class Client : Node
 			GD.PrintErr($"Failed to start WebSocket client. Error code: {err}");
 		}
 
+		_chatWs = new WebSocketClient();
+		_chatWs.Connect("connection_closed", this, nameof(OnChatConnectionClosed));
+		_chatWs.Connect("connection_error", this, nameof(OnChatConnectionError));
+		_chatWs.Connect("connection_established", this, nameof(OnChatConnectionEstablished));
+		_chatWs.Connect("data_received", this, nameof(OnChatDataReceived));
+
+		Error chatErr = _chatWs.ConnectToUrl(_chatWsUrl);
+		if (chatErr == Error.Ok)
+		{
+			GD.Print($"Connecting to Chat WebSocket at {_chatWsUrl}...");
+		}
+		else
+		{
+			GD.PrintErr($"Failed to start Chat WebSocket client. Error code: {chatErr}");
+		}
+
 		// Initialize UI
 		CanvasLayer canvasLayer = new CanvasLayer();
 		AddChild(canvasLayer);
@@ -200,6 +221,12 @@ public class Client : Node
 		_chatHistory.BbcodeText = "[color=yellow]Chat Space Initialized[/color]\n";
 		chatContainer.AddChild(_chatHistory);
 
+		_replyBox = new RichTextLabel();
+		_replyBox.RectMinSize = new Vector2(0, 60); // Give it some height
+		_replyBox.BbcodeEnabled = true;
+		_replyBox.BbcodeText = "[color=cyan]Replies will appear here...[/color]";
+		chatContainer.AddChild(_replyBox);
+
 		HBoxContainer chatInputBox = new HBoxContainer();
 		chatContainer.AddChild(chatInputBox);
 
@@ -220,6 +247,11 @@ public class Client : Node
 		if (_ws != null && _ws.GetConnectionStatus() != NetworkedMultiplayerPeer.ConnectionStatus.Disconnected)
 		{
 			_ws.Poll();
+		}
+
+		if (_chatWs != null && _chatWs.GetConnectionStatus() != NetworkedMultiplayerPeer.ConnectionStatus.Disconnected)
+		{
+			_chatWs.Poll();
 		}
 
 		float turnSpeed = (currentLeftMotor - currentRightMotor);
@@ -394,6 +426,34 @@ public class Client : Node
 		_chatHistory.BbcodeText += $"\n[color=lightblue]You:[/color] {newText}";
 		_chatInput.Text = "";
 		
-		// TODO: Send chat message over WebSocket to teammate's chat bot
+		if (_chatWs != null && _chatWs.GetConnectionStatus() == NetworkedMultiplayerPeer.ConnectionStatus.Connected)
+		{
+			_chatWs.GetPeer(1).PutPacket(System.Text.Encoding.UTF8.GetBytes(newText));
+		}
+	}
+	private void OnChatConnectionEstablished(string protocol)
+	{
+		GD.Print($"Chat WebSocket connection established with protocol: {protocol}");
+		_chatHistory.BbcodeText += "\n[color=green]Chat connected![/color]";
+	}
+
+	private void OnChatConnectionClosed(bool wasClean)
+	{
+		GD.Print($"Chat WebSocket connection closed, clean: {wasClean}");
+		_chatHistory.BbcodeText += "\n[color=red]Chat disconnected![/color]";
+	}
+
+	private void OnChatConnectionError()
+	{
+		GD.Print("Chat WebSocket connection error");
+		_chatHistory.BbcodeText += "\n[color=red]Chat connection error![/color]";
+	}
+
+	private void OnChatDataReceived()
+	{
+		byte[] packet = _chatWs.GetPeer(1).GetPacket();
+		string response = System.Text.Encoding.UTF8.GetString(packet);
+		_chatHistory.BbcodeText += $"\n[color=lightgreen]Server:[/color] {response}";
+		_replyBox.BbcodeText = $"[color=lightgreen]Latest Reply:[/color] {response}";
 	}
 }
