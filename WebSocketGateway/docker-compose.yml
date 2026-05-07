@@ -1,8 +1,19 @@
 services:
+  socketserver:
+    build:
+      context: ..  # This is the root (WebSocketGateway/)
+      dockerfile: WebSocketGateway/WebSocketGateway/Dockerfile # Path from the new root
+    image: "socketserver"
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   app:
     build: .
     image: ${JUPYTER_LAB_CONTAINER}
     container_name: jupyter-lab-host
+    privileged: true
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:
@@ -21,6 +32,7 @@ services:
               device_ids:
                 - nvidia.com/gpu=all
               capabilities: [gpu]
+
   ollama:
     image: ollama/ollama
     network_mode: "host"
@@ -41,33 +53,16 @@ services:
       resources:
         reservations:
           devices:
-            - driver: cdi                    # <-- Changed from nvidia to cdi
-              device_ids:                    # <-- Replaced 'count: all'
-                - nvidia.com/gpu=all         # <-- Added the CDI device ID
+            - driver: cdi
+              device_ids:
+                - nvidia.com/gpu=all
               capabilities: [gpu]
 
-   # deploy:
-   #   resources:
-   #     reservations:
-   #       devices:
-   #         - driver: nvidia
-   #           count: all
-   #           capabilities: [gpu]
-
   cloudflare-tunnel:
-    image: cloudflare/cloudflared:latest              # Pull the latest version of the Cloudflare Tunnel image
-    container_name: cloudflare-tunnel                 # Name of the Cloudflare Tunnel container
-    hostname: cloudflare-tunnel                       # Hostname for the Cloudflare Tunnel container
-    restart: unless-stopped                           # Restart the container unless manually stopped
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    hostname: cloudflare-tunnel
+    restart: unless-stopped
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${SECRET_TOKEN}
-
-
-
-    
-
-
-
-
-

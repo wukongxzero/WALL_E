@@ -5,4 +5,5 @@ ollama
 pybind11
 fastapi 
 uvicorn
+fastapi
 websockets
