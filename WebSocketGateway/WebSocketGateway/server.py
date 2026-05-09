@@ -1,7 +1,11 @@
 import json
 import asyncio
 import tankstatus_wrapper
+import time
+import serial
+
 # from physicalTankbot import PhysicalTankbot as tb
+import ctypes
 
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
@@ -10,21 +14,39 @@ from ollama import AsyncClient
 OLLAMA_HOST = "http://host.docker.internal:11434"
 # Note: If gemma2:2b fails to use the tool, change this to "llama3.1"
 MODEL_NAME = "llama3.1"
+PORT = "/dev/ttyACM0"
+BAUD = 115200
+PKT_LEN = 8
+CMD_HZ = 50
+CMD_PERIOD = 1.0 / CMD_HZ
+CENTER = 127
 
 
 # ==========================================
 # HARDWARE TOOL DEFINITION
 # ==========================================
-def move_tank(left_speed: int, right_speed: int) -> str:
+ser = serial.Serial(PORT, BAUD, timeout=0)
+ser.reset_input_buffer()
+
+
+def move_tank(left_speed: int, right_speed: int, duration: float) -> str:
     """
     Moves the tank by setting the left and right motor speeds.
-    Speeds should be between -255 (full reverse) and 255 (full forward).
+    Speeds should be between 0 (full reverse) and 255 (full forward).
+    duration should be how long the motors will run
     """
     ts = tankstatus_wrapper.TankStatusClass()
-    ts.drive_left = left_speed
-    ts.drive_right = right_speed
-
+    ts.drive_left = ctypes.c_ubyte(left_speed).value
+    ts.drive_right = ctypes.c_ubyte(right_speed).value
     packet = ts.make_into_bytes()
+
+    ser.write(packet)
+    time.sleep(duration)
+
+    ts.drive_left = ctypes.c_ubyte(CENTER).value
+    ts.drive_right = ctypes.c_ubyte(CENTER).value
+
+    ser.write(packet)
 
     # --- HARDWARE EXECUTION GOES HERE ---
     # Example: tb.move(left_speed, right_speed)
@@ -102,7 +124,8 @@ async def chat_endpoint(websocket: WebSocket):
                 user_text = str(raw_data)
 
             print(f"👤 User: {user_text}")
-            chat_history.append({"role": "user", "content": user_text})
+            ctrl_str = " :128 is the center position, 255 is fwd per wheel,0 is bwd per wheel unsigned char are expected values"
+            chat_history.append({"role": "user", "content": user_text + ctrl_str})
 
             try:
                 # 1. Ask Ollama, passing the tool definition
@@ -123,15 +146,16 @@ async def chat_endpoint(websocket: WebSocket):
                             args = tool.function.arguments
                             left = args.get("left_speed", 200)
                             right = args.get("right_speed", 200)
+                            duration = args.get("duration", 10)
 
                             # Execute the physical movement
-                            tool_result = move_tank(left, right)
+                            tool_result = move_tank(left, right, duration)
 
                             # Update history so the AI knows what happened
-                            chat_history.append(response.message)
-                            chat_history.append(
-                                {"role": "tool", "content": tool_result}
-                            )
+                            # chat_history.append(response.message)
+                            # chat_history.append(
+                            #    {"role": "tool", "content": tool_result}
+                            # )
 
                     # 3. Ask Ollama to summarize what it just did
                     response = await client.chat(
