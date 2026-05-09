@@ -24,36 +24,36 @@ RUN mkdir /app/projects
 # Install system dependencies
 
 RUN apt-get update && apt-get install -y \
-    ffmpeg build-essential cmake pkg-config wget pybind11-dev \
-    && rm -rf /var/lib/apt/lists/*
+  ffmpeg build-essential cmake pkg-config wget pybind11-dev
 
-ENV LD_PRELOAD="/usr/lib/aarch64-linux-gnu/libstdc++.so.6"
-ENV LD_LIBRARY_PATH="/usr/local/cuda/lib64:/usr/lib/aarch64-linux-gnu:${LD_LIBRARY_PATH}"
+
 
 COPY requirements.txt .
 
-RUN mkdir -p /app/builds/ 
+RUN python3 -m pip install --no-cache-dir -r requirements.txt
 RUN mkdir -p /app/tankstatus/ 
 COPY tankstatus /app/tankstatus
+WORKDIR /app/tankstatus/builds
+RUN cmake .. && make
 
-# Install JupyterLab (for x86 base) and your requirements
-# Note: l4t-ml already has Jupyter installed, so it will just skip it on the Jetson
-RUN python3 -m pip install --no-cache-dir -r requirements.txt
+WORKDIR /app/
 
-WORKDIR /app/builds/
-RUN cmake /app/tankstatus/
-RUN make
-RUN cp -r * /app/projects/
+RUN find /app/tankstatus -name "*.so"
 
+ENV PYTHONPATH="/app/tankstatus:/app/tankstatus/builds:${PYTHONPATH:-}"
+RUN python3 -c "import tankstatus_wrapper; print('Success! Wrapper imported cleanly.')"
 
 # Create User and Setup Permissions
 RUN useradd -m dockerUser
 RUN chown -R dockerUser:dockerUser /app/projects
+RUN usermod -aG dialout dockerUser
 
-USER dockerUser
+
+
 WORKDIR /app/projects
+USER dockerUser
 
 EXPOSE 8888
 
 # Run Jupyter directly from the system Python environment
-ENTRYPOINT ["python3", "-m", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser"]
+ENTRYPOINT ["python3", "-m", "jupyter", "lab", "--ip=0.0.0.0", "--port=8888", "--no-browser" , "--allow-root"]
