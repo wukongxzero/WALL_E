@@ -33,7 +33,10 @@
     <ContainerPort Include="5165" Type="tcp" />
     <ContainerPort Include="7288" Type="tcp" />
 
+
+
   </ItemGroup>
+
 
 
 
