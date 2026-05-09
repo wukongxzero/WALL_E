@@ -3,12 +3,12 @@ FROM python:3.10-slim AS socketserver
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    cmake \
-    g++ \
-    build-essential \
-    git \
-    python3-dev \
-    && rm -rf /var/lib/apt/lists/*
+  cmake \
+  g++ \
+  build-essential \
+  git \
+  python3-dev \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 FROM python:3.10-slim AS socketserver

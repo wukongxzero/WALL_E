@@ -9,7 +9,7 @@ from ollama import AsyncClient
 
 OLLAMA_HOST = "http://host.docker.internal:11434"
 # Note: If gemma2:2b fails to use the tool, change this to "llama3.1"
-MODEL_NAME = "gemma2:2b"
+MODEL_NAME = "llama3.1"
 
 
 # ==========================================
