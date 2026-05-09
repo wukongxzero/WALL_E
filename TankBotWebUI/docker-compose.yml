@@ -1,6 +1,7 @@
 services:
-  partywantedserver:
+  app:
     image: tankwebui-server-image  # (leave whatever you have here)
+    container_name: "tankwebui-container" 
     # ADD/FIX THIS BLOCK:
     ports:
       - "8080:8080"
@@ -8,3 +9,12 @@ services:
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_HTTPS_PORTS=
+
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    hostname: cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${SECRET_TOKEN}
