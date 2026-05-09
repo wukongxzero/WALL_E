@@ -16,7 +16,7 @@ build:
 	DOTNET_SYSTEM_NET_DISABLEIPV6=1 dotnet restore 
 	DOTNET_SYSTEM_NET_DISABLEIPV6=1 dotnet publish -c Release \
 		--os linux \
-		--arch x64 \
+		--arch arm64 \
 		-p:CONTAINER_NAME=$(CONTAINER_NAME) \
 		/t:PublishContainer --disable-parallel --ignore-failed-sources
 

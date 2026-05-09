@@ -10,10 +10,10 @@ services:
       - ASPNETCORE_URLS=http://+:8080
       - ASPNETCORE_HTTPS_PORTS=
 
-  cloudflare-tunnel:
+  cloudflare-tunnel-webui:
     image: cloudflare/cloudflared:latest
-    container_name: cloudflare-tunnel
-    hostname: cloudflare-tunnel
+    container_name: cloudflare-tunnel-webui
+    hostname: cloudflare-tunnel-webui
     restart: unless-stopped
     command: tunnel run
     environment:

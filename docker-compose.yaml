@@ -1,33 +1,109 @@
 services:
-  wall_e_ros2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: wall_e_ros2:latest
-    container_name: wall_e_ros2
-    network_mode: host
-    privileged: true
+  # ==========================================
+  # TANK WEB UI
+  # ==========================================
+  webui:
+    image: tankwebui-server-image
+    container_name: tankwebui-container
+    ports:
+      - "8080:8080"
     environment:
-      - ROS_DOMAIN_ID=0
-    volumes:
-      - /home/nixjetson/WALL_E_ROS2:/ros2_ws
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTPS_PORTS=
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
-    working_dir: /ros2_ws
-    depends_on:
-      - ollama
+  # ==========================================
+  # WEBSOCKET GATEWAY
+  # ==========================================
+  socketserver:
+    build:
+      context: .  # Changed from '..' since we are now in the root folder
+      dockerfile: WebSocketGateway/WebSocketGateway/Dockerfile
+    image: "socketserver"
+    container_name: socketserver
+    privileged: true
+    ports:
+      - "8000:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     devices:
-      - /dev/ttyUSB0:/dev/ttyUSB0
-      - /dev/ttyUSB1:/dev/ttyUSB1
-      - /dev/rfcomm0:/dev/rfcomm0
+       - "/dev/ttyACM0:/dev/ttyACM0"
+       - "/dev/ttyACM1:/dev/ttyACM1"
 
+  # ==========================================
+  # JUPYTER LAB
+  # ==========================================
+  jupyter_lab:  # Renamed from 'app' to avoid conflict with Web UI
+    build:
+      context: ./WebSocketGateway  # Adjusted for root execution
+    image: ${JUPYTER_LAB_CONTAINER}
+    container_name: jupyter-lab-host
+    privileged: true
+    ports:
+      - "8888:8888"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ${NIX_LIBSTDC_PATH}:/app/libstdc++.so.6:ro
+      - ./WebSocketGateway/projects:/app/projects  # Adjusted relative path
+    environment:
+      - JUPYTER_TOKEN=${SECRET_PASSWORD}
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all#compute,utility
+    devices:
+      - "/dev/ttyACM0:/dev/ttyACM0"
+      - "/dev/ttyACM1:/dev/ttyACM1"
+    group_add:
+      - dialout 
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: cdi
+              device_ids:
+                - nvidia.com/gpu=all
+              capabilities: [gpu]
+
+  # ==========================================
+  # OLLAMA AI
+  # ==========================================
   ollama:
     image: ollama/ollama
+    network_mode: "host"
     container_name: ollama
-    network_mode: host
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
-      - ollama_models:/root/.ollama
+      - /var/lib/ollama:/root/.ollama
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://host.docker.internal:11434"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: cdi
+              device_ids:
+                - nvidia.com/gpu=all
+              capabilities: [gpu]
 
-volumes:
-  ollama_models:
+  # ==========================================
+  # CLOUDFLARE TUNNEL (Unified)
+  # ==========================================
+  cloudflare-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare-tunnel
+    hostname: cloudflare-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${SECRET_TOKEN}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
