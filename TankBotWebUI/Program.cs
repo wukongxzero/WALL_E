@@ -40,17 +40,13 @@ builder.Services.AddResponseCompression(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".pck"] = "application/octet-stream";
 provider.Mappings[".wasm"] = "application/wasm";
+
+app.UseStaticFiles(new StaticFileOptions { ContentTypeProvider = provider });
 
 app.UseCors("_myAllowSpecificOrigins");
 
@@ -189,10 +185,10 @@ app.MapGet(
 );
 app.UseHttpsRedirection();
 app.MapGet(
-    "/quote",
+    "/webui",
     (IWebHostEnvironment env) =>
     {
-        var indexPath = Path.Combine(env.WebRootPath, "RentReady.html");
+        var indexPath = Path.Combine(env.WebRootPath, "webui_tankstatus.html");
         return Results.File(indexPath, "text/html");
     }
 );
