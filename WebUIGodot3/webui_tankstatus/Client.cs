@@ -7,7 +7,7 @@ public class Client : Node
 	private string _wsUrl = "ws://127.0.0.1:8881";
 
 	private WebSocketClient _chatWs;
-	private string _chatWsUrl = "wss://socket.jordanirgangportfolio.com/ws/chat";
+	private string _chatWsUrl = "wss://tankstatus.jordanirgangportfolio.com/ws/chat";
 
 	TankStatus localTankSubscriber;
 
@@ -115,7 +115,7 @@ public class Client : Node
 		_cameraPivot.AddChild(_camera);
 		
 		// Set the camera's local offset (move back and slightly up from pivot)
-		_camera.Transform = new Transform(Basis.Identity, new Vector3(0, 2, 12));
+		_camera.Transform = new Transform(Basis.Identity, new Vector3(0, 5, 12)); // Reset to 5 up, 12 back
 		
 		// Apply initial rotations
 		_cameraPivot.Rotation = new Vector3(_camRotationX, _camRotationY, 0);
@@ -428,7 +428,8 @@ public class Client : Node
 		
 		if (_chatWs != null && _chatWs.GetConnectionStatus() == NetworkedMultiplayerPeer.ConnectionStatus.Connected)
 		{
-			_chatWs.GetPeer(1).PutPacket(System.Text.Encoding.UTF8.GetBytes(newText));
+			string jsonMsg = $"{{\"message\": \"{newText}\"}}";
+			_chatWs.GetPeer(1).PutPacket(System.Text.Encoding.UTF8.GetBytes(jsonMsg));
 		}
 	}
 	private void OnChatConnectionEstablished(string protocol)

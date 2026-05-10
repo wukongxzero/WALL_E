@@ -8,11 +8,12 @@
 script = ExtResource( 1 )
 
 [node name="Camera" type="Camera" parent="Node"]
-transform = Transform( 1, 0, 0, 0, 0.896842, 0.442351, 0, -0.442351, 0.896842, 0, 9.11441, 8.12824 )
+transform = Transform( 0.824008, -0.566507, -0.0090179, 0, -0.0159164, 0.999873, -0.566579, -0.823903, -0.0131152, 0.53379, 15.943, 21.2783 )
 
 [node name="BaseCSGBox" type="CSGBox" parent="Node"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.48457, 0 )
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -2.61481, 5.91389, 7.22213 )
 width = 4.19754
+height = 2.23444
 depth = 4.67889
 
 [node name="CSGPlatform" type="CSGBox" parent="Node/BaseCSGBox"]
