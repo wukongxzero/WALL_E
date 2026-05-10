@@ -1,0 +1,5 @@
+tankstatus/builds/
+tankstatus/build/
+CMakeCache.txt
+CMakeFiles/
+*.so

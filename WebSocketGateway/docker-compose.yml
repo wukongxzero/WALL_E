@@ -7,8 +7,8 @@ services:
        - "/dev/ttyACM0:/dev/ttyACM0" # Maps the 40-pin header UART
        - "/dev/ttyACM1:/dev/ttyACM1" # Maps a USB serial device
     privileged: true
-    #group_add:
-    #  - dialout
+    group_add:
+      - dialout
     image: "socketserver"
     ports:
       - "8000:8000"
@@ -16,7 +16,9 @@ services:
       - "host.docker.internal:host-gateway"
 
   app:
-    build: .
+    build:
+      context: ..
+      dockerfile: WebSocketGateway/Dockerfile
     image: ${JUPYTER_LAB_CONTAINER}
     container_name: jupyter-lab-host
     privileged: true

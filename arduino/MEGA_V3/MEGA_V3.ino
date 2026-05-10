@@ -124,9 +124,9 @@ unsigned long lastPktMs = 0;
 #define PKT_TIMEOUT_MS 500
 
 // ── DRIVE FROM TANKSTATUS ──────────────────────────────────────
-void driveMotors() {
-    int throttle = -((int)(tsLocalIn.driveLeft) - 127);
-    int steering = -((int)(tsLocalIn.driveRight)  - 127);
+void driveMotors(unsigned char left,unsigned char right) {
+    int throttle = -((int)(left) - 127);
+    int steering = -((int)(right)  - 127);
 
     throttle = clampi(throttle, -124, 124);
     steering = clampi(steering, -124, 124);
@@ -169,6 +169,18 @@ void setup() {
     if (MCUSR & (1 << WDRF)) MCUSR = 0;
     wdt_disable();
     wdt_enable(WDTO_1S);
+
+
+
+    tsLocalIn.driveLeft = 127; 
+    tsLocalIn.driveRight = 127; 
+
+    tsLocalOut.driveLeft = 127; 
+    tsLocalOut.driveRight = 127; 
+
+    driveMotors(10, 200);
+    delay(500);
+    driveMotors(127,127);
 }
 
 // ── LOOP ──────────────────────────────────────────────────────
@@ -180,32 +192,35 @@ void loop() {
         pktBuf[pktIdx++] = c;
         if (pktIdx >= TANKSTATUS_PACKET_LENGTH) {
             tsLocalIn.BuildFromBytes(pktBuf);
+            driveMotors(tsLocalIn.driveLeft, tsLocalIn.driveRight);
             
             pktIdx    = 0;
             lastPktMs = millis();
+
+            unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
+            Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+
+
         }
     }
-
-    /*
-    if ((millis() - lastPktMs) > PKT_TIMEOUT_MS) {
-        stopMotors();
-        motorsHalted = true;
-    } else {
-        motorsHalted = false;
-    }
-    */
-
+//
+//    if ((millis() - lastPktMs) > PKT_TIMEOUT_MS) {
+//        stopMotors();
+//        motorsHalted = true;
+//    } else {
+//        motorsHalted = false;
+//    }
+//
     unsigned long now = millis();
     if ((now - lastLoop) < LOOP_MS) return;
     lastLoop = now;
 
     updateOdometry();
-    if (!motorsHalted) driveMotors();
 
     static int odomCount = 0;
     if (++odomCount >= 10) {
         odomCount = 0;
-        unsigned char* txBuffer = tsLocalOut.MakeIntoBytes();
-        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+//        unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
+//        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
     }
 }

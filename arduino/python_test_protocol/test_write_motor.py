@@ -73,12 +73,14 @@ def main():
             # ---------------------------------------------------------
             if now - last_cmd >= CMD_PERIOD:
                 last_cmd = now
-                throttle = ramp_throttle(elapsed)
+                # throttle = ramp_throttle(elapsed)
 
                 # Modify wrapper properties directly
                 # Note: Adjust to `tx.drive_left` if pybind11 converted the case
-                tx.drive_left = max(0, min(255, CENTER - int(throttle)))
-                tx.drive_right = max(0, min(255, CENTER - int(0)))
+                # tx.drive_left = max(0, min(255, CENTER - int(throttle)))
+                # tx.drive_right = max(0, min(255, CENTER - int(0)))
+                tx.drive_left = 250
+                tx.drive_right = 250
 
                 try:
                     # Let the C++ wrapper handle the packing and byte alignment!
@@ -90,26 +92,30 @@ def main():
             # ---------------------------------------------------------
             # RECEIVE (Deserialize from Bytes)
             # ---------------------------------------------------------
-            if ser.in_waiting >= PKT_LEN:
-                # Read exactly 10 bytes (NO readline!)
-                raw = ser.read(PKT_LEN)
+            #
+            if ser.in_waiting >= 1:
+                raw = ser.read(1)
+                print(raw)
+            # if ser.in_waiting >= PKT_LEN:
+            # Read exactly 10 bytes (NO readline!)
+            #    raw = ser.read(PKT_LEN)
 
-                try:
-                    # Build from the raw byte array
-                    rx.build_from_bytes(raw)
-                    throttle_now = ramp_throttle(elapsed)
+            #   try:
+            # Build from the raw byte array
+            #       rx.build_from_bytes(raw)
+            #   throttle_now = ramp_throttle(elapsed)
 
-                    # Read properties back to verify
-                    print(
-                        f"t={elapsed:5.2f}s  cmd={throttle_now:+6.1f}  "
-                        f"L={rx.drive_left}  "
-                        f"R={rx.drive_right}  "
-                        f"EulerX={rx.eulerXFloat:+.3f}"
-                    )
-                except Exception as e:
-                    print(
-                        f"BuildFromBytes failed (check pybind byte array handling): {e}"
-                    )
+            # Read properties back to verify
+            #   print(
+            #       f"t={elapsed:5.2f}s  cmd={throttle_now:+6.1f}  "
+            #       f"L={rx.drive_left}  "
+            #       f"R={rx.drive_right}  "
+            #       f"EulerX={rx.eulerXFloat:+.3f}"
+            # 3   )
+            # except Exception as e:
+            #   print(
+            #       f"BuildFromBytes failed (check pybind byte array handling): {e}"
+            #   )
 
             if elapsed > total_dur:
                 break

@@ -1,6 +1,10 @@
 #ifndef TANKSTATUS_SYNC_STRUCT
 #define TANKSTATUS_SYNC_STRUCT
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define TANKSTATUS_PACKET_LENGTH                                               \
   8 // bytes,1 +1+4+4+4 + 2 bits for extra room/ keep as multiple of 8, adding
      // 8 extra bytes of padding
@@ -8,6 +12,7 @@
 #define DECODE_SHORT(data) ((float)(data) / 256.0f)
 #define ENCODE_SHORT(reading) ((short)((reading) * 256.0f))
 
+#pragma pack(push, 1)
 // todo: rename file as from ITankStatus to tankStatus
 struct TankStatus {
   volatile unsigned char driveLeft;  // = 0;  // 1 byte 0-255
@@ -17,6 +22,7 @@ struct TankStatus {
   volatile short eulerZ;             // 2 byte
   volatile unsigned char changeFlag;
 };
+#pragma pack(pop)
 void constructTankStatus(struct TankStatus *self);
 // TODO: should turn all chars into one char byte array as a buffer to be
 // streamed over usart
@@ -30,5 +36,9 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
 int get_tankstatus_packet_length();
 float getDecodedShortToFloat(short data);
 short getEncodedFloatToShort(float reading);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
