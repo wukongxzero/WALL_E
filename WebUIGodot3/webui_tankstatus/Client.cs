@@ -323,38 +323,36 @@ public class Client : Node
 
 	private void OnDataReceived()
 	{
-		// Grab the raw bytes
+		// Grab the raw bytes and convert to string
 		byte[] packet = _ws.GetPeer(1).GetPacket();
+		string jsonStr = System.Text.Encoding.UTF8.GetString(packet);
 
-		// Initialize a fresh struct
-		TankStatus ts = new TankStatus();
+		JSONParseResult result = JSON.Parse(jsonStr);
+		if (result.Error != Error.Ok)
+		{
+			GD.PrintErr("Failed to parse telemetry JSON");
+			return;
+		}
 
-		// Optional: Call your C constructor if it sets default values
-		TankStatusNative.constructTankStatus(ref ts);
-
-		// Pass the byte array and the struct reference to the C library
-		TankStatusNative.readByteTankStatus(packet, packet.Length, ref ts);
-		decodedEulerX = TankStatusNative.getDecodedShortToFloat(ts.eulerX);
-		decodedEulerY = TankStatusNative.getDecodedShortToFloat(ts.eulerY);
-		decodedEulerZ = TankStatusNative.getDecodedShortToFloat(ts.eulerZ);
+		Godot.Collections.Dictionary data = result.Result as Godot.Collections.Dictionary;
 		
-		currentLeftMotor = (ts.driveLeft - 127) / 128.0f;
-		currentRightMotor = (ts.driveRight - 127) / 128.0f;
+		decodedEulerX = Convert.ToSingle(data["eulerX"]);
+		decodedEulerY = Convert.ToSingle(data["eulerY"]);
+		decodedEulerZ = Convert.ToSingle(data["eulerZ"]);
+		
+		byte driveLeft = Convert.ToByte(data["driveLeft"]);
+		byte driveRight = Convert.ToByte(data["driveRight"]);
 
-		// Print the newly populated struct data
-		GD.Print($"--- Tank Status Update ---");
-		GD.Print($"Drive: Left={ts.driveLeft}, Right={ts.driveRight}");
-		GD.Print($"Euler: X={decodedEulerX}, Y={decodedEulerY}, Z={decodedEulerZ}");
-		GD.Print($"Flag:  {ts.changeFlag}");
-
-		float forwardSpeed = (currentLeftMotor + currentRightMotor) / 2.0f;
+		currentLeftMotor = (driveLeft - 127) / 128.0f;
+		currentRightMotor = (driveRight - 127) / 128.0f;
 
 		// Update UI
-		lblDriveLeft.Text = $"Drive Left: {ts.driveLeft}";
-		lblDriveRight.Text = $"Drive Right: {ts.driveRight}";
+		lblDriveLeft.Text = $"Drive Left: {driveLeft}";
+		lblDriveRight.Text = $"Drive Right: {driveRight}";
 		lblEuler.Text = $"Euler: X={decodedEulerX:F2}, Y={decodedEulerY:F2}, Z={decodedEulerZ:F2}";
+		float forwardSpeed = (currentLeftMotor + currentRightMotor) / 2.0f;
 		lblSpeed.Text = $"Speed: {forwardSpeed:F2}";
-		
+
 		// Change color depending on speed
 		if (forwardSpeed > 0.5f)
 			lblSpeed.Modulate = new Color(0, 1, 0); // Green for fast forward
@@ -374,19 +372,9 @@ public class Client : Node
 			return;
 		}
 
-		TankStatus ts = new TankStatus();
-		TankStatusNative.constructTankStatus(ref ts);
-		ts.driveLeft = left;
-		ts.driveRight = right;
-		ts.changeFlag = 1;
-
-		int packetLen = TankStatusNative.get_tankstatus_packet_length();
-		byte[] buffer = new byte[packetLen];
-
-		TankStatusNative.makeByteTankStatus(buffer, packetLen, ref ts);
-
-		_ws.GetPeer(1).PutPacket(buffer);
-		GD.Print($"Sent command: Left={left}, Right={right}");
+		string jsonCmd = $"{{\"driveLeft\": {left}, \"driveRight\": {right}, \"changeFlag\": 1}}";
+		_ws.GetPeer(1).PutPacket(System.Text.Encoding.UTF8.GetBytes(jsonCmd));
+		GD.Print($"Sent JSON command: {jsonCmd}");
 	}
 
 	private void OnBtnForwardPressed()
@@ -453,8 +441,34 @@ public class Client : Node
 	private void OnChatDataReceived()
 	{
 		byte[] packet = _chatWs.GetPeer(1).GetPacket();
-		string response = System.Text.Encoding.UTF8.GetString(packet);
-		_chatHistory.BbcodeText += $"\n[color=lightgreen]Server:[/color] {response}";
-		_replyBox.BbcodeText = $"[color=lightgreen]Latest Reply:[/color] {response}";
+		string jsonStr = System.Text.Encoding.UTF8.GetString(packet);
+		
+		JSONParseResult result = JSON.Parse(jsonStr);
+		if (result.Error != Error.Ok)
+		{
+			// Fallback if the server sends plain text instead of JSON
+			_chatHistory.BbcodeText += $"\n[color=lightgreen]Server:[/color] {jsonStr}";
+			_replyBox.BbcodeText = $"[color=lightgreen]Latest Reply:[/color] {jsonStr}";
+			return;
+		}
+
+		Godot.Collections.Dictionary data = result.Result as Godot.Collections.Dictionary;
+		string type = data.Contains("type") ? data["type"].ToString() : "";
+		
+		if (type == "chunk")
+		{
+			string content = data["content"].ToString();
+			_chatHistory.BbcodeText += content; // Streaming effect
+			_replyBox.BbcodeText = $"[color=lightgreen]Latest:[/color] {content}";
+		}
+		else if (type == "done")
+		{
+			_chatHistory.BbcodeText += "\n";
+		}
+		else if (type == "error")
+		{
+			string errorMsg = data["content"].ToString();
+			_chatHistory.BbcodeText += $"\n[color=red]Error:[/color] {errorMsg}";
+		}
 	}
 }
