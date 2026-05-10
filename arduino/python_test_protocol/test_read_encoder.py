@@ -1,10 +1,12 @@
 import serial
 import tankstatus_wrapper
 
+PORT = "/dev/ttyACM0"
+
 
 def main():
     # Connect to the Arduino (Make sure the port matches your setup)
-    ser = serial.Serial("/dev/ttyACM1", 115200)
+    ser = serial.Serial(PORT, 115200)
 
     # Instantiate your wrapper
     rx_status = tankstatus_wrapper.TankStatusClass()
@@ -26,7 +28,7 @@ def main():
 
                 # Print the decoded values
                 print(
-                    f"Left Vel: {rx_status.eulerXFloat:.2f} | Right Vel: {rx_status.eulerYFloat:.2f}"
+                    f"Left PWM: {rx_status.drive_left} | Right PWM: {rx_status.drive_right}"
                 )
 
     except KeyboardInterrupt:

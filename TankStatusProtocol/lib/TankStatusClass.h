@@ -1,4 +1,4 @@
-
+#include "TankStatus.h"
 extern "C" {
 #include "TankStatus.h"
 }
@@ -11,21 +11,23 @@ protected:
   struct TankStatus ts;
 
 public:
-  float eulerXFloat = 0;
-  float eulerYFloat = 0;
-  float eulerZFloat = 0;
+  // Normal values, NOT pointers!
+  unsigned char driveLeft;
+  unsigned char driveRight;
+  short eulerX;
+  short eulerY;
+  short eulerZ;
+  bool changeFlag;
 
-  // wrapping for python
-  volatile unsigned char *driveLeft;
-  volatile unsigned char *driveRight;
-  volatile short *eulerX;
-  volatile short *eulerY;
-  volatile short *eulerZ;
-  volatile bool *changeFlag;
-  int packetLength = TANKSTATUS_PACKET_LENGTH;
+  float eulerXFloat;
+  float eulerYFloat;
+  float eulerZFloat;
+
+  int packetLength;
 
   TankStatusClass();
   ~TankStatusClass();
+  
   unsigned char *MakeIntoBytes();
-  void BuildFromBytes(unsigned char *buffer);
+  void BuildFromBytes(unsigned char *incoming_buffer);
 };

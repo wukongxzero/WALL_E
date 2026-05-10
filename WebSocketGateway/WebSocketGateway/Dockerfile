@@ -19,8 +19,8 @@ WORKDIR /app
 
 # 1. Build the C++ TankStatusProtocol 
 # This path is now correct because our context is WALL_E_ROS2
-COPY ./TankStatusProtocol /app/TankStatusProtocol
-WORKDIR /app/TankStatusProtocol/builds
+COPY TankStatusProtocol /app/tankstatus
+WORKDIR /app/tankstatus/builds
 RUN rm -rf * && cmake .. && make
 
 # 2. Setup the Python environment
@@ -29,7 +29,7 @@ WORKDIR /app/src
 COPY ./WebSocketGateway /app/src/WebSocketGateway
 
 # 3. Move the compiled library into the nested app folder
-RUN find /app/TankStatusProtocol/builds -name "*.so" -exec cp {} /app/src/WebSocketGateway/WebSocketGateway/ \;
+RUN find /app/tankstatus/builds -name "*.so" -exec cp {} /app/src/WebSocketGateway/WebSocketGateway/ \;
 
 # 4. Install Python deps 
 # Path adjusted to the new copy location

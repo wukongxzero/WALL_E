@@ -23,9 +23,6 @@ void setup()
 
 }
 
-
-
-
 // ── LOOP ──────────────────────────────────────────────────────
 void loop() {
     // 1. Read incoming TankStatus packets (to test receiving)
@@ -34,32 +31,30 @@ void loop() {
         pktBuf[pktIdx++] = c;
         if (pktIdx >= TANKSTATUS_PACKET_LENGTH) {
             tsLocalIn.BuildFromBytes(pktBuf);
-            pktIdx = 0;
-            // You could optionally print/use tsLocalIn data here if testing two-way
+            pktIdx = 0; 
         }
     }
-    //Serial.println(TANKSTATUS_PACKET_LENGTH);
 
-    unsigned long nowBlink = millis();
     // 2. Timing loop execution (5ms)
     unsigned long now = millis();
     if ((now - lastLoop) < LOOP_MS) return;
     lastLoop = now;
 
-    //echo
-    tsLocalOut.driveLeft = tsLocalIn.driveLeft;
-    tsLocalOut.driveRight = tsLocalIn.driveRight;
+    // --- EVERYTHING BELOW HERE HAPPENS EXACTLY ONCE EVERY 5ms ---
 
-   // 5. Stream packet back using MakeIntoBytes()
     static int odomCount = 0;
     if (++odomCount >= 10) { // Send every 10 loops (50ms / 20Hz)
         odomCount = 0;
         
-        // Grab the byte array directly from the OUT instance
-        unsigned char* txBuffer = tsLocalOut.MakeIntoBytes();
-        
+        // 3. Set values right before you send them
+        // WARNING: If these still send as 0, check TankStatusClass.h to make sure
+        // you aren't supposed to be doing tsLocalOut.ts.driveLeft = 10;
+        tsLocalOut.driveLeft = tsLocalIn.driveLeft; 
+        tsLocalOut.driveRight = tsLocalIn.driveRight;
 
-        // Write the whole struct payload seamlessly
-        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+        // 4. Stream packet back
+        unsigned char* txBuffer = tsLocalOut.MakeIntoBytes();
+        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH); 
     }
 }
+

@@ -28,13 +28,18 @@ RUN apt-get update && apt-get install -y \
 
 
 
-COPY requirements.txt .
+COPY WebSocketGateway/requirements.txt .
 
 RUN python3 -m pip install --no-cache-dir -r requirements.txt
 RUN mkdir -p /app/tankstatus/ 
-COPY tankstatus /app/tankstatus
+
+COPY TankStatusProtocol /app/tankstatus
+
+# Fix the path to match the destination above
 WORKDIR /app/tankstatus/builds
-RUN cmake .. && make
+
+# Now CMake will find your CMakeLists.txt in the parent directory
+RUN rm -rf * && cmake .. && make
 
 WORKDIR /app/
 
