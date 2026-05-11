@@ -1,0 +1,5 @@
+CompileFlags:
+  Add: [
+    "-I/path/to/pybind11/include",
+    "-I/usr/include/python3.x"
+  ]
