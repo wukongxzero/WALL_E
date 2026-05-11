@@ -10,6 +10,8 @@ services:
     group_add:
       - dialout
     image: "socketserver"
+    volumes:
+      - WebSocketLog:"WebSocketGateway/WebSocketGateway/logs:/app/logs"
     ports:
       - "8000:8000"
     extra_hosts:
@@ -80,3 +82,5 @@ services:
     command: tunnel run
     environment:
       - TUNNEL_TOKEN=${SECRET_TOKEN}
+volumes:
+  WebSocketLog:

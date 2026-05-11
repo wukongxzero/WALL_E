@@ -16,6 +16,7 @@ FROM python:3.10-slim AS socketserver
 RUN apt-get update && apt-get install -y cmake g++ build-essential git python3-dev pybind11-dev && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
+RUN mkdir /app/logs
 
 # 1. Build the C++ TankStatusProtocol 
 # This path is now correct because our context is WALL_E_ROS2
