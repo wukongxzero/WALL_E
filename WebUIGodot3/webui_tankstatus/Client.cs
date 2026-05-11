@@ -40,7 +40,6 @@ public class Client : Node
 
 	// Chat state
 	private RichTextLabel _chatHistory;
-	private RichTextLabel _replyBox;
 	private LineEdit _chatInput;
 
 	public override void _Ready()
@@ -221,11 +220,7 @@ public class Client : Node
 		_chatHistory.BbcodeText = "[color=yellow]Chat Space Initialized[/color]\n";
 		chatContainer.AddChild(_chatHistory);
 
-		_replyBox = new RichTextLabel();
-		_replyBox.RectMinSize = new Vector2(0, 60); // Give it some height
-		_replyBox.BbcodeEnabled = true;
-		_replyBox.BbcodeText = "[color=cyan]Replies will appear here...[/color]";
-		chatContainer.AddChild(_replyBox);
+		// _replyBox removed
 
 		HBoxContainer chatInputBox = new HBoxContainer();
 		chatContainer.AddChild(chatInputBox);
@@ -447,8 +442,7 @@ public class Client : Node
 		if (result.Error != Error.Ok)
 		{
 			// Fallback if the server sends plain text instead of JSON
-			_chatHistory.BbcodeText += $"\n[color=lightgreen]Server:[/color] {jsonStr}";
-			_replyBox.BbcodeText = $"[color=lightgreen]Latest Reply:[/color] {jsonStr}";
+			GD.Print($"Server Reply: {jsonStr}");
 			return;
 		}
 
@@ -458,12 +452,11 @@ public class Client : Node
 		if (type == "chunk")
 		{
 			string content = data["content"].ToString();
-			_chatHistory.BbcodeText += content; // Streaming effect
-			_replyBox.BbcodeText = $"[color=lightgreen]Latest:[/color] {content}";
+			// Ignored: Not displaying server replies
 		}
 		else if (type == "done")
 		{
-			_chatHistory.BbcodeText += "\n";
+			// Done
 		}
 		else if (type == "error")
 		{
