@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WALL-E Command Center</title>
+    <style>
+        body {
+            background: #121212;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .status {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #00ff41;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 15px;
+        }
+
+        button {
+            background: #1a1a1a;
+            border: 2px solid #00ff41;
+            color: #00ff41;
+            font-weight: bold;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.1s;
+            user-select: none;
+        }
+
+        button:active {
+            background: #00ff41;
+            color: #121212;
+            box-shadow: 0 0 20px #00ff41;
+        }
+
+        .up    { grid-column: 2; }
+        .left  { grid-column: 1; grid-row: 2; }
+        .stop  { grid-column: 2; grid-row: 2; border-color: #ff3e3e; color: #ff3e3e; }
+        .right { grid-column: 3; grid-row: 2; }
+        .down  { grid-column: 2; grid-row: 3; }
+    </style>
+</head>
+<body>
+
+    <div class="status" id="ws-status">DISCONNECTED</div>
+
+    <div class="controls">
+        <button class="up" onclick="sendCommand(255, 255)">FWD</button>
+        <button class="left" onclick="sendCommand(0, 255)">LEFT</button>
+        <button class="stop" onclick="sendCommand(127, 127)">STOP</button>
+        <button class="right" onclick="sendCommand(255, 0)">RIGHT</button>
+        <button class="down" onclick="sendCommand(0, 0)">BACK</button>
+    </div>
+
+    <script>
+        const endpoint = "wss://tankstatus.jordanirgangportfolio.com/ws/drive";
+        const statusEl = document.getElementById('ws-status');
+        let socket;
+
+        function connect() {
+            socket = new WebSocket(endpoint);
+
+            socket.onopen = () => {
+                statusEl.innerText = "CONNECTED";
+                statusEl.style.color = "#00ff41";
+                statusEl.style.borderColor = "#00ff41";
+            };
+
+            socket.onclose = () => {
+                statusEl.innerText = "DISCONNECTED - RECONNECTING...";
+                statusEl.style.color = "#ff3e3e";
+                statusEl.style.borderColor = "#ff3e3e";
+                setTimeout(connect, 2000); // Auto-reconnect
+            };
+
+            socket.onerror = (err) => console.error("WS Error: ", err);
+        }
+
+        function sendCommand(left, right) {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                const payload = {
+                    driveLeft: left,
+                    driveRight: right,
+                    changeFlag: 1
+                };
+                
+                socket.send(JSON.stringify(payload));
+                console.log("Sent:", payload);
+            } else {
+                console.warn("Cannot send: WebSocket is not open.");
+            }
+        }
+
+        // Initialize connection
+        connect();
+    </script>
+</body>
+</html>

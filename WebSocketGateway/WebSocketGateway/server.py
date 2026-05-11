@@ -86,7 +86,7 @@ ser.reset_input_buffer()
 ser2.reset_input_buffer()
 
 
-async def move_tank(left_speed: int, right_speed: int, duration: float) -> str:
+async def move_tank(left_speed: int, right_speed: int, duration=0) -> str:
     """
     Moves the tank by setting the left and right motor speeds.
     Speeds should be between 0 (full reverse) and 255 (full forward).
@@ -101,7 +101,8 @@ async def move_tank(left_speed: int, right_speed: int, duration: float) -> str:
     logger.info(
         f"🕹️ Movement started, hardware called. Packet Generated: {packet.hex()}, for  {duration}"
     )
-    await asyncio.sleep(duration)
+    if duration != 0:
+        await asyncio.sleep(duration)
     ts.drive_left = ctypes.c_ubyte(CENTER).value
     ts.drive_right = ctypes.c_ubyte(CENTER).value
     packet = ts.make_into_bytes()
@@ -278,6 +279,45 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+# ==========================================
+# DRIVE ENDPOINT
+# ==========================================
+@app.websocket("/ws/drive")
+async def drive_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    # Create the object once, outside the loop
+    ts = tankstatus_wrapper.TankStatusClass()
+    logger.info("🚀 Tank Drive Connection Established")
+
+    try:
+        while True:
+            # Add a timeout or check if the socket is still alive
+            data = await websocket.receive_json()
+
+            # Logic here...
+            left = data.get("driveLeft", 127)
+            right = data.get("driveRight", 127)
+
+            ts.drive_left = left
+            ts.drive_right = right
+            ser.write(ts.make_into_bytes())
+
+            logger.info(f"✅ Drive Command Processed: {left}, {right}")
+            await move_tank(left, right)
+
+    except WebSocketDisconnect:
+        logger.info("🔌 Client disconnected normally.")
+    except Exception as e:
+        # This will tell us if it's a JSON error or something else!
+        logger.error(f"❌ Unexpected Error: {type(e).__name__} - {e}")
+    finally:
+        # Reset motors for safety
+        ts.drive_left = 127
+        ts.drive_right = 127
+        ser.write(ts.make_into_bytes())
+        logger.info("🛑 Safety stop: Resetting motors to 127")
 
 
 # ==========================================

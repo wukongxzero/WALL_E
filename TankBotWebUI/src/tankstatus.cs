@@ -15,7 +15,7 @@ public struct TankStatus
 
 public static class TankStatusNative
 {
-    public const int PacketLength = 16;
+    public const int PacketLength = 8;
 
     public static void constructTankStatus(ref TankStatus self)
     {
@@ -34,19 +34,18 @@ public static class TankStatusNative
         buffer[0] = ts.driveLeft;
         buffer[1] = ts.driveRight;
         
-        // Offset 2 and 3 are padding, skip them
         
         byte[] ex = BitConverter.GetBytes(ts.eulerX);
-        buffer[4] = ex[0];
-        buffer[5] = ex[1];
+        buffer[2] = ex[0];
+        buffer[3] = ex[1];
 
         byte[] ey = BitConverter.GetBytes(ts.eulerY);
-        buffer[6] = ey[0];
-        buffer[7] = ey[1];
+        buffer[4] = ey[0];
+        buffer[5] = ey[1];
 
         byte[] ez = BitConverter.GetBytes(ts.eulerZ);
-        buffer[8] = ez[0];
-        buffer[9] = ez[1];
+        buffer[6] = ez[0];
+        buffer[7] = ez[1];
     }
 
     public static void readByteTankStatus(byte[] buffer, int byteLength, ref TankStatus ts)
@@ -58,9 +57,9 @@ public static class TankStatusNative
         
         // Offset 2 and 3 are padding, skip them
         
-        ts.eulerX = BitConverter.ToInt16(buffer, 4);
-        ts.eulerY = BitConverter.ToInt16(buffer, 6);
-        ts.eulerZ = BitConverter.ToInt16(buffer, 8);
+        ts.eulerX = BitConverter.ToInt16(buffer, 2);
+        ts.eulerY = BitConverter.ToInt16(buffer, 4);
+        ts.eulerZ = BitConverter.ToInt16(buffer, 6);
     }
 
     public static int get_tankstatus_packet_length()

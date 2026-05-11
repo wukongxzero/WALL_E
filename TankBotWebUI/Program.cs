@@ -6,6 +6,9 @@ using Microsoft.Net.Http.Headers;
 
 float simulatedEulerY = 0;
 
+TankStatus tankBotStatus = new TankStatus();
+TankStatusNative.constructTankStatus(ref tankBotStatus);
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -165,7 +168,7 @@ app.MapGet(
 
             // Print the struct data and the raw hex bytes for debugging
             string hexString = BitConverter.ToString(byteData).Replace("-", "");
-            Console.WriteLine($"Sent EulerX: {ts.eulerX, 4} | Hex: {hexString}");
+            Console.WriteLine($"Sent EulerX: {ts.eulerX,4} | Hex: {hexString}");
 
             // Increment the simulated value and wrap around at 360 degrees
             simulatedEulerY += 10;
@@ -183,12 +186,144 @@ app.MapGet(
         }
     }
 );
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+//
+//
+
+
+app.MapPost("/api/setTankStatus", async (HttpContext context) =>
+{
+    using var ms = new MemoryStream();
+    await context.Request.Body.CopyToAsync(ms);
+    byte[] tsData = ms.ToArray();
+
+    //    Console.WriteLine($"TankStatusNative.PacketLength{TankStatusNative.PacketLength}");
+
+    if (tsData.Length >= TankStatusNative.PacketLength)
+    {
+        // Update the global state
+        TankStatusNative.readByteTankStatus(tsData, tsData.Length, ref tankBotStatus);
+        return Results.Ok();
+    }
+    return Results.BadRequest("Packet too short");
+});
+
+
+app.MapGet("/api/getTankStatusBytes", ()
+    =>
+    {
+        byte[] tsBytesBuffer = Array.Empty<byte>();
+        TankStatusNative.makeByteTankStatus(tsBytesBuffer, TankStatusNative.PacketLength, ref tankBotStatus);
+        return tsBytesBuffer;
+    });
+
+
+app.MapGet("/api/getTankStatusJson", () =>
+{
+    return Results.Ok(new
+    {
+        left = tankBotStatus.driveLeft,
+        right = tankBotStatus.driveRight,
+        x = TankStatusNative.getDecodedShortToFloat(tankBotStatus.eulerX),
+        y = TankStatusNative.getDecodedShortToFloat(tankBotStatus.eulerY),
+        z = TankStatusNative.getDecodedShortToFloat(tankBotStatus.eulerZ),
+        flag = tankBotStatus.changeFlag
+    });
+});
+
+app.MapGet("/api/getTankStatusOneTime", () =>
+{
+    // Decode the shorts into readable floats using your helper
+    float x = TankStatusNative.getDecodedShortToFloat(tankBotStatus.eulerX);
+    float y = TankStatusNative.getDecodedShortToFloat(tankBotStatus.eulerY);
+    float z = TankStatusNative.getDecodedShortToFloat(tankBotStatus.eulerZ);
+
+    // Build the HTML string
+    string htmlContent = $@"
+    <html>
+        <body style='font-family: monospace; background-color: #121212; color: #00ff00; padding: 20px;'>
+            <h2>TankBot System Status</h2>
+            <hr/>
+            <p><b>Motor Left:</b>  {tankBotStatus.driveLeft}</p>
+            <p><b>Motor Right:</b> {tankBotStatus.driveRight}</p>
+            <br/>
+            <p><b>Euler X:</b>     {x:F2}</p>
+            <p><b>Euler Y:</b>     {y:F2}</p>
+            <p><b>Euler Z:</b>     {z:F2}</p>
+            <hr/>
+            <p><b>Change Flag:</b> {tankBotStatus.changeFlag}</p>
+            <p><b>Timestamp:</b>   {DateTime.Now:HH:mm:ss}</p>
+        </body>
+    </html>";
+
+    // Returns the string with the correct MIME type so the browser renders it
+    return Results.Content(htmlContent, "text/html");
+});
+
+app.MapGet("/api/getTankStatus", () =>
+{
+    string htmlContent = $@"
+    <html>
+        <head>
+            <title>TANKBOT Live Telemetry</title>
+            <style>
+                body {{ font-family: 'Courier New', monospace; background: #0a0a0a; color: #33ff33; padding: 20px; }}
+                .stat-box {{ border: 1px solid #33ff33; padding: 10px; margin: 10px 0; width: 300px; }}
+                .val {{ color: white; font-weight: bold; }}
+            </style>
+        </head>
+        <body>
+            <h2>TANKBOT LIVE STATUS</h2>
+            <div class='stat-box'>
+                <div>LEFT MOTOR:  <span id='l' class='val'>--</span>/255</div>
+                <div>RIGHT MOTOR: <span id='r' class='val'>--</span>/255</div>
+            </div>
+            <div class='stat-box'>
+                <div>EULER X: <span id='ex' class='val'>--</span>deg</div>
+                <div>EULER Y: <span id='ey' class='val'>--</span>deg</div>
+                <div>EULER Z: <span id='ez' class='val'>--</span>deg</div>
+            </div>
+
+            <script>
+                async function updateStatus() {{
+                    try {{
+                        const response = await fetch('/api/getTankStatusJson');
+                        const data = await response.json();
+                        
+                        // Update the HTML elements by ID
+                        document.getElementById('l').innerText = data.left;
+                        document.getElementById('r').innerText = data.right;
+                        document.getElementById('ex').innerText = data.x.toFixed(2);
+                        document.getElementById('ey').innerText = data.y.toFixed(2);
+                        document.getElementById('ez').innerText = data.z.toFixed(2);
+                        document.getElementById('flag').innerText = data.flag;
+                    }} catch (err) {{
+                        console.error('Data link lost:', err);
+                    }}
+                }}
+
+                // Run every 200 milliseconds
+                setInterval(updateStatus, 200);
+            </script>
+        </body>
+    </html>";
+
+    return Results.Content(htmlContent, "text/html");
+});
+
 app.MapGet(
     "/webui",
     (IWebHostEnvironment env) =>
     {
         var indexPath = Path.Combine(env.WebRootPath, "webui_tankstatus.html");
+        return Results.File(indexPath, "text/html");
+    }
+);
+app.MapGet(
+    "/drive",
+    (IWebHostEnvironment env) =>
+    {
+        var indexPath = Path.Combine(env.WebRootPath, "drive.html");
         return Results.File(indexPath, "text/html");
     }
 );
