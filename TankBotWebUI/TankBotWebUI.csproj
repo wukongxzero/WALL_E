@@ -16,7 +16,7 @@
   <ItemGroup>
 <PackageReference Include="Microsoft.AspNetCore.Authentication.Certificate" Version="9.0.9" />
 
-  <None Include="../TankStatusProtocol/builds/libtankstatus_lib.so">
+  <None Include="../TankStatusProtocol/builds/libtankstatus_shared.so">
     <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     <CopyToPublishDirectory>Always</CopyToPublishDirectory>
   </None>
