@@ -19,9 +19,18 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(pybind11)
 
+add_library(tankstatus_shared SHARED
+    lib/TankStatus.c
+    lib/TankStatus.h
+)
+
+# Tell the library where its own headers are
+target_include_directories(tankstatus_shared PUBLIC lib)
+
 # 3. Create the Python module
 # Note: I am using the "lib/" prefix based on your earlier 'cat lib/TankStatusClass.h' command.
 # If your .c and .cpp files are actually in 'src/', change 'lib/' to 'src/'.
+# /home/nixjetson/WALL_E_ROS2/TankStatusProtocol/builds/libtankstatus_lib.so
 
 # Add tankstatuswrapper.cpp to the list of source files!
 pybind11_add_module(tankstatus_wrapper
