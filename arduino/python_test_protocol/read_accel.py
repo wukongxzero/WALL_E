@@ -28,7 +28,7 @@ def main():
 
                 # Print the decoded values
                 print(
-                    f"Left PWM: {rx_status.drive_left} | Right PWM: {rx_status.drive_right}"
+                    f"Euler Y: {rx_status.euler_x} | {rx_status.eulerXFloat}| Euler X: {rx_status.euler_y} | {rx_status.eulerYFloat}"
                 )
 
     except KeyboardInterrupt:
