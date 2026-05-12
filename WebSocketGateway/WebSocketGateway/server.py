@@ -103,14 +103,14 @@ async def move_tank(left_speed: int, right_speed: int, duration=0) -> str:
     )
     if duration != 0:
         await asyncio.sleep(duration)
-    ts.drive_left = ctypes.c_ubyte(CENTER).value
-    ts.drive_right = ctypes.c_ubyte(CENTER).value
-    packet = ts.make_into_bytes()
+        ts.drive_left = ctypes.c_ubyte(CENTER).value
+        ts.drive_right = ctypes.c_ubyte(CENTER).value
+        packet = ts.make_into_bytes()
 
-    ser.write(packet)
-    logger.info(
-        f"🕹️ Movement stopped, hardware called. Packet Generated: {packet.hex()}"
-    )
+        ser.write(packet)
+        logger.info(
+            f"🕹️ Movement stopped, hardware called. Packet Generated: {packet.hex()}"
+        )
 
     # --- HARDWARE EXECUTION GOES HERE ---
     # Example: tb.move(left_speed, right_speed)
