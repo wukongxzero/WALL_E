@@ -34,11 +34,11 @@ uint16_t readAngle(uint8_t ch) {
 
 // ── MOTOR PINS ────────────────────────────────────────────────
 #define ENA     5
-#define IN1     23
-#define IN2     22
+#define IN1     27
+#define IN2     26
 #define ENB     6
-#define IN3     25
-#define IN4     24
+#define IN3     29
+#define IN4     28
 #define MAX_PWM 250
 #define LOOP_MS 5
 #define FLIP_THRESHOLD 150
@@ -84,8 +84,8 @@ void updateOdometry() {
 
 
 
-    tsLocalIn.driveLeft = static_cast<unsigned char>(map(leftVel,0,MAX_VELOCITY,0,MAX_PWM));
-    tsLocalIn.driveRight = static_cast<unsigned char>(map(rightDiff,0,MAX_VELOCITY,0,MAX_PWM));
+    tsLocalOut.driveLeft = static_cast<unsigned char>(map(leftVel,0,MAX_VELOCITY,0,MAX_PWM));
+    tsLocalOut.driveRight = static_cast<unsigned char>(map(rightDiff,0,MAX_VELOCITY,0,MAX_PWM));
 }
 
 // ── MOTOR DRIVER ──────────────────────────────────────────────
@@ -123,28 +123,29 @@ unsigned long lastLoop  = 0;
 unsigned long lastPktMs = 0;
 #define PKT_TIMEOUT_MS 500
 
-// ── DRIVE FROM TANKSTATUS ──────────────────────────────────────
-void driveMotors(unsigned char left,unsigned char right) {
-    int throttle = -((int)(left) - 127);
-    int steering = -((int)(right)  - 127);
 
-    throttle = clampi(throttle, -124, 124);
-    steering = clampi(steering, -124, 124);
 
-    if (abs(throttle - lastLeftRaw)  > FLIP_THRESHOLD) throttle = lastLeftRaw;
-    if (abs(steering - lastRightRaw) > FLIP_THRESHOLD) steering = lastRightRaw;
+void driveMotors(unsigned char leftIn, unsigned char rightIn) {
+    // 1. Convert 0-255 (neutral 127) to -127 to 127
+    int leftSpd  = (int)leftIn - 127;
+    int rightSpd = (int)rightIn - 127;
 
-    lastLeftRaw  = throttle;
-    lastRightRaw = steering;
+    // 2. Deadzone: stop "humming" when idle
+//if (abs(leftSpd) < 10) leftSpd = 0;
+ //   if (abs(rightSpd) < 10) rightSpd = 0;
 
-    throttle = (throttle * 255) / 124;
-    steering = (steering * 255) / 124;
+    // 3. Map to your MAX_PWM (250)
+    int leftPWM  = map(leftSpd, -127, 127, -MAX_PWM, MAX_PWM);
+    int rightPWM = map(rightSpd, -127, 127, -MAX_PWM, MAX_PWM);
 
-    currentRightPWM = clampi(throttle + steering, -MAX_PWM, MAX_PWM);
-    currentLeftPWM  = clampi(throttle - steering, -MAX_PWM, MAX_PWM);
+    // 4. Update the global state variables
+   // currentLeftPWM = leftPWM;
+    //currentLeftPWMrrentRightPWM = rightPWM;
 
-    setMotor(ENA, IN1, IN2, currentRightPWM);
-    setMotor(ENB, IN3, IN4, currentLeftPWM);
+    // 5. Send to hardware
+    // If the tank goes backward when you press forward, swap the 'current' variables here
+    setMotor(ENA, IN1, IN2, -leftPWM);
+    setMotor(ENB, IN3, IN4, rightPWM);
 }
 
 // ── SETUP ─────────────────────────────────────────────────────
@@ -166,9 +167,11 @@ void setup() {
     lastPktMs   = millis();
     lastLoop    = millis();
 
+    /*
     if (MCUSR & (1 << WDRF)) MCUSR = 0;
     wdt_disable();
     wdt_enable(WDTO_1S);
+    */
 
 
 
@@ -178,49 +181,56 @@ void setup() {
     tsLocalOut.driveLeft = 127; 
     tsLocalOut.driveRight = 127; 
 
-    driveMotors(10, 200);
-    delay(500);
+    driveMotors(200, 200);
+    delay(1000);
+    driveMotors(200, 200);
+    delay(1000);
     driveMotors(127,127);
 }
 
 // ── LOOP ──────────────────────────────────────────────────────
 void loop() {
-    wdt_reset();
+    //wdt_reset();
 
     while (Serial.available()) {
         uint8_t c = Serial.read();
         pktBuf[pktIdx++] = c;
         if (pktIdx >= TANKSTATUS_PACKET_LENGTH) {
             tsLocalIn.BuildFromBytes(pktBuf);
-            driveMotors(tsLocalIn.driveLeft, tsLocalIn.driveRight);
+
             
             pktIdx    = 0;
             lastPktMs = millis();
 
-            unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
-            Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+            //unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
+            //Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+
+            driveMotors(tsLocalIn.driveLeft, tsLocalIn.driveRight);
 
 
         }
     }
-//
-//    if ((millis() - lastPktMs) > PKT_TIMEOUT_MS) {
-//        stopMotors();
-//        motorsHalted = true;
-//    } else {
-//        motorsHalted = false;
-//    }
-//
+/*
+    if ((millis() - lastPktMs) > PKT_TIMEOUT_MS) {
+        stopMotors();
+        motorsHalted = true;
+    } else {
+        motorsHalted = false;
+    }
+    */
+
     unsigned long now = millis();
     if ((now - lastLoop) < LOOP_MS) return;
     lastLoop = now;
 
     updateOdometry();
 
+
+
     static int odomCount = 0;
     if (++odomCount >= 10) {
         odomCount = 0;
-//        unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
-//        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+        unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
+        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
     }
 }
