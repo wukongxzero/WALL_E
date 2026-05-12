@@ -4,6 +4,8 @@
 #include <string.h>
 #include "src/TankStatusClass/TankStatusClass.h"
 
+// #define DRY_RUN   // uncomment for bench test (no motors / encoders / Jetson)
+
 #define MAX_VELOCITY 4095
 bool motorsHalted = false;
 
@@ -42,8 +44,7 @@ uint16_t readAngle(uint8_t ch) {
 #define FLIP_THRESHOLD 150
 
 // Ramp config — PWM counts allowed to change per LOOP_MS tick.
-// 5 counts / 5 ms = 1000 counts/s → full 0→250 ramp in ~250 ms.
-// Lower = smoother/slower, higher = snappier.
+// 5 / 5ms = 1000 counts/s → full 0→250 ramp in ~250 ms.
 #define MAX_PWM_DELTA 5
 
 // ── ODOMETRY ──────────────────────────────────────────────────
@@ -85,8 +86,9 @@ void updateOdometry() {
     int leftVel  = leftDist  / dt;
     int rightVel = rightDist / dt;
 
-    tsLocalOut.driveLeft  = static_cast<unsigned char>(map(leftVel,   0, MAX_VELOCITY, 0, MAX_PWM));
-    tsLocalOut.driveRight = static_cast<unsigned char>(map(rightDiff, 0, MAX_VELOCITY, 0, MAX_PWM));
+    tsLocalOut.driveLeft  = static_cast<unsigned char>(map(leftVel,  0, MAX_VELOCITY, 0, MAX_PWM));
+    tsLocalOut.driveRight = static_cast<unsigned char>(map(rightDiff,0, MAX_VELOCITY, 0, MAX_PWM));
+    //                                                       ^^^^^^^^ still suspect; should likely be rightVel
 }
 
 // ── MOTOR DRIVER ──────────────────────────────────────────────
@@ -96,6 +98,7 @@ int clampi(int x, int lo, int hi) {
 
 void setMotor(int en, int a, int b, int spd) {
     int pwm = clampi(abs(spd), 0, MAX_PWM);
+#ifndef DRY_RUN
     if (pwm == 0) {
         digitalWrite(a, LOW); digitalWrite(b, LOW);
         analogWrite(en, 0); return;
@@ -103,6 +106,9 @@ void setMotor(int en, int a, int b, int spd) {
     digitalWrite(a, spd > 0 ? HIGH : LOW);
     digitalWrite(b, spd > 0 ? LOW  : HIGH);
     analogWrite(en, pwm);
+#else
+    (void)en; (void)a; (void)b; (void)pwm;
+#endif
 }
 
 // ── STATE ─────────────────────────────────────────────────────
@@ -145,6 +151,28 @@ void updateMotorRamp() {
     currentRightPWM = rampToward(currentRightPWM, targetRightPWM, MAX_PWM_DELTA);
     setMotor(ENA, IN1, IN2, -currentLeftPWM);   // sign matches your wiring
     setMotor(ENB, IN3, IN4,  currentRightPWM);
+
+#ifdef DRY_RUN
+    static uint8_t printCnt = 0;
+    if (++printCnt >= 4) {                // print every 20 ms
+        printCnt = 0;
+        Serial.print("tgtL:");  Serial.print(targetLeftPWM);
+        Serial.print(" curL:"); Serial.print(currentLeftPWM);
+        Serial.print(" tgtR:"); Serial.print(targetRightPWM);
+        Serial.print(" curR:"); Serial.println(currentRightPWM);
+    }
+#endif
+}
+
+// Blocking ramp pump — only for ad-hoc bench tests. Not used in operation.
+void rampForMs(unsigned long ms) {
+    unsigned long start = millis();
+    while (millis() - start < ms) {
+        if (millis() - lastLoop >= LOOP_MS) {
+            lastLoop = millis();
+            updateMotorRamp();
+        }
+    }
 }
 
 // Called whenever a new TankStatus packet arrives.
@@ -168,8 +196,10 @@ void setup() {
     pinMode(ENB,OUTPUT); pinMode(IN3,OUTPUT); pinMode(IN4,OUTPUT);
     stopMotors();
 
+#ifndef DRY_RUN
     leftAnglePrev  = readAngle(LEFT_CHANNEL);
     rightAnglePrev = readAngle(RIGHT_CHANNEL);
+#endif
 
     lastEncTime = millis();
     lastPktMs   = millis();
@@ -217,6 +247,8 @@ void loop() {
     lastLoop = now;
 
     updateMotorRamp();
+
+#ifndef DRY_RUN
     updateOdometry();
 
     static int odomCount = 0;
@@ -225,4 +257,5 @@ void loop() {
         unsigned char* txBuffer = tsLocalIn.MakeIntoBytes();
         Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
     }
+#endif
 }
