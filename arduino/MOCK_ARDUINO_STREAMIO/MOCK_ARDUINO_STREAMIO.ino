@@ -15,6 +15,67 @@ int mockRight = 255;
 int leftStep = 1;
 int rightStep = -1;
 
+
+void updateOdometry() {
+    unsigned long now = millis();
+    float dt = (now - lastEncTime) / 1000.0f;
+    if (dt < 0.01f) return;
+    lastEncTime = now;
+
+    uint16_t leftAngle  = readAngle(LEFT_CHANNEL);
+    uint16_t rightAngle = readAngle(RIGHT_CHANNEL);
+
+    int16_t leftDiff  = angleDiff(leftAngle,  leftAnglePrev);
+    int16_t rightDiff = angleDiff(rightAngle, rightAnglePrev);
+
+    leftAnglePrev  = leftAngle;
+    rightAnglePrev = rightAngle;
+
+    float leftDist  = (leftDiff  / CPR) * 2.0f * M_PI * WHEEL_RADIUS;
+    float rightDist = (rightDiff / CPR) * 2.0f * M_PI * WHEEL_RADIUS;
+
+    int leftVel  = leftDist  / dt;
+    int rightVel = rightDist / dt;
+
+
+
+    tsLocalOut.driveLeft = static_cast<unsigned char>(map(leftVel,0,MAX_VELOCITY,0,MAX_PWM));
+    tsLocalOut.driveRight = static_cast<unsigned char>(map(rightDiff,0,MAX_VELOCITY,0,MAX_PWM));
+}
+
+// ── MOTOR DRIVER ──────────────────────────────────────────────
+int clampi(int x, int lo, int hi) {
+    return x < lo ? lo : (x > hi ? hi : x);
+}
+void setMotor(int en, int a, int b, int spd) {
+    int pwm = abs(spd);
+    if (pwm > 250) pwm = 250; // Safety cap
+
+    if (pwm == 0) {
+        digitalWrite(a, LOW); 
+        digitalWrite(b, LOW);
+        analogWrite(en, 0); 
+        return;
+    }
+
+    // Direction Logic
+    if (spd > 0) {
+        digitalWrite(a, HIGH);
+        digitalWrite(b, LOW);
+    } else {
+        digitalWrite(a, LOW);
+        digitalWrite(b, HIGH);
+    }
+    analogWrite(en, pwm);
+}
+
+void stopMotors() {
+    setMotor(ENA, IN1, IN2, 0);
+   setMotor(ENB, IN3, IN4, 0);
+}
+
+
+
 void setup()
 {
   Serial.begin(115200);

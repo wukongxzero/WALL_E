@@ -79,8 +79,8 @@ def main():
                 # Note: Adjust to `tx.drive_left` if pybind11 converted the case
                 # tx.drive_left = max(0, min(255, CENTER - int(throttle)))
                 # tx.drive_right = max(0, min(255, CENTER - int(0)))
-                tx.drive_left = 250
-                tx.drive_right = 250
+                tx.drive_left = 255
+                tx.drive_right = 0
 
                 try:
                     # Let the C++ wrapper handle the packing and byte alignment!
