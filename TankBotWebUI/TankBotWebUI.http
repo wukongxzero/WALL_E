@@ -1,0 +1,6 @@
+@TankBotWebUI_HostAddress = http://localhost:5252
+
+GET {{TankBotWebUI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

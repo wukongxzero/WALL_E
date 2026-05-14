@@ -1,0 +1,8 @@
+scipy
+pyserial
+sympy
+ollama
+pybind11
+fastapi 
+uvicorn
+websockets

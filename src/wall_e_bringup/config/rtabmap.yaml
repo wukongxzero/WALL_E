@@ -1,0 +1,55 @@
+# RTAB-Map parameters for WALL-E D435 SLAM
+
+rtabmap:
+  ros__parameters:
+
+    # Frame IDs — must match URDF
+    frame_id: base_footprint
+    odom_frame_id: odom
+    map_frame_id: map
+
+    # Subscribe to depth + RGB
+    subscribe_depth: true
+    subscribe_rgb: true
+    subscribe_scan: false
+
+    # Topic remappings handled in launch file
+
+    # RTAB-Map core params
+    Rtabmap/DetectionRate: "1.0"        # map update rate Hz
+    Rtabmap/TimeThr: "0"                # no time limit
+    Rtabmap/MemoryThr: "0"              # no memory limit
+
+    # Loop closure
+    Kp/MaxFeatures: "400"               # features per frame
+    Vis/MinInliers: "15"                # min matches for loop closure
+    Vis/InlierDistance: "0.1"
+
+    # Visual odometry
+    Odom/Strategy: "0"                  # 0=Frame-to-Map, 1=Frame-to-Frame
+    Odom/ResetCountdown: "1"
+    OdomF2M/MaxSize: "1000"
+
+    # Memory management — important for Jetson RAM
+    Mem/RehearsalSimilarity: "0.45"
+    Mem/STMSize: "10"                   # short term memory size
+    Mem/ImageKept: "false"              # save RAM — dont keep raw images
+
+    # RGBD
+    RGBD/AngularUpdate: "0.01"          # update map every 0.01 rad
+    RGBD/LinearUpdate: "0.01"           # update map every 1cm
+    RGBD/OptimizeFromGraphEnd: "false"
+    RGBD/ProximityBySpace: "true"
+
+    # Grid map for Nav2
+    Grid/FromDepth: "true"
+    Grid/RayTracing: "true"
+    Grid/3D: "false"                    # 2D occupancy grid for Nav2
+    Grid/NoiseFilteringRadius: "0.05"
+    Grid/NoiseFilteringMinNeighbors: "5"
+
+    # D435 depth range
+    Grid/DepthDecimation: "4"
+    Grid/RangeMin: "0.3"                # min depth 30cm
+    Grid/RangeMax: "4.0"                # max depth 4m indoors
+
