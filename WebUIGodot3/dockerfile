@@ -1,0 +1,13 @@
+# Use a lightweight Ubuntu base image
+FROM ubuntu:22.04
+FROM barichello/godot-ci:mono-3.6
+
+# Set up the working directory where we will mount the project
+WORKDIR /app
+
+# 4. Create an output directory for the HTML5 build inside the container
+RUN mkdir -p /app/build/html5
+
+# 5. Set the default command to execute the HTML5 export
+# This assumes you have an export preset named exactly "HTML5" in your Godot project.
+CMD ["godot", "--export", "HTML5", "/app/build/html5/index.html"]

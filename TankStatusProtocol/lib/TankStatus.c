@@ -1,4 +1,4 @@
-#include <TankStatus/TankStatus.h>
+#include "TankStatus.h"
 #include <string.h> // Required for memcpy
 
 /**
@@ -31,10 +31,6 @@ void makeByteTankStatus(unsigned char *buffer, int byteLength,
          sizeof(ts->driveRight));
   offset += sizeof(ts->driveRight);
 
-  // Skip 2 bytes of padding if your hardware requires 4-byte alignment for
-  // floats This aligns with your #define TANKSTATUS_PACKET_LENGTH 16
-  offset += 2;
-
   memcpy(buffer + offset, (const void *)&ts->eulerX, sizeof(ts->eulerX));
   offset += sizeof(ts->eulerX);
 
@@ -62,9 +58,6 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
   memcpy((void *)&ts->driveRight, buffer + offset, sizeof(ts->driveRight));
   offset += sizeof(ts->driveRight);
 
-  // Skip the 2 bytes of padding used to reach the 16-byte alignment
-  offset += 2;
-
   memcpy((void *)&ts->eulerX, buffer + offset, sizeof(ts->eulerX));
   offset += sizeof(ts->eulerX);
 
@@ -73,3 +66,8 @@ void readByteTankStatus(unsigned char *buffer, int byteLength,
 
   memcpy((void *)&ts->eulerZ, buffer + offset, sizeof(ts->eulerZ));
 }
+
+// exists for other modules looking in
+int get_tankstatus_packet_length() { return TANKSTATUS_PACKET_LENGTH; }
+float getDecodedShortToFloat(short data) { return DECODE_SHORT(data); }
+short getEncodedFloatToShort(float reading) { return ENCODE_SHORT(reading); }

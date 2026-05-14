@@ -3,6 +3,7 @@ CompileFlags:
     "-I", "include",         # Tells clangd where your .h files are
 #    "-D", "SIMULATION_SCREEN", # Enables your ncurses code paths
     "-D", "INCLUDE_SAMPLES",   # Enables your sprite data
+    "-D", "BLUETOOTH",
     "-std=c11",              # Use C11 standard
     "-Wall",                 # Show all warnings
     "-Wno-missing-braces"    # 2D arrays sometimes trigger this annoyingly

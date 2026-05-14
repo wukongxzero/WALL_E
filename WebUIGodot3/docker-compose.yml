@@ -1,0 +1,20 @@
+services:
+  export-html5:
+    build: .
+    # Compose will automatically read this from the .env file!
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    volumes:
+      - ./webui_tankstatus/:/app:z
+      - ../WebUIGodot3/build:/app/build:z
+      - ../TankBotWebUI:/TankBotWebUI:z
+    working_dir: /app
+    command: bash -c "ls -la && mkdir -p /app/build/html5 && godot --export 'HTML5' /app/build/html5/index.html"
+
+  export-linux:
+    build: .
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    volumes:
+      - .:/app:z
+      - ../TankBotWebUI:/TankBotWebUI:z
+    working_dir: /app/webui_tankstatus
+    command: godot --export "Linux/X11" ./build/linux/mygame.x86_64

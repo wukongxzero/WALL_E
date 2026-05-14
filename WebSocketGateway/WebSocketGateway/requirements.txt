@@ -1,0 +1,10 @@
+scipy
+pyserial
+sympy
+ollama
+pybind11
+fastapi 
+uvicorn
+fastapi
+websockets
+httpx
