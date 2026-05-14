@@ -1,6 +1,10 @@
 #include <Wire.h>
 #include <Servo.h>
+#include "src/TankStatusClass/TankStatusClass.h"
 
+
+
+TankStatusClass tsLocalOut; // For sending data back to Python/ROS
 // ── Configuration ──
 static const uint8_t MPU_ADDR = 0x68;
 static const float GYRO_SENS = 131.0f;
@@ -10,7 +14,7 @@ static const float COMP_ALPHA = 0.995f;
 const int PITCH_PIN = 9;
 const int ROLL_PIN  = 10;
 const int P_CENTER  = 1400;  
-const int R_CENTER  = 1275;
+const int R_CENTER  = 1210;
 const int SAFE_RANGE = 300; 
 const int SAFE_RANGE_PITCH = 400;
 
@@ -29,7 +33,7 @@ float smoothR = R_CENTER;
 const float LPF_BETA = 0.2f; // Lower = smoother, but slower (range 0.05 to 0.4)
 
 float gyroPitchBias = 0, gyroRollBias = 0;
-float pitchDeg = 0, rollDeg = 0;
+float pitchDeg = 0, rollDeg = 0, yawDeg = 0;
 uint32_t lastUs = 0;
 
 Servo pitchServo, rollServo;
@@ -43,6 +47,7 @@ void mpuWrite(uint8_t reg, uint8_t val) {
 
 void setup() {
     Serial.begin(115200);
+    tsLocalOut = TankStatusClass();
     while(!Serial); 
     Wire.begin();
     Wire.setClock(400000);
@@ -53,7 +58,7 @@ void setup() {
     mpuWrite(0x1C, 0x00); 
     mpuWrite(0x1A, 0x03); 
     
-    Serial.println("Calibrating...");
+//    Serial.println("Calibrating...");
     float sumGx = 0, sumGy = 0;
     for(int i = 0; i < 400; i++) {
         Wire.beginTransmission(MPU_ADDR);
@@ -139,7 +144,7 @@ void loop() {
 
     pitchServo.writeMicroseconds((int)targetP);
     rollServo.writeMicroseconds((int)targetR);
-
+/*
     Serial.println("target pitch");
     Serial.println(targetP);
     Serial.println("pitch angle");
@@ -148,4 +153,18 @@ void loop() {
     Serial.println(targetR);
     Serial.println("roll angle");
     Serial.println(rollDeg);
+    */
+
+
+    tsLocalOut.eulerYFloat = pitchDeg;
+    tsLocalOut.eulerXFloat = rollDeg;
+    tsLocalOut.eulerZFloat = yawDeg; 
+    static int odomCount = 0;
+    if (++odomCount >= 10) {
+
+        static int odomCount = 0;
+        odomCount = 0;
+        unsigned char* txBuffer = tsLocalOut.MakeIntoBytes();
+        Serial.write(txBuffer, TANKSTATUS_PACKET_LENGTH);
+    }
 }
