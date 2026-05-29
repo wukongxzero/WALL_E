@@ -1,0 +1,7 @@
+pyrealsense2
+aiortc
+fastapi
+fastrtc
+jinja2
+opencv-python-headless
+fastrtc[vad]
