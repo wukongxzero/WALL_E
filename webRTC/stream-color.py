@@ -1,4 +1,3 @@
-import pyrealsense2 as rs
 import numpy as np
 import cv2
 
@@ -15,11 +14,11 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from aiortc import RTCConfiguration, RTCIceServer
 
-# 🌟 INITIALIZE HARDWARE ONCE GLOBALLY
-GLOBAL_PIPELINE = rs.pipeline()
-GLOBAL_CONFIG = rs.config()
-GLOBAL_CONFIG.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
-GLOBAL_CONFIG.enable_stream(rs.stream.color, 640, 480, rs.format.bgr8, 30)
+import os
+
+# 🌟 INITIALIZE WEBCAM GLOBALLY
+# Index 0 is almost always the built-in laptop webcam on Linux
+GLOBAL_CAP = None
 
 ice_config = RTCConfiguration(
     iceServers=[
@@ -29,29 +28,6 @@ ice_config = RTCConfiguration(
 )
 
 
-# 🌟 Helper function to handle ALL blocking C-extension / hardware code safely in a thread
-def get_realsense_depth_frame():
-    try:
-        frames = GLOBAL_PIPELINE.wait_for_frames()
-        depth_frame = frames.get_depth_frame()
-        color_frame = frames.get_color_frame()
-
-        if not depth_frame or not color_frame:
-            return None
-
-        # Convert images to numpy arrays
-        depth_image = np.asanyarray(depth_frame.get_data())
-
-        # Apply colormap on depth image (convert to 8-bit per pixel first)
-        depth_colormap = cv2.applyColorMap(
-            cv2.convertScaleAbs(depth_image, alpha=0.03), cv2.COLORMAP_JET
-        )
-        return depth_colormap
-    except Exception as e:
-        print(f"Hardware grabbing error: {e}")
-        return None
-
-
 class CustomVideoStreamTrack(VideoStreamTrack):
     def __init__(self):
         super().__init__()
@@ -59,33 +35,53 @@ class CustomVideoStreamTrack(VideoStreamTrack):
 
     async def recv(self):
         self.frame_count += 1
+        print(f"Sending frame {self.frame_count}")
         try:
-            # 🌟 Offload the entire hardware read + matrix manipulation to a worker thread
-            depth_colormap = await asyncio.to_thread(get_realsense_depth_frame)
-
-            if depth_colormap is None:
-                await asyncio.sleep(0.01)  # Short throttle before retrying frame drop
+            if GLOBAL_CAP is None or not GLOBAL_CAP.isOpened():
+                print("Webcam device is not initialized or open.")
+                await asyncio.sleep(0.033)  # Throttle to prevent spinning on failure
                 return await self.recv()
 
-            # Build PyAV frame safely
-            video_frame = VideoFrame.from_ndarray(depth_colormap, format="bgr24")
+            # 🌟 Fetch standard color frame from Vivobook webcam without blocking asyncio
+            ret, frame = await asyncio.to_thread(GLOBAL_CAP.read)
+            if not ret:
+                print("Failed to grab frame from webcam. Retrying...")
+                await asyncio.sleep(0.033)
+                return await self.recv()
+
+            # OpenCV captures frames in BGR format by default
+            video_frame = VideoFrame.from_ndarray(frame, format="bgr24")
             video_frame.pts = self.frame_count
             video_frame.time_base = fractions.Fraction(1, 30)
 
             return video_frame
         except Exception as e:
-            print(f"WebRTC track frame error: {e}")
+            print(f"Error occurred during frame capture: {e}")
             raise e
 
+    def stop(self):
+        super().stop()
 
-# FASTAPI web interface handling lifecycle cleanly
+
+# FASTAPI web interface
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Lifespan started - Initializing RealSense Pipeline")
-    GLOBAL_PIPELINE.start(GLOBAL_CONFIG)
+    global GLOBAL_CAP
+    print("Lifespan started - Initializing Vivobook Webcam")
+
+    # Open default video capture card
+    GLOBAL_CAP = cv2.VideoCapture(0)
+
+    # Configure capture parameters
+    GLOBAL_CAP.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    GLOBAL_CAP.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    GLOBAL_CAP.set(cv2.CAP_PROP_FPS, 30)
+
     yield
-    GLOBAL_PIPELINE.stop()
-    print("RealSense camera pipeline stopped cleanly.")
+
+    if GLOBAL_CAP is not None:
+        GLOBAL_CAP.release()
+    print("Webcam device released cleanly.")
 
 
 app = FastAPI(lifespan=lifespan)
