@@ -90,6 +90,25 @@ def generate_launch_description():
              output='screen'
          ),
 
+        # ── DEPTH → LASERSCAN (for Nav2 costmaps) ──
+        Node(
+            package='depthimage_to_laserscan',
+            executable='depthimage_to_laserscan_node',
+            name='depthimage_to_laserscan',
+            parameters=[{
+                'scan_height':   10,      # pixel rows to collapse into scan
+                'range_min':     0.2,     # D435 min reliable depth
+                'range_max':     4.0,
+                'output_frame':  'camera_link',
+            }],
+            remappings=[
+                ('depth',        '/camera/realsense2_camera/aligned_depth_to_color/image_raw'),
+                ('depth_camera_info', '/camera/realsense2_camera/aligned_depth_to_color/camera_info'),
+                ('scan',         '/scan'),
+            ],
+            output='screen'
+        ),
+
         # ── RTAB-MAP ──
         Node(
             package='rtabmap_slam',

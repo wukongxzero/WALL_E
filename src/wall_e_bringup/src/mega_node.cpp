@@ -9,8 +9,9 @@
 #include <termios.h>
 #include <unistd.h>
 #include <thread>
-#include<chrono>
+#include <chrono>
 #include <cstdint>
+#include <mutex>
 
 #define CMD_LEN     8    // TankStatus packet Jetson → Mega
 #define ODOM_LEN    20   // Odometry packet   Mega → Jetson
@@ -49,16 +50,16 @@ public:
 
         // Read serial in background thread
         read_thread_ = std::thread(&MegaNode::read_loop, this);
-        read_thread_.detach();
 
         RCLCPP_INFO(get_logger(), "Mega node ready");
     }
 
     ~MegaNode() {
-    running_ = false;       // stop thread first
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    send_packet(127, 127);  // then stop motors
-    close(fd_);             // then close
+        running_ = false;
+        if (read_thread_.joinable())
+            read_thread_.join();
+        send_packet(127, 127);
+        close(fd_);
     }
 
 private:
@@ -66,14 +67,21 @@ private:
     void cmd_callback(const geometry_msgs::msg::Twist::SharedPtr msg) {
         last_cmd_ = now();
 
-        int throttle = static_cast<int>(msg->linear.x  * 124.0);
-        int steering = static_cast<int>(msg->angular.z * 124.0);
-        throttle = std::max(-124, std::min(124, throttle));
-        steering = std::max(-124, std::min(124, steering));
+        float linear  = msg->linear.x;
+        float angular = msg->angular.z;
 
-        // Encode unsigned 0-255 (127 = stop)
-        uint8_t drive_right = 127 - throttle;
-        uint8_t drive_left  = 127 - steering;
+        // Differential drive: mix linear + angular into per-wheel speeds
+        float v_left  = linear - (angular * TRACK_WIDTH / 2.0f);
+        float v_right = linear + (angular * TRACK_WIDTH / 2.0f);
+
+        int left_cmd  = static_cast<int>(v_left  * 124.0f);
+        int right_cmd = static_cast<int>(v_right * 124.0f);
+        left_cmd  = std::max(-124, std::min(124, left_cmd));
+        right_cmd = std::max(-124, std::min(124, right_cmd));
+
+        // Encode unsigned 0-255 (127 = stop, <127 = forward)
+        uint8_t drive_left  = static_cast<uint8_t>(127 - left_cmd);
+        uint8_t drive_right = static_cast<uint8_t>(127 - right_cmd);
 
         send_packet(drive_left, drive_right);
     }
@@ -163,9 +171,6 @@ private:
         odom.pose.covariance[7]  = 0.01;
         odom.pose.covariance[35] = 0.01;
 
-        odom_pub_->publish(odom);
-
-        // Broadcast TF odom → base_footprint
         geometry_msgs::msg::TransformStamped tf;
         tf.header.stamp    = stamp;
         tf.header.frame_id = "odom";
@@ -179,7 +184,11 @@ private:
         tf.transform.rotation.z    = q.z();
         tf.transform.rotation.w    = q.w();
 
-        tf_broadcaster_->sendTransform(tf);
+        {
+            std::lock_guard<std::mutex> lock(pub_mutex_);
+            odom_pub_->publish(odom);
+            tf_broadcaster_->sendTransform(tf);
+        }
     }
 
     void configure_serial(int fd) {
@@ -201,6 +210,7 @@ private:
 
     int fd_;
     bool running_ = true;
+    std::mutex pub_mutex_;
     rclcpp::Time last_cmd_;
     std::thread read_thread_;
 
