@@ -42,8 +42,9 @@ public:
         // TF broadcaster odom → base_footprint
         tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
 
-        // Watchdog — stop motors if no cmd_vel for 0.5s
-        last_cmd_ = now();
+        // Watchdog — stop motors if no cmd_vel for 0.5s or no odom for 1s
+        last_cmd_  = now();
+        last_odom_ = now();
         watchdog_ = create_wall_timer(
             std::chrono::milliseconds(100),
             std::bind(&MegaNode::watchdog, this));
@@ -87,9 +88,17 @@ private:
     }
 
     void watchdog() {
-        double elapsed = (now() - last_cmd_).seconds();
-        if (elapsed > 0.5)
+        double cmd_elapsed  = (now() - last_cmd_).seconds();
+        double odom_elapsed = (now() - last_odom_).seconds();
+
+        if (cmd_elapsed > 0.5)
             send_packet(127, 127);
+
+        if (odom_elapsed > 1.0) {
+            RCLCPP_ERROR_THROTTLE(get_logger(), *get_clock(), 2000,
+                "Mega serial timeout — no odom for %.1fs, motors stopped", odom_elapsed);
+            send_packet(127, 127);
+        }
     }
 
     void send_packet(uint8_t drive_left, uint8_t drive_right,
@@ -135,6 +144,7 @@ private:
     }
 
     void parse_odom(uint8_t* buf) {
+        last_odom_ = now();
         float x, y, theta, lvel, rvel;
         memcpy(&x,     buf + 2,  4);
         memcpy(&y,     buf + 6,  4);
@@ -212,6 +222,7 @@ private:
     bool running_ = true;
     std::mutex pub_mutex_;
     rclcpp::Time last_cmd_;
+    rclcpp::Time last_odom_;
     std::thread read_thread_;
 
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;

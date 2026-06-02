@@ -8,15 +8,15 @@ rtabmap:
     odom_frame_id: odom
     map_frame_id: map
 
-    # Subscribe to depth + RGB
+    # Subscribe to depth + RGB + laser scan
     subscribe_depth: true
     subscribe_rgb: true
-    subscribe_scan: false
+    subscribe_scan: true
 
     # Topic remappings handled in launch file
 
     # RTAB-Map core params
-    Rtabmap/DetectionRate: "1.0"        # map update rate Hz
+    Rtabmap/DetectionRate: "0"           # process every frame (no throttle)
     Rtabmap/TimeThr: "0"                # no time limit
     Rtabmap/MemoryThr: "0"              # no memory limit
 

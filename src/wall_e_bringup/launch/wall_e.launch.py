@@ -125,14 +125,14 @@ def generate_launch_description():
     	     output='screen'
 	),
         # ── NAV2 ──
+        # RTAB-Map provides /map and map→odom TF — no static map file needed
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
                 os.path.join(nav2_pkg, 'launch', 'navigation_launch.py')
             ),
             launch_arguments={
-                'params_file':   nav2_params,
-                'use_sim_time':  'false',
-                'map':           '/home/vk-jn-or/WALL_E_ROS2/maps/test_map.yaml',
+                'params_file':  nav2_params,
+                'use_sim_time': 'false',
             }.items()
         ),
 

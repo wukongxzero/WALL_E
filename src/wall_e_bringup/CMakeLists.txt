@@ -21,7 +21,7 @@ add_executable(uno_bridge src/uno_bridge.cpp)
 ament_target_dependencies(uno_bridge rclcpp std_msgs)
 
 add_executable(state_machine src/state_machine.cpp)
-ament_target_dependencies(state_machine rclcpp geometry_msgs std_msgs)
+ament_target_dependencies(state_machine rclcpp geometry_msgs std_msgs sensor_msgs nav_msgs)
 
 add_executable(controller_node src/controller_node.cpp)
 ament_target_dependencies(controller_node rclcpp geometry_msgs std_msgs)
@@ -41,10 +41,11 @@ install(PROGRAMS
   src/udp_godot_bridge.py
   src/yolo_nav_node.py
   src/webrtc_video_bridge.py
+  src/odom_to_tf.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch urdf config
+install(DIRECTORY launch urdf config worlds
   DESTINATION share/${PROJECT_NAME}
 )
 
