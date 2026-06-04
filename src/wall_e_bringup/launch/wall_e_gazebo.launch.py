@@ -64,7 +64,7 @@ def generate_launch_description():
             arguments=[
                 '/cmd_vel@geometry_msgs/msg/Twist@gz.msgs.Twist',
                 '/odom@nav_msgs/msg/Odometry@gz.msgs.Odometry',
-                '/clock@rosgraph_msgs/msg/Clock@gz.msgs.Clock',
+                '/world/test_room/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
                 '/tf@tf2_msgs/msg/TFMessage@gz.msgs.Pose_V',
                 '/wall_e/camera/image@sensor_msgs/msg/Image[gz.msgs.Image',
                 '/wall_e/camera/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
@@ -73,6 +73,7 @@ def generate_launch_description():
             ],
             remappings=[
                 ('/world/test_room/model/wall_e/joint_state', '/joint_states'),
+                ('/world/test_room/clock', '/clock'),
             ],
             output='screen'
         ),
@@ -141,7 +142,7 @@ def generate_launch_description():
             executable='controller_server',
             name='controller_server',
             parameters=[nav2_params, {'use_sim_time': True}],
-            remappings=nav2_remappings + [('cmd_vel', 'cmd_vel_nav')],
+            remappings=nav2_remappings + [('cmd_vel', '/cmd_vel')],
             output='screen'
         ),
         Node(
