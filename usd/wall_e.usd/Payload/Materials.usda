@@ -1,0 +1,81 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.0"
+    }
+    defaultPrim = "wall_e"
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "wall_e"
+{
+    def Scope "Materials"
+    {
+        def Material "grey" (
+            prepend references = @./MaterialsLibrary.usdc@</Materials/grey>
+        )
+        {
+        }
+
+        def Material "black" (
+            prepend references = @./MaterialsLibrary.usdc@</Materials/black>
+        )
+        {
+        }
+
+        def Material "blue" (
+            prepend references = @./MaterialsLibrary.usdc@</Materials/blue>
+        )
+        {
+        }
+    }
+
+    over "Geometry"
+    {
+        over "base_footprint"
+        {
+            over "base_link"
+            {
+                over "box" (
+                    prepend apiSchemas = ["MaterialBindingAPI"]
+                )
+                {
+                    rel material:binding = </wall_e/Materials/grey>
+                }
+
+                over "left_track"
+                {
+                    over "cylinder" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </wall_e/Materials/black>
+                    }
+                }
+
+                over "right_track"
+                {
+                    over "cylinder" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </wall_e/Materials/black>
+                    }
+                }
+
+                over "camera_link"
+                {
+                    over "box" (
+                        prepend apiSchemas = ["MaterialBindingAPI"]
+                    )
+                    {
+                        rel material:binding = </wall_e/Materials/blue>
+                    }
+                }
+            }
+        }
+    }
+}
+

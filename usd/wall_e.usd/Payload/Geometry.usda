@@ -1,0 +1,627 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.0"
+    }
+    defaultPrim = "wall_e"
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Xform "wall_e"
+{
+    def Scope "Geometry"
+    {
+        def Xform "base_footprint"
+        {
+            def Xform "base_link"
+            {
+                quatf xformOp:orient = (1, 0, 0, 0)
+                float3 xformOp:scale = (1, 1, 1)
+                double3 xformOp:translate = (0, 0, 0.2025)
+                uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                def Cube "box"
+                {
+                    float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+                    double size = 1
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (0.365, 0.39, 0.245)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                }
+
+                def Cube "box_1" (
+                    displayName = "box"
+                )
+                {
+                    float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+                    uniform token purpose = "guide"
+                    double size = 1
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (0.365, 0.39, 0.245)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                }
+
+                def Xform "left_track"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0.23, -0.1225)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Cylinder "cylinder"
+                    {
+                        uniform token axis = "Z"
+                        float3[] extent = [(-0.08, -0.08, -0.035), (0.08, 0.08, 0.035)]
+                        double height = 0.07
+                        double radius = 0.08
+                        quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+
+                    def Cylinder "cylinder_1" (
+                        displayName = "cylinder"
+                    )
+                    {
+                        uniform token axis = "Z"
+                        float3[] extent = [(-0.08, -0.08, -0.035), (0.08, 0.08, 0.035)]
+                        double height = 0.07
+                        uniform token purpose = "guide"
+                        double radius = 0.08
+                        quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                def Xform "right_track"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, -0.23, -0.1225)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Cylinder "cylinder"
+                    {
+                        uniform token axis = "Z"
+                        float3[] extent = [(-0.08, -0.08, -0.035), (0.08, 0.08, 0.035)]
+                        double height = 0.07
+                        double radius = 0.08
+                        quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+
+                    def Cylinder "cylinder_1" (
+                        displayName = "cylinder"
+                    )
+                    {
+                        uniform token axis = "Z"
+                        float3[] extent = [(-0.08, -0.08, -0.035), (0.08, 0.08, 0.035)]
+                        double height = 0.07
+                        uniform token purpose = "guide"
+                        double radius = 0.08
+                        quatf xformOp:orient = (0.70710677, 0.70710677, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                def Xform "camera_link"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0.15, 0, 0.16499999999999998)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Cube "box"
+                    {
+                        float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+                        double size = 1
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (0.09, 0.025, 0.025)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+
+                    def Cube "box_1" (
+                        displayName = "box"
+                    )
+                    {
+                        float3[] extent = [(-0.5, -0.5, -0.5), (0.5, 0.5, 0.5)]
+                        uniform token purpose = "guide"
+                        double size = 1
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (0.09, 0.025, 0.025)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+
+                    def Xform "camera_depth_optical_frame"
+                    {
+                        quatf xformOp:orient = (-0.5, 0.5, -0.5, 0.5)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+
+                    def Xform "camera_color_optical_frame"
+                    {
+                        quatf xformOp:orient = (-0.5, 0.5, -0.5, 0.5)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                def Xform "imu_link"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0, 0, 0)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                }
+
+                def Xform "left_front_support"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0.1025, 0.23, -0.1225)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Sphere "sphere"
+                    {
+                        float3[] extent = [(-0.08, -0.08, -0.08), (0.08, 0.08, 0.08)]
+                        uniform token purpose = "guide"
+                        double radius = 0.08
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                def Xform "left_rear_support"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (-0.1025, 0.23, -0.1225)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Sphere "sphere"
+                    {
+                        float3[] extent = [(-0.08, -0.08, -0.08), (0.08, 0.08, 0.08)]
+                        uniform token purpose = "guide"
+                        double radius = 0.08
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                def Xform "right_front_support"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (0.1025, -0.23, -0.1225)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Sphere "sphere"
+                    {
+                        float3[] extent = [(-0.08, -0.08, -0.08), (0.08, 0.08, 0.08)]
+                        uniform token purpose = "guide"
+                        double radius = 0.08
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+
+                def Xform "right_rear_support"
+                {
+                    quatf xformOp:orient = (1, 0, 0, 0)
+                    float3 xformOp:scale = (1, 1, 1)
+                    double3 xformOp:translate = (-0.1025, -0.23, -0.1225)
+                    uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+
+                    def Sphere "sphere"
+                    {
+                        float3[] extent = [(-0.08, -0.08, -0.08), (0.08, 0.08, 0.08)]
+                        uniform token purpose = "guide"
+                        double radius = 0.08
+                        quatf xformOp:orient = (1, 0, 0, 0)
+                        float3 xformOp:scale = (1, 1, 1)
+                        double3 xformOp:translate = (0, 0, 0)
+                        uniform token[] xformOpOrder = ["xformOp:translate", "xformOp:orient", "xformOp:scale"]
+                    }
+                }
+            }
+        }
+
+        def Scope "custom"
+        {
+            def Scope "gazebo"
+            {
+                def Scope "plugin"
+                {
+                    custom string urdf:filename = "gz-sim-diff-drive-system"
+                    custom string urdf:name = "gz::sim::systems::DiffDrive"
+
+                    def Scope "left_joint"
+                    {
+                        custom string urdf:text = "left_track_joint"
+                    }
+
+                    def Scope "right_joint"
+                    {
+                        custom string urdf:text = "right_track_joint"
+                    }
+
+                    def Scope "wheel_separation"
+                    {
+                        custom string urdf:text = "0.46"
+                    }
+
+                    def Scope "wheel_radius"
+                    {
+                        custom string urdf:text = "0.08"
+                    }
+
+                    def Scope "odom_publish_frequency"
+                    {
+                        custom string urdf:text = "30"
+                    }
+
+                    def Scope "topic"
+                    {
+                        custom string urdf:text = "/cmd_vel"
+                    }
+
+                    def Scope "odom_topic"
+                    {
+                        custom string urdf:text = "/odom"
+                    }
+
+                    def Scope "frame_id"
+                    {
+                        custom string urdf:text = "odom"
+                    }
+
+                    def Scope "child_frame_id"
+                    {
+                        custom string urdf:text = "base_footprint"
+                    }
+                }
+
+                def Scope "plugin_1" (
+                    displayName = "plugin"
+                )
+                {
+                    custom string urdf:filename = "gz-sim-joint-state-publisher-system"
+                    custom string urdf:name = "gz::sim::systems::JointStatePublisher"
+                }
+            }
+
+            def Scope "gazebo_1" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "base_link"
+
+                def Scope "material"
+                {
+                    custom string urdf:text = "Gazebo/Grey"
+                }
+            }
+
+            def Scope "gazebo_2" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "left_track"
+
+                def Scope "material"
+                {
+                    custom string urdf:text = "Gazebo/Black"
+                }
+
+                def Scope "collision"
+                {
+                    def Scope "surface"
+                    {
+                        def Scope "friction"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "mu"
+                                {
+                                    custom string urdf:text = "1.5"
+                                }
+
+                                def Scope "mu2"
+                                {
+                                    custom string urdf:text = "1.5"
+                                }
+                            }
+                        }
+
+                        def Scope "contact"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "kp"
+                                {
+                                    custom string urdf:text = "1e6"
+                                }
+
+                                def Scope "kd"
+                                {
+                                    custom string urdf:text = "100.0"
+                                }
+
+                                def Scope "min_depth"
+                                {
+                                    custom string urdf:text = "0.001"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Scope "gazebo_3" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "right_track"
+
+                def Scope "material"
+                {
+                    custom string urdf:text = "Gazebo/Black"
+                }
+
+                def Scope "collision"
+                {
+                    def Scope "surface"
+                    {
+                        def Scope "friction"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "mu"
+                                {
+                                    custom string urdf:text = "1.5"
+                                }
+
+                                def Scope "mu2"
+                                {
+                                    custom string urdf:text = "1.5"
+                                }
+                            }
+                        }
+
+                        def Scope "contact"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "kp"
+                                {
+                                    custom string urdf:text = "1e6"
+                                }
+
+                                def Scope "kd"
+                                {
+                                    custom string urdf:text = "100.0"
+                                }
+
+                                def Scope "min_depth"
+                                {
+                                    custom string urdf:text = "0.001"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Scope "gazebo_4" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "left_front_support"
+
+                def Scope "collision"
+                {
+                    def Scope "surface"
+                    {
+                        def Scope "friction"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "mu"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+
+                                def Scope "mu2"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Scope "gazebo_5" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "left_rear_support"
+
+                def Scope "collision"
+                {
+                    def Scope "surface"
+                    {
+                        def Scope "friction"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "mu"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+
+                                def Scope "mu2"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Scope "gazebo_6" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "right_front_support"
+
+                def Scope "collision"
+                {
+                    def Scope "surface"
+                    {
+                        def Scope "friction"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "mu"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+
+                                def Scope "mu2"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Scope "gazebo_7" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "right_rear_support"
+
+                def Scope "collision"
+                {
+                    def Scope "surface"
+                    {
+                        def Scope "friction"
+                        {
+                            def Scope "ode"
+                            {
+                                def Scope "mu"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+
+                                def Scope "mu2"
+                                {
+                                    custom string urdf:text = "0.01"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            def Scope "gazebo_8" (
+                displayName = "gazebo"
+            )
+            {
+                custom string urdf:reference = "camera_link"
+
+                def Scope "material"
+                {
+                    custom string urdf:text = "Gazebo/Blue"
+                }
+
+                def Scope "sensor"
+                {
+                    custom string urdf:name = "rgbd_camera"
+                    custom string urdf:type = "rgbd_camera"
+
+                    def Scope "camera"
+                    {
+                        def Scope "horizontal_fov"
+                        {
+                            custom string urdf:text = "1.204"
+                        }
+
+                        def Scope "image"
+                        {
+                            def Scope "width"
+                            {
+                                custom string urdf:text = "640"
+                            }
+
+                            def Scope "height"
+                            {
+                                custom string urdf:text = "480"
+                            }
+                        }
+
+                        def Scope "clip"
+                        {
+                            def Scope "near"
+                            {
+                                custom string urdf:text = "0.3"
+                            }
+
+                            def Scope "far"
+                            {
+                                custom string urdf:text = "4.0"
+                            }
+                        }
+                    }
+
+                    def Scope "always_on"
+                    {
+                        custom string urdf:text = "1"
+                    }
+
+                    def Scope "update_rate"
+                    {
+                        custom string urdf:text = "5"
+                    }
+
+                    def Scope "topic"
+                    {
+                        custom string urdf:text = "/wall_e/camera"
+                    }
+
+                    def Scope "gz_frame_id"
+                    {
+                        custom string urdf:text = "camera_link"
+                    }
+                }
+            }
+        }
+    }
+}
+
