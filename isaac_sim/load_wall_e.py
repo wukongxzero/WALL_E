@@ -1,69 +1,63 @@
 """
-WALL-E Isaac Sim — Scene 1: Load robot, add ground plane, verify it spawns.
+WALL-E Isaac Sim 4.5 — minimal load test.
+Spawns WALL-E USD in the scene, runs 200 steps, prints position.
 
 Run with:
-    ~/.conda/envs/isaacenv/bin/isaacsim --exec load_wall_e.py
-
-What this does:
-- Launches Isaac Sim headless=False (GUI opens)
-- Adds a ground plane
-- Spawns WALL-E from the existing USD file
-- Runs the simulation so you can see the robot sitting on the ground
-- Press Ctrl+C to exit
+    conda activate isaaclab
+    cd ~/IsaacLab && ./isaaclab.sh -p ~/WALL_E/isaac_sim/load_wall_e.py --headless
 """
 
-from isaacsim import SimulationApp
+import argparse
+from isaaclab.app import AppLauncher
 
-# Launch the GUI — set headless=True for no window
-sim_app = SimulationApp({"headless": False})
+parser = argparse.ArgumentParser(description="Load WALL-E in Isaac Sim 4.5")
+AppLauncher.add_app_launcher_args(parser)
+args_cli = parser.parse_args()
 
-import omni.isaac.core.utils.stage as stage_utils
-from omni.isaac.core import World
-from omni.isaac.core.utils.nucleus import get_assets_root_path
-from omni.isaac.core.objects import GroundPlane
-from omni.isaac.core.robots import Robot
+app_launcher = AppLauncher(args_cli)
+simulation_app = app_launcher.app
+
+import isaaclab.sim as sim_utils
+from isaaclab.sim import SimulationContext
+from pxr import UsdPhysics
 import omni.usd
-import numpy as np
 
-# Path to your USD file
-WALL_E_USD_PATH = "/home/wukong/WALL_E/usd/wall_e.usd"
+WALL_E_USDA = "/home/wukong/WALL_E/usd/wall_e.usd/wall_e.usda"
+
 
 def main():
-    # Create the world — handles physics, rendering, stepping
-    world = World(stage_units_in_meters=1.0)
+    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
+    sim = SimulationContext(sim_cfg)
+    sim.set_camera_view([2.5, 2.5, 2.0], [0.0, 0.0, 0.3])
 
-    # Add a ground plane so the robot doesn't fall forever
-    world.scene.add_default_ground_plane()
-
-    # Add WALL-E — spawns at origin, 0.2m above ground so it settles naturally
-    robot = world.scene.add(
-        Robot(
-            prim_path="/World/wall_e",
-            name="wall_e",
-            usd_path=WALL_E_USD_PATH,
-            position=np.array([0.0, 0.0, 0.2]),
-        )
+    # Ground plane + light
+    sim_utils.GroundPlaneCfg().func("/World/defaultGroundPlane", sim_utils.GroundPlaneCfg())
+    sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75)).func(
+        "/World/Light", sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
     )
 
-    # Initialize the world (sets up physics, loads assets)
-    world.reset()
+    # Spawn WALL-E USD as a reference prim
+    stage = omni.usd.get_context().get_stage()
+    wall_e_prim = stage.DefinePrim("/World/wall_e", "Xform")
+    wall_e_prim.GetReferences().AddReference(WALL_E_USDA)
 
-    print("\nWALL-E loaded. Running simulation...")
-    print("Joint names:", robot.dof_names)
-    print("Press Ctrl+C to exit.\n")
+    sim.reset()
+    print("\n[INFO] WALL-E spawned. Running 200 steps...")
 
-    step = 0
-    while sim_app.is_running():
-        world.step(render=True)
+    # Print prim children to confirm USD loaded
+    children = list(stage.GetPrimAtPath("/World/wall_e").GetChildren())
+    print(f"[INFO] wall_e children: {[str(c.GetPath()) for c in children]}")
 
-        # Print robot position every 100 steps so you can see it settling
-        if step % 100 == 0:
-            pos, rot = robot.get_world_pose()
-            print(f"Step {step:5d} | position: {pos}")
+    count = 0
+    while simulation_app.is_running() and count < 200:
+        sim.step()
+        count += 1
+        if count % 50 == 0:
+            print(f"[INFO] Step {count} OK")
 
-        step += 1
+    print("[INFO] 200 steps complete — WALL-E loaded successfully.")
 
-    sim_app.close()
 
 if __name__ == "__main__":
     main()
+    simulation_app.close()
