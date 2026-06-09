@@ -2,6 +2,7 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <std_msgs/msg/bool.hpp>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <cstring>
@@ -19,7 +20,9 @@
 #define BAUD        B115200
 #define TRACK_WIDTH 0.32f
 
-class MegaNode : public rclcpp::Node {
+
+class MegaNode : public rclcpp::Node
+    {
 public:
     MegaNode() : Node("mega_node") {
 
@@ -38,6 +41,9 @@ public:
 
         // Publish odometry from Mega encoder data
         odom_pub_ = create_publisher<nav_msgs::msg::Odometry>("/odom", 10);
+
+        // Publish serial fault so state machine can go IDLE
+        serial_fault_pub_ = create_publisher<std_msgs::msg::Bool>("/wall_e/serial_fault", 10);
 
         // TF broadcaster odom → base_footprint
         tf_broadcaster_ = std::make_shared<tf2_ros::TransformBroadcaster>(this);
@@ -98,6 +104,9 @@ private:
             RCLCPP_ERROR_THROTTLE(get_logger(), *get_clock(), 2000,
                 "Mega serial timeout — no odom for %.1fs, motors stopped", odom_elapsed);
             send_packet(127, 127);
+            auto fault = std_msgs::msg::Bool();
+            fault.data = true;
+            serial_fault_pub_->publish(fault);
         }
     }
 
@@ -227,6 +236,7 @@ private:
 
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_sub_;
     rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_pub_;
+    rclcpp::Publisher<std_msgs::msg::Bool>::SharedPtr serial_fault_pub_;
     rclcpp::TimerBase::SharedPtr watchdog_;
     std::shared_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
 };

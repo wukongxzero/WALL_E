@@ -30,6 +30,13 @@ public:
             "/emergency_stop", 10,
             std::bind(&StateMachine::estop_callback, this, std::placeholders::_1));
 
+        serial_fault_sub_ = create_subscription<std_msgs::msg::Bool>(
+            "/wall_e/serial_fault", 10,
+            [this](const std_msgs::msg::Bool::SharedPtr msg) {
+                if (msg->data && state_ == State::AUTONOMOUS)
+                    go_idle("SERIAL TIMEOUT");
+            });
+
         // Safety watchdog subscriptions
         camera_sub_ = create_subscription<sensor_msgs::msg::Image>(
             "/camera/realsense2_camera/color/image_raw", 1,
@@ -135,7 +142,7 @@ private:
     rclcpp::Time last_localization_;
 
     rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr joy_sub_, nav_sub_;
-    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr toggle_sub_, estop_sub_;
+    rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr toggle_sub_, estop_sub_, serial_fault_sub_;
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr camera_sub_;
     rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr rtabmap_odom_sub_;
 
