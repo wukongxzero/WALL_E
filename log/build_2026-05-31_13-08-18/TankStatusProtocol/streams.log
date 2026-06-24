@@ -1,0 +1,20 @@
+[0.007s] Invoking command in '/home/wukong/WALL_E/build/TankStatusProtocol': CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/wukong/WALL_E/TankStatusProtocol -DCMAKE_INSTALL_PREFIX=/home/wukong/WALL_E/install/TankStatusProtocol
+[0.125s] -- The C compiler identification is GNU 13.3.0
+[0.166s] -- The CXX compiler identification is GNU 13.3.0
+[0.182s] -- Detecting C compiler ABI info
+[0.257s] -- Detecting C compiler ABI info - done
+[0.262s] -- Check for working C compiler: /usr/bin/cc - skipped
+[0.263s] -- Detecting C compile features
+[0.264s] -- Detecting C compile features - done
+[0.271s] -- Detecting CXX compiler ABI info
+[0.342s] -- Detecting CXX compiler ABI info - done
+[0.348s] -- Check for working CXX compiler: /usr/bin/c++ - skipped
+[0.348s] -- Detecting CXX compile features
+[0.348s] -- Detecting CXX compile features - done
+[0.490s] -- Found Python3: /home/wukong/miniconda3/bin/python3 (found version "3.13.13") found components: Interpreter Development Development.Module Development.Embed 
+[2.025s] -- pybind11 v2.13.1 
+[2.049s] -- Performing Test HAS_FLTO
+[2.187s] -- Performing Test HAS_FLTO - Success
+[2.188s] -- Configuring done (2.2s)
+[2.193s] -- Generating done (0.0s)
+[2.194s] -- Build files have been written to: /home/wukong/WALL_E/build/TankStatusProtocol

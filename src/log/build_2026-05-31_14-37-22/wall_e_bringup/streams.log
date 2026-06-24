@@ -1,0 +1,67 @@
+[0.013s] Invoking command in '/home/wukong/WALL_E/src/build/wall_e_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/wukong/WALL_E/src/wall_e_bringup -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/wukong/WALL_E/src/install/wall_e_bringup
+[0.035s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.283s] -- Override CMake install command with custom implementation using symlinks instead of copying resources
+[0.292s] -- Found rclcpp: 28.1.18 (/opt/ros/jazzy/share/rclcpp/cmake)
+[0.328s] -- Found rosidl_generator_c: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[0.340s] -- Found rosidl_generator_cpp: 4.6.7 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[0.354s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[0.370s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[0.450s] -- Found rmw_implementation_cmake: 7.3.3 (/opt/ros/jazzy/share/rmw_implementation_cmake/cmake)
+[0.452s] -- Found rmw_fastrtps_cpp: 8.4.3 (/opt/ros/jazzy/share/rmw_fastrtps_cpp/cmake)
+[0.544s] -- Using RMW implementation 'rmw_fastrtps_cpp' as default
+[0.627s] -- Found geometry_msgs: 5.3.7 (/opt/ros/jazzy/share/geometry_msgs/cmake)
+[0.667s] -- Found sensor_msgs: 5.3.7 (/opt/ros/jazzy/share/sensor_msgs/cmake)
+[0.699s] -- Found nav_msgs: 5.3.7 (/opt/ros/jazzy/share/nav_msgs/cmake)
+[0.734s] -- Found tf2: 0.36.20 (/opt/ros/jazzy/share/tf2/cmake)
+[0.739s] -- Found tf2_ros: 0.36.20 (/opt/ros/jazzy/share/tf2_ros/cmake)
+[1.041s] -- Configuring done (1.0s)
+[1.072s] -- Generating done (0.0s)
+[1.081s] -- Build files have been written to: /home/wukong/WALL_E/src/build/wall_e_bringup
+[1.096s] Invoked command in '/home/wukong/WALL_E/src/build/wall_e_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/wukong/WALL_E/src/wall_e_bringup -DAMENT_CMAKE_SYMLINK_INSTALL=1 -DCMAKE_INSTALL_PREFIX=/home/wukong/WALL_E/src/install/wall_e_bringup
+[1.097s] Invoking command in '/home/wukong/WALL_E/src/build/wall_e_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/src/build/wall_e_bringup -- -j16 -l16
+[1.180s] [ 50%] [32mBuilding CXX object CMakeFiles/controller_node.dir/src/controller_node.cpp.o[0m
+[1.180s] [ 50%] [32mBuilding CXX object CMakeFiles/state_machine.dir/src/state_machine.cpp.o[0m
+[1.181s] [ 50%] [32mBuilding CXX object CMakeFiles/uno_bridge.dir/src/uno_bridge.cpp.o[0m
+[1.181s] [ 50%] [32mBuilding CXX object CMakeFiles/mega_node.dir/src/mega_node.cpp.o[0m
+[4.783s] [ 62%] [32m[1mLinking CXX executable uno_bridge[0m
+[4.957s] [ 62%] Built target uno_bridge
+[7.884s] [ 75%] [32m[1mLinking CXX executable mega_node[0m
+[8.180s] [ 75%] Built target mega_node
+[8.805s] [ 87%] [32m[1mLinking CXX executable state_machine[0m
+[9.098s] [ 87%] Built target state_machine
+[9.143s] [100%] [32m[1mLinking CXX executable controller_node[0m
+[9.389s] [100%] Built target controller_node
+[9.399s] Invoked command in '/home/wukong/WALL_E/src/build/wall_e_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/src/build/wall_e_bringup -- -j16 -l16
+[9.407s] Invoking command in '/home/wukong/WALL_E/src/build/wall_e_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/wukong/WALL_E/src/build/wall_e_bringup
+[9.413s] -- Install configuration: ""
+[9.413s] -- Execute custom install script
+[9.414s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/mega_node
+[9.420s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/uno_bridge
+[9.426s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/state_machine
+[9.433s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/controller_node
+[9.441s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/llama_interpreter_node.py
+[9.449s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/llama_nav_node.py
+[9.456s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/fake_odom.py
+[9.464s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/udp_godot_bridge.py
+[9.470s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/yolo_nav_node.py
+[9.477s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/webrtc_video_bridge.py
+[9.484s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/wall_e.launch.py
+[9.491s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/urdf/wall_e.urdf.xacro
+[9.498s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/nav2_params.yaml
+[9.505s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/rtabmap.yaml
+[9.513s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/package_run_dependencies/wall_e_bringup
+[9.520s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/parent_prefix_path/wall_e_bringup
+[9.527s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/ament_prefix_path.sh
+[9.534s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/ament_prefix_path.dsv
+[9.542s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/path.sh
+[9.549s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/path.dsv
+[9.556s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.bash
+[9.563s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.sh
+[9.570s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.zsh
+[9.577s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.dsv
+[9.584s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/package.dsv
+[9.593s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/packages/wall_e_bringup
+[9.601s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/cmake/wall_e_bringupConfig.cmake
+[9.609s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/cmake/wall_e_bringupConfig-version.cmake
+[9.616s] -- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/package.xml
+[9.626s] Invoked command in '/home/wukong/WALL_E/src/build/wall_e_bringup' returned '0': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --install /home/wukong/WALL_E/src/build/wall_e_bringup

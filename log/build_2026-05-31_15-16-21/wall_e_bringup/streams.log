@@ -1,0 +1,16 @@
+[0.013s] Invoking command in '/home/wukong/WALL_E/build/wall_e_bringup': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/build/wall_e_bringup -- -j16 -l16
+[0.105s] [ 62%] Building CXX object CMakeFiles/state_machine.dir/src/state_machine.cpp.o
+[0.105s] [ 62%] Building CXX object CMakeFiles/mega_node.dir/src/mega_node.cpp.o
+[0.105s] [ 75%] Built target uno_bridge
+[0.105s] [ 75%] Built target controller_node
+[0.479s] /home/wukong/WALL_E/src/wall_e_bringup/src/state_machine.cpp:5:10: fatal error: sensor_msgs/msg/image.hpp: No such file or directory
+[0.479s]     5 | #include <sensor_msgs/msg/image.hpp>
+[0.479s]       |          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+[0.479s] compilation terminated.
+[0.487s] gmake[2]: *** [CMakeFiles/state_machine.dir/build.make:76: CMakeFiles/state_machine.dir/src/state_machine.cpp.o] Error 1
+[0.487s] gmake[1]: *** [CMakeFiles/Makefile2:195: CMakeFiles/state_machine.dir/all] Error 2
+[0.488s] gmake[1]: *** Waiting for unfinished jobs....
+[6.641s] [ 87%] Linking CXX executable mega_node
+[6.880s] [ 87%] Built target mega_node
+[6.880s] gmake: *** [Makefile:146: all] Error 2
+[6.883s] Invoked command in '/home/wukong/WALL_E/build/wall_e_bringup' returned '2': CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}:/opt/ros/jazzy CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/build/wall_e_bringup -- -j16 -l16

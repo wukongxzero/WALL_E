@@ -1,0 +1,106 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-3108e13d0632d3958d41.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.15"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"name" : "",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "wall_e_bringup",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2,
+						3,
+						4,
+						5
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "controller_node::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-controller_node-7ac25ff9a34bf276041b.json",
+					"name" : "controller_node",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "mega_node::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-mega_node-d91149d94b2c779d8a6d.json",
+					"name" : "mega_node",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "state_machine::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-state_machine-423abb03d1c1c71f17ad.json",
+					"name" : "state_machine",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uninstall-7b5bb05bb0d460cfb971.json",
+					"name" : "uninstall",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "uno_bridge::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-uno_bridge-e85650c728e2cfcc13cc.json",
+					"name" : "uno_bridge",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "wall_e_bringup_uninstall::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-wall_e_bringup_uninstall-85d4a1eba8808277fef0.json",
+					"name" : "wall_e_bringup_uninstall",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/wukong/WALL_E/src/build/wall_e_bringup",
+		"source" : "/home/wukong/WALL_E/src/wall_e_bringup"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 6
+	}
+}

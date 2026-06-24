@@ -1,63 +1,55 @@
 """
-WALL-E Isaac Sim 4.5 — minimal load test.
+WALL-E Isaac Sim 6.0 — load test.
 Spawns WALL-E USD in the scene, runs 200 steps, prints position.
 
 Run with:
-    conda activate isaaclab
-    cd ~/IsaacLab && ./isaaclab.sh -p ~/WALL_E/isaac_sim/load_wall_e.py --headless
+    ~/isaac-sim/python.sh ~/WALL_E/isaac_sim/load_wall_e.py
 """
 
-import argparse
-from isaaclab.app import AppLauncher
+from isaacsim import SimulationApp
 
-parser = argparse.ArgumentParser(description="Load WALL-E in Isaac Sim 4.5")
-AppLauncher.add_app_launcher_args(parser)
-args_cli = parser.parse_args()
+simulation_app = SimulationApp({"headless": False})
 
-app_launcher = AppLauncher(args_cli)
-simulation_app = app_launcher.app
+import isaacsim.core.experimental.utils.app as app_utils
+import isaacsim.core.experimental.utils.stage as stage_utils
+from isaacsim.core.experimental.objects import DistantLight, GroundPlane
+from isaacsim.core.rendering_manager import RenderingManager
+from isaacsim.core.simulation_manager import SimulationManager
+from pxr import Usd
 
-import isaaclab.sim as sim_utils
-from isaaclab.sim import SimulationContext
-from pxr import UsdPhysics
+WALL_E_USD = "/home/wukong/WALL_E/usd/wall_e_v2.usd"
+
+# New stage
+stage_utils.create_new_stage()
+stage = Usd.Stage.Open(stage_utils.get_current_stage_url()) if False else None
+
+# Ground + light
+GroundPlane("/World/GroundPlane")
+light = DistantLight("/World/DistantLight")
+light.set_intensities(3000)
+
+# Spawn WALL-E as a USD reference
 import omni.usd
+stage = omni.usd.get_context().get_stage()
+wall_e = stage.DefinePrim("/World/wall_e", "Xform")
+wall_e.GetReferences().AddReference(WALL_E_USD)
 
-WALL_E_USDA = "/home/wukong/WALL_E/usd/wall_e.usd/wall_e.usda"
+SimulationManager.set_physics_dt(1.0 / 60.0)
 
+app_utils.play()
+simulation_app.update()
 
-def main():
-    sim_cfg = sim_utils.SimulationCfg(device=args_cli.device)
-    sim = SimulationContext(sim_cfg)
-    sim.set_camera_view([2.5, 2.5, 2.0], [0.0, 0.0, 0.3])
+print("\n[INFO] WALL-E spawned. Running simulation (Ctrl+C to stop)...")
+children = list(stage.GetPrimAtPath("/World/wall_e").GetChildren())
+print(f"[INFO] wall_e children: {[str(c.GetPath()) for c in children]}")
 
-    # Ground plane + light
-    sim_utils.GroundPlaneCfg().func("/World/defaultGroundPlane", sim_utils.GroundPlaneCfg())
-    sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75)).func(
-        "/World/Light", sim_utils.DomeLightCfg(intensity=3000.0, color=(0.75, 0.75, 0.75))
-    )
+for i in range(1000000):
+    SimulationManager.step()
+    RenderingManager.render()
+    simulation_app.update()
+    if i % 50 == 0:
+        print(f"[INFO] Step {i} OK")
 
-    # Spawn WALL-E USD as a reference prim
-    stage = omni.usd.get_context().get_stage()
-    wall_e_prim = stage.DefinePrim("/World/wall_e", "Xform")
-    wall_e_prim.GetReferences().AddReference(WALL_E_USDA)
-
-    sim.reset()
-    print("\n[INFO] WALL-E spawned. Running 200 steps...")
-
-    # Print prim children to confirm USD loaded
-    children = list(stage.GetPrimAtPath("/World/wall_e").GetChildren())
-    print(f"[INFO] wall_e children: {[str(c.GetPath()) for c in children]}")
-
-    count = 0
-    while simulation_app.is_running() and count < 200:
-        sim.step()
-        count += 1
-        if count % 50 == 0:
-            print(f"[INFO] Step {count} OK")
-
-    print("[INFO] 200 steps complete — WALL-E loaded successfully.")
-
-
-if __name__ == "__main__":
-    main()
-    simulation_app.close()
+print("[INFO] Simulation complete.")
+app_utils.stop()
+simulation_app.close()

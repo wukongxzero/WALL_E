@@ -1,0 +1,1 @@
+Invoking command in '/home/wukong/WALL_E/build/TankStatusProtocol': CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake /home/wukong/WALL_E/TankStatusProtocol -DCMAKE_INSTALL_PREFIX=/home/wukong/WALL_E/install/TankStatusProtocol

@@ -1,0 +1,1 @@
+/home/wukong/WALL_E/src/wall_e_bringup/src/yolo_nav_node.py

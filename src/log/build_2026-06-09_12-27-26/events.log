@@ -1,0 +1,162 @@
+[0.000000] (-) TimerEvent: {}
+[0.000148] (wall_e_bringup) JobQueued: {'identifier': 'wall_e_bringup', 'dependencies': OrderedDict()}
+[0.000212] (wall_e_bringup) JobStarted: {'identifier': 'wall_e_bringup'}
+[0.007879] (wall_e_bringup) JobProgress: {'identifier': 'wall_e_bringup', 'progress': 'cmake'}
+[0.008602] (wall_e_bringup) JobProgress: {'identifier': 'wall_e_bringup', 'progress': 'build'}
+[0.008943] (wall_e_bringup) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/wukong/WALL_E/src/build/wall_e_bringup', '--', '-j16', '-l16'], 'cwd': '/home/wukong/WALL_E/src/build/wall_e_bringup', 'env': OrderedDict({'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'XDG_ACTIVATION_TOKEN': 'gnome-shell/Terminator/3026-0-wukong-LOQ-15AHP10_TIME41172', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'CONDA_PROMPT_MODIFIER': '(base)', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'AI_AGENT': 'claude-code_2-1-169_agent', 'USER': 'wukong', 'CLAUDE_CODE_ENTRYPOINT': 'cli', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'GIT_EDITOR': 'true', 'XDG_SESSION_TYPE': 'x11', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/wukong', 'CONDA_SHLVL': '1', 'OLDPWD': '/home/wukong/IsaacLab', 'DESKTOP_SESSION': 'ubuntu', 'OMNI_KIT_ACCEPT_EULA': 'YES', 'GIO_LAUNCHED_DESKTOP_FILE': '/usr/share/applications/terminator.desktop', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'MANAGERPID': '2610', 'SYSTEMD_EXEC_PID': '3026', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', '_CE_M': '', 'TERMINATOR_DBUS_NAME': 'net.tenshu.Terminator23558193cd9818af7fe4d2c2f5bd9d00f', '_CONDA_ROOT': '/home/wukong/miniconda3', 'GIO_LAUNCHED_DESKTOP_FILE_PID': '4195', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'wukong', 'JOURNAL_STREAM': '9:28836', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'wukong', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', '_CE_CONDA': '', 'WINDOWPATH': '2', 'PATH': '/home/wukong/miniconda3/bin:/home/wukong/miniconda3/condabin:/home/wukong/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/wukong/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/wukong-LOQ-15AHP10:@/tmp/.ICE-unix/2982,unix/wukong-LOQ-15AHP10:/tmp/.ICE-unix/2982', 'INVOCATION_ID': 'feda6fe58218442293e08d4138c70869', 'COREPACK_ENABLE_AUTO_PIN': '0', 'XDG_MENU_PREFIX': 'gnome-', 'XDG_RUNTIME_DIR': '/run/user/1000', 'CLAUDE_EFFORT': 'high', 'DISPLAY': ':1', 'TERMINATOR_DBUS_PATH': '/net/tenshu/Terminator2', 'NoDefaultCurrentDirectoryInExePath': '1', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'CONDA_PYTHON_EXE': '/home/wukong/miniconda3/bin/python', 'SHELL': '/bin/bash', 'TERMINATOR_UUID': 'urn:uuid:420af9d7-952b-42fa-9308-9a55b9960f3d', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'CLAUDE_CODE_SESSION_ID': 'dbc300b6-0a8d-405b-b6fc-c21a422e6ae4', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'CONDA_DEFAULT_ENV': 'base', 'CLAUDECODE': '1', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'GJS_DEBUG_OUTPUT': 'stderr', '_CONDA_EXE': '/home/wukong/miniconda3/bin/conda', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/wukong/WALL_E/src/build/wall_e_bringup', 'LC_ALL': 'en_US.UTF-8', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'CONDA_EXE': '/home/wukong/miniconda3/bin/conda', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'CLAUDE_CODE_EXECPATH': '/home/wukong/.local/share/claude/versions/2.1.169', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'CONDA_PREFIX': '/home/wukong/miniconda3', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy'}), 'shell': False}
+[0.099569] (-) TimerEvent: {}
+[0.119110] (wall_e_bringup) StdoutLine: {'line': b'[ 75%] Building CXX object CMakeFiles/mega_node.dir/src/mega_node.cpp.o\n'}
+[0.119360] (wall_e_bringup) StdoutLine: {'line': b'[ 75%] Built target uno_bridge\n'}
+[0.119463] (wall_e_bringup) StdoutLine: {'line': b'[ 75%] Built target controller_node\n'}
+[0.119548] (wall_e_bringup) StdoutLine: {'line': b'[ 75%] Building CXX object CMakeFiles/state_machine.dir/src/state_machine.cpp.o\n'}
+[0.199726] (-) TimerEvent: {}
+[0.299945] (-) TimerEvent: {}
+[0.400156] (-) TimerEvent: {}
+[0.500347] (-) TimerEvent: {}
+[0.600569] (-) TimerEvent: {}
+[0.700768] (-) TimerEvent: {}
+[0.800962] (-) TimerEvent: {}
+[0.901139] (-) TimerEvent: {}
+[1.001314] (-) TimerEvent: {}
+[1.101536] (-) TimerEvent: {}
+[1.201750] (-) TimerEvent: {}
+[1.301986] (-) TimerEvent: {}
+[1.402194] (-) TimerEvent: {}
+[1.502416] (-) TimerEvent: {}
+[1.602609] (-) TimerEvent: {}
+[1.702821] (-) TimerEvent: {}
+[1.803015] (-) TimerEvent: {}
+[1.903225] (-) TimerEvent: {}
+[2.003393] (-) TimerEvent: {}
+[2.103582] (-) TimerEvent: {}
+[2.203744] (-) TimerEvent: {}
+[2.303929] (-) TimerEvent: {}
+[2.404134] (-) TimerEvent: {}
+[2.504327] (-) TimerEvent: {}
+[2.604515] (-) TimerEvent: {}
+[2.704711] (-) TimerEvent: {}
+[2.804890] (-) TimerEvent: {}
+[2.905079] (-) TimerEvent: {}
+[3.005304] (-) TimerEvent: {}
+[3.105506] (-) TimerEvent: {}
+[3.205724] (-) TimerEvent: {}
+[3.305925] (-) TimerEvent: {}
+[3.406156] (-) TimerEvent: {}
+[3.506361] (-) TimerEvent: {}
+[3.606558] (-) TimerEvent: {}
+[3.706786] (-) TimerEvent: {}
+[3.806996] (-) TimerEvent: {}
+[3.907218] (-) TimerEvent: {}
+[4.007446] (-) TimerEvent: {}
+[4.107679] (-) TimerEvent: {}
+[4.207899] (-) TimerEvent: {}
+[4.308103] (-) TimerEvent: {}
+[4.408292] (-) TimerEvent: {}
+[4.508506] (-) TimerEvent: {}
+[4.608696] (-) TimerEvent: {}
+[4.708900] (-) TimerEvent: {}
+[4.809088] (-) TimerEvent: {}
+[4.909307] (-) TimerEvent: {}
+[5.009536] (-) TimerEvent: {}
+[5.109810] (-) TimerEvent: {}
+[5.210013] (-) TimerEvent: {}
+[5.310242] (-) TimerEvent: {}
+[5.410469] (-) TimerEvent: {}
+[5.510687] (-) TimerEvent: {}
+[5.610855] (-) TimerEvent: {}
+[5.711047] (-) TimerEvent: {}
+[5.811242] (-) TimerEvent: {}
+[5.911428] (-) TimerEvent: {}
+[6.011630] (-) TimerEvent: {}
+[6.111834] (-) TimerEvent: {}
+[6.212027] (-) TimerEvent: {}
+[6.312197] (-) TimerEvent: {}
+[6.412384] (-) TimerEvent: {}
+[6.512632] (-) TimerEvent: {}
+[6.612908] (-) TimerEvent: {}
+[6.699499] (wall_e_bringup) StdoutLine: {'line': b'[ 87%] Linking CXX executable mega_node\n'}
+[6.713020] (-) TimerEvent: {}
+[6.813212] (-) TimerEvent: {}
+[6.913420] (-) TimerEvent: {}
+[7.013616] (-) TimerEvent: {}
+[7.082211] (wall_e_bringup) StdoutLine: {'line': b'[ 87%] Built target mega_node\n'}
+[7.113715] (-) TimerEvent: {}
+[7.213917] (-) TimerEvent: {}
+[7.314129] (-) TimerEvent: {}
+[7.414312] (-) TimerEvent: {}
+[7.514496] (-) TimerEvent: {}
+[7.614688] (-) TimerEvent: {}
+[7.714881] (-) TimerEvent: {}
+[7.815074] (-) TimerEvent: {}
+[7.915247] (-) TimerEvent: {}
+[8.015438] (-) TimerEvent: {}
+[8.115669] (-) TimerEvent: {}
+[8.215936] (-) TimerEvent: {}
+[8.316156] (-) TimerEvent: {}
+[8.416370] (-) TimerEvent: {}
+[8.516585] (-) TimerEvent: {}
+[8.616816] (-) TimerEvent: {}
+[8.717027] (-) TimerEvent: {}
+[8.817240] (-) TimerEvent: {}
+[8.917452] (-) TimerEvent: {}
+[9.017637] (-) TimerEvent: {}
+[9.117857] (-) TimerEvent: {}
+[9.218041] (-) TimerEvent: {}
+[9.318223] (-) TimerEvent: {}
+[9.418454] (-) TimerEvent: {}
+[9.518688] (-) TimerEvent: {}
+[9.618909] (-) TimerEvent: {}
+[9.719127] (-) TimerEvent: {}
+[9.819358] (-) TimerEvent: {}
+[9.919585] (-) TimerEvent: {}
+[10.019796] (-) TimerEvent: {}
+[10.120001] (-) TimerEvent: {}
+[10.220239] (-) TimerEvent: {}
+[10.320466] (-) TimerEvent: {}
+[10.350367] (wall_e_bringup) StdoutLine: {'line': b'[100%] Linking CXX executable state_machine\n'}
+[10.420610] (-) TimerEvent: {}
+[10.520930] (-) TimerEvent: {}
+[10.621165] (-) TimerEvent: {}
+[10.721399] (-) TimerEvent: {}
+[10.771946] (wall_e_bringup) StdoutLine: {'line': b'[100%] Built target state_machine\n'}
+[10.781510] (wall_e_bringup) CommandEnded: {'returncode': 0}
+[10.784707] (wall_e_bringup) JobProgress: {'identifier': 'wall_e_bringup', 'progress': 'install'}
+[10.793410] (wall_e_bringup) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/wukong/WALL_E/src/build/wall_e_bringup'], 'cwd': '/home/wukong/WALL_E/src/build/wall_e_bringup', 'env': OrderedDict({'GJS_DEBUG_TOPICS': 'JS ERROR;JS LOG', 'XDG_ACTIVATION_TOKEN': 'gnome-shell/Terminator/3026-0-wukong-LOQ-15AHP10_TIME41172', 'LESSOPEN': '| /usr/bin/lesspipe %s', 'CONDA_PROMPT_MODIFIER': '(base)', 'GZ_SIM_RESOURCE_PATH': '/opt/ros/jazzy/share', 'AI_AGENT': 'claude-code_2-1-169_agent', 'USER': 'wukong', 'CLAUDE_CODE_ENTRYPOINT': 'cli', 'GZ_CONFIG_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/share/gz:/opt/ros/jazzy/opt/sdformat_vendor/share/gz:/opt/ros/jazzy/opt/gz_gui_vendor/share/gz:/opt/ros/jazzy/opt/gz_transport_vendor/share/gz:/opt/ros/jazzy/opt/gz_rendering_vendor/share/gz:/opt/ros/jazzy/opt/gz_plugin_vendor/share/gz:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/share/gz:/opt/ros/jazzy/opt/gz_msgs_vendor/share/gz:/opt/ros/jazzy/opt/gz_common_vendor/share/gz', 'GIT_EDITOR': 'true', 'XDG_SESSION_TYPE': 'x11', 'CLUTTER_DISABLE_MIPMAPPED_TEXT': '1', 'SHLVL': '2', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor/lib:/opt/ros/jazzy/opt/gz_sensors_vendor/lib:/opt/ros/jazzy/opt/gz_physics_vendor/lib:/opt/ros/jazzy/opt/sdformat_vendor/lib:/opt/ros/jazzy/opt/rviz_ogre_vendor/lib:/opt/ros/jazzy/lib/x86_64-linux-gnu:/opt/ros/jazzy/opt/gz_gui_vendor/lib:/opt/ros/jazzy/opt/gz_transport_vendor/lib:/opt/ros/jazzy/opt/gz_rendering_vendor/lib:/opt/ros/jazzy/opt/gz_plugin_vendor/lib:/opt/ros/jazzy/opt/gz_fuel_tools_vendor/lib:/opt/ros/jazzy/opt/gz_msgs_vendor/lib:/opt/ros/jazzy/opt/gz_common_vendor/lib:/opt/ros/jazzy/opt/gz_math_vendor/lib:/opt/ros/jazzy/opt/gz_utils_vendor/lib:/opt/ros/jazzy/opt/gz_tools_vendor/lib:/opt/ros/jazzy/opt/gz_ogre_next_vendor/lib:/opt/ros/jazzy/opt/gz_dartsim_vendor/lib:/opt/ros/jazzy/opt/gz_cmake_vendor/lib:/opt/ros/jazzy/lib', 'HOME': '/home/wukong', 'CONDA_SHLVL': '1', 'OLDPWD': '/home/wukong/IsaacLab', 'DESKTOP_SESSION': 'ubuntu', 'OMNI_KIT_ACCEPT_EULA': 'YES', 'GIO_LAUNCHED_DESKTOP_FILE': '/usr/share/applications/terminator.desktop', 'ROS_PYTHON_VERSION': '3', 'GNOME_SHELL_SESSION_MODE': 'ubuntu', 'GTK_MODULES': 'gail:atk-bridge', 'MANAGERPID': '2610', 'SYSTEMD_EXEC_PID': '3026', 'GSM_SKIP_SSH_AGENT_WORKAROUND': 'true', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLORTERM': 'truecolor', '_CE_M': '', 'TERMINATOR_DBUS_NAME': 'net.tenshu.Terminator23558193cd9818af7fe4d2c2f5bd9d00f', '_CONDA_ROOT': '/home/wukong/miniconda3', 'GIO_LAUNCHED_DESKTOP_FILE_PID': '4195', 'DEBUGINFOD_URLS': 'https://debuginfod.ubuntu.com', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'wukong', 'JOURNAL_STREAM': '9:28836', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'MEMORY_PRESSURE_WATCH': '/sys/fs/cgroup/user.slice/user-1000.slice/user@1000.service/session.slice/org.gnome.Shell@x11.service/memory.pressure', 'XDG_SESSION_CLASS': 'user', 'USERNAME': 'wukong', 'TERM': 'xterm-256color', 'GNOME_DESKTOP_SESSION_ID': 'this-is-deprecated', '_CE_CONDA': '', 'WINDOWPATH': '2', 'PATH': '/home/wukong/miniconda3/bin:/home/wukong/miniconda3/condabin:/home/wukong/.local/bin:/opt/ros/jazzy/opt/gz_msgs_vendor/bin:/opt/ros/jazzy/opt/gz_tools_vendor/bin:/opt/ros/jazzy/opt/gz_ogre_next_vendor/bin:/opt/ros/jazzy/bin:/home/wukong/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/snap/bin', 'SESSION_MANAGER': 'local/wukong-LOQ-15AHP10:@/tmp/.ICE-unix/2982,unix/wukong-LOQ-15AHP10:/tmp/.ICE-unix/2982', 'INVOCATION_ID': 'feda6fe58218442293e08d4138c70869', 'COREPACK_ENABLE_AUTO_PIN': '0', 'XDG_MENU_PREFIX': 'gnome-', 'XDG_RUNTIME_DIR': '/run/user/1000', 'CLAUDE_EFFORT': 'high', 'DISPLAY': ':1', 'TERMINATOR_DBUS_PATH': '/net/tenshu/Terminator2', 'NoDefaultCurrentDirectoryInExePath': '1', 'LANG': 'en_US.UTF-8', 'XDG_CURRENT_DESKTOP': 'ubuntu:GNOME', 'XMODIFIERS': '@im=ibus', 'XDG_SESSION_DESKTOP': 'ubuntu', 'XAUTHORITY': '/run/user/1000/gdm/Xauthority', 'LS_COLORS': 'rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=00:su=37;41:sg=30;43:ca=00:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arc=01;31:*.arj=01;31:*.taz=01;31:*.lha=01;31:*.lz4=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.tzo=01;31:*.t7z=01;31:*.zip=01;31:*.z=01;31:*.dz=01;31:*.gz=01;31:*.lrz=01;31:*.lz=01;31:*.lzo=01;31:*.xz=01;31:*.zst=01;31:*.tzst=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.alz=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.cab=01;31:*.wim=01;31:*.swm=01;31:*.dwm=01;31:*.esd=01;31:*.avif=01;35:*.jpg=01;35:*.jpeg=01;35:*.mjpg=01;35:*.mjpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.webp=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.m4a=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.oga=00;36:*.opus=00;36:*.spx=00;36:*.xspf=00;36:*~=00;90:*#=00;90:*.bak=00;90:*.crdownload=00;90:*.dpkg-dist=00;90:*.dpkg-new=00;90:*.dpkg-old=00;90:*.dpkg-tmp=00;90:*.old=00;90:*.orig=00;90:*.part=00;90:*.rej=00;90:*.rpmnew=00;90:*.rpmorig=00;90:*.rpmsave=00;90:*.swp=00;90:*.tmp=00;90:*.ucf-dist=00;90:*.ucf-new=00;90:*.ucf-old=00;90:', 'SSH_AUTH_SOCK': '/run/user/1000/keyring/ssh', 'AMENT_PREFIX_PATH': '/opt/ros/jazzy', 'CONDA_PYTHON_EXE': '/home/wukong/miniconda3/bin/python', 'SHELL': '/bin/bash', 'TERMINATOR_UUID': 'urn:uuid:420af9d7-952b-42fa-9308-9a55b9960f3d', 'QT_ACCESSIBILITY': '1', 'GDMSESSION': 'ubuntu', 'CLAUDE_CODE_SESSION_ID': 'dbc300b6-0a8d-405b-b6fc-c21a422e6ae4', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'CONDA_DEFAULT_ENV': 'base', 'CLAUDECODE': '1', 'GPG_AGENT_INFO': '/run/user/1000/gnupg/S.gpg-agent:0:1', 'GJS_DEBUG_OUTPUT': 'stderr', '_CONDA_EXE': '/home/wukong/miniconda3/bin/conda', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'QT_IM_MODULE': 'ibus', 'PWD': '/home/wukong/WALL_E/src/build/wall_e_bringup', 'LC_ALL': 'en_US.UTF-8', 'XDG_CONFIG_DIRS': '/etc/xdg/xdg-ubuntu:/etc/xdg', 'CONDA_EXE': '/home/wukong/miniconda3/bin/conda', 'XDG_DATA_DIRS': '/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/:/var/lib/snapd/desktop', 'CLAUDE_CODE_EXECPATH': '/home/wukong/.local/share/claude/versions/2.1.169', 'PYTHONPATH': '/opt/ros/jazzy/lib/python3.12/site-packages', 'CONDA_PREFIX': '/home/wukong/miniconda3', 'COLCON': '1', 'MEMORY_PRESSURE_WRITE': 'c29tZSAyMDAwMDAgMjAwMDAwMAA=', 'VTE_VERSION': '7600', 'CMAKE_PREFIX_PATH': '/opt/ros/jazzy/opt/gz_sim_vendor:/opt/ros/jazzy/opt/gz_sensors_vendor:/opt/ros/jazzy/opt/gz_physics_vendor:/opt/ros/jazzy/opt/sdformat_vendor:/opt/ros/jazzy/opt/gz_gui_vendor:/opt/ros/jazzy/opt/gz_transport_vendor:/opt/ros/jazzy/opt/gz_rendering_vendor:/opt/ros/jazzy/opt/gz_plugin_vendor:/opt/ros/jazzy/opt/gz_fuel_tools_vendor:/opt/ros/jazzy/opt/gz_msgs_vendor:/opt/ros/jazzy/opt/gz_common_vendor:/opt/ros/jazzy/opt/gz_math_vendor:/opt/ros/jazzy/opt/gz_utils_vendor:/opt/ros/jazzy/opt/gz_tools_vendor:/opt/ros/jazzy/opt/gz_ogre_next_vendor:/opt/ros/jazzy/opt/gz_dartsim_vendor:/opt/ros/jazzy/opt/gz_cmake_vendor:/opt/ros/jazzy'}), 'shell': False}
+[10.801219] (wall_e_bringup) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[10.801963] (wall_e_bringup) StdoutLine: {'line': b'-- Execute custom install script\n'}
+[10.803011] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/mega_node\n'}
+[10.803105] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/uno_bridge\n'}
+[10.803191] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/state_machine\n'}
+[10.803430] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/controller_node\n'}
+[10.803632] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/llama_interpreter_node.py\n'}
+[10.803917] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/llama_nav_node.py\n'}
+[10.803988] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/fake_odom.py\n'}
+[10.804180] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/udp_godot_bridge.py\n'}
+[10.804251] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/yolo_nav_node.py\n'}
+[10.804424] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/webrtc_video_bridge.py\n'}
+[10.804490] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/odom_to_tf.py\n'}
+[10.805702] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/wall_e.launch.py\n'}
+[10.805914] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/wall_e_gazebo.launch.py\n'}
+[10.806208] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/urdf/wall_e.urdf.xacro\n'}
+[10.806520] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/nav2_params.yaml\n'}
+[10.806608] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/rtabmap.yaml\n'}
+[10.806723] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/worlds/test_room.sdf\n'}
+[10.806918] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/package_run_dependencies/wall_e_bringup\n'}
+[10.807148] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/parent_prefix_path/wall_e_bringup\n'}
+[10.807345] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/ament_prefix_path.sh\n'}
+[10.807544] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/ament_prefix_path.dsv\n'}
+[10.807748] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/path.sh\n'}
+[10.807959] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/environment/path.dsv\n'}
+[10.808143] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.bash\n'}
+[10.808357] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.sh\n'}
+[10.808577] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.zsh\n'}
+[10.808764] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/local_setup.dsv\n'}
+[10.808854] (wall_e_bringup) StdoutLine: {'line': b'-- Symlinking: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/package.dsv\n'}
+[10.816933] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/packages/wall_e_bringup\n'}
+[10.817268] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/cmake/wall_e_bringupConfig.cmake\n'}
+[10.817482] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/cmake/wall_e_bringupConfig-version.cmake\n'}
+[10.817575] (wall_e_bringup) StdoutLine: {'line': b'-- Up-to-date symlink: /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/package.xml\n'}
+[10.818677] (wall_e_bringup) CommandEnded: {'returncode': 0}
+[10.821469] (-) TimerEvent: {}
+[10.830662] (wall_e_bringup) JobEnded: {'identifier': 'wall_e_bringup', 'rc': 0}
+[10.831108] (-) EventReactorShutdown: {}

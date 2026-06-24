@@ -1,0 +1,2 @@
+Invoking command in '/home/wukong/WALL_E/build/TankStatus': CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/build/TankStatus -- -j16 -l16
+Invoked command in '/home/wukong/WALL_E/build/TankStatus' returned '0': CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/build/TankStatus -- -j16 -l16

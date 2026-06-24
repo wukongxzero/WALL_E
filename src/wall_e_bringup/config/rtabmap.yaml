@@ -51,5 +51,5 @@ rtabmap:
     # D435 depth range
     Grid/DepthDecimation: "4"
     Grid/RangeMin: "0.3"                # min depth 30cm
-    Grid/RangeMax: "4.0"                # max depth 4m indoors
+    Grid/RangeMax: "6.0"                # 6m for Isaac Sim 10x10m room
 
