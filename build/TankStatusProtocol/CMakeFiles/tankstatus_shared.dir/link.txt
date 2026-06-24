@@ -1,1 +1,0 @@
-/usr/bin/cc -fPIC -shared -Wl,-soname,libtankstatus_shared.so -o libtankstatus_shared.so CMakeFiles/tankstatus_shared.dir/lib/TankStatus.c.o 

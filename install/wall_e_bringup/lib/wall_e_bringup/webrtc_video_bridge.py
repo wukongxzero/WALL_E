@@ -1,1 +1,0 @@
-/home/wukong/WALL_E/src/wall_e_bringup/src/webrtc_video_bridge.py

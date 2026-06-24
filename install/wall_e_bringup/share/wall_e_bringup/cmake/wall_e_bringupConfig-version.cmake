@@ -1,1 +1,0 @@
-/home/wukong/WALL_E/build/wall_e_bringup/ament_cmake_core/wall_e_bringupConfig-version.cmake

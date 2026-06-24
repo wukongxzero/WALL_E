@@ -1,1 +1,0 @@
-ament_cmake_symlink_install_targets("TARGET_FILES" "/home/wukong/WALL_E/build/wall_e_bringup/mega_node" "/home/wukong/WALL_E/build/wall_e_bringup/uno_bridge" "/home/wukong/WALL_E/build/wall_e_bringup/state_machine" "/home/wukong/WALL_E/build/wall_e_bringup/controller_node" "TARGETS" "mega_node" "uno_bridge" "state_machine" "controller_node" "DESTINATION" "lib/wall_e_bringup")

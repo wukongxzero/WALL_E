@@ -1,2 +1,0 @@
-/home/wukong/WALL_E/build/TankStatus/CMakeFiles/edit_cache.dir
-/home/wukong/WALL_E/build/TankStatus/CMakeFiles/rebuild_cache.dir

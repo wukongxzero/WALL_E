@@ -1,6 +1,0 @@
-[ 62%] Building CXX object CMakeFiles/state_machine.dir/src/state_machine.cpp.o
-[ 62%] Building CXX object CMakeFiles/mega_node.dir/src/mega_node.cpp.o
-[ 75%] Built target uno_bridge
-[ 75%] Built target controller_node
-[ 87%] Linking CXX executable mega_node
-[ 87%] Built target mega_node

@@ -1,4 +1,0 @@
-[0.016s] Invoking command in '/home/wukong/WALL_E/build/TankStatusProtocol': CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/build/TankStatusProtocol -- -j16 -l16
-[0.090s] [ 33%] Built target tankstatus_shared
-[0.093s] [100%] Built target tankstatus_wrapper
-[0.113s] Invoked command in '/home/wukong/WALL_E/build/TankStatusProtocol' returned '0': CONDA_PROMPT_MODIFIER=(base) DEBUGINFOD_URLS=https://debuginfod.ubuntu.com /usr/bin/cmake --build /home/wukong/WALL_E/build/TankStatusProtocol -- -j16 -l16

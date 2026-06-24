@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -flto -shared  -o tankstatus_wrapper.cpython-313-x86_64-linux-gnu.so CMakeFiles/tankstatus_wrapper.dir/tankstatuswrapper.cpp.o CMakeFiles/tankstatus_wrapper.dir/lib/TankStatusClass.cpp.o CMakeFiles/tankstatus_wrapper.dir/lib/TankStatus.c.o 
