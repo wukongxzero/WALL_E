@@ -46,7 +46,6 @@ def generate_launch_description():
         'planner_server',
         'behavior_server',
         'velocity_smoother',
-        'collision_monitor',
         'bt_navigator',
         'waypoint_follower',
     ]
