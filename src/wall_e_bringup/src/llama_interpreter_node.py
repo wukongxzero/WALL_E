@@ -176,8 +176,7 @@ class LlamaInterpreterNode(Node):
         except Exception as e:
             self.get_logger().error(f"Error: {e}")
 
-    # ── NAVIGATION ─────────────────────────────────────────────────────────────
-
+    # navigation ------------------------------------------------------------------
     def _handle_navigate(self, command: str):
         command = command.strip().lower()
 
