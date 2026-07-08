@@ -19,7 +19,7 @@ Run with:
   ~/isaac-sim/python.sh ~/WALL_E/isaac_sim/ros2_wall_e.py
 """
 from isaacsim import SimulationApp
-simulation_app = SimulationApp({"headless": True})
+simulation_app = SimulationApp({"headless": False})
 
 import math
 import isaacsim.core.experimental.utils.app as app_utils

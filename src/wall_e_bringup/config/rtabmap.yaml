@@ -8,9 +8,9 @@ rtabmap:
     odom_frame_id: odom
     map_frame_id: map
 
-    # Subscribe to depth + RGB + laser scan
-    subscribe_depth: true
-    subscribe_rgb: true
+    # Scan-only mode — RGB/depth disabled until camera zeros bug is fixed
+    subscribe_depth: false
+    subscribe_rgb: false
     subscribe_scan: true
 
     # Topic remappings handled in launch file
@@ -42,7 +42,7 @@ rtabmap:
     RGBD/ProximityBySpace: "true"
 
     # Grid map for Nav2
-    Grid/FromDepth: "true"
+    Grid/FromDepth: "false"
     Grid/RayTracing: "true"
     Grid/3D: "false"                    # 2D occupancy grid for Nav2
     Grid/NoiseFilteringRadius: "0.05"

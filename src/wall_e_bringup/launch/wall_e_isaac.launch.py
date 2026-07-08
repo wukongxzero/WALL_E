@@ -16,6 +16,7 @@ def generate_launch_description():
 
     nav2_params    = os.path.join(pkg_path, 'config', 'nav2_params.yaml')
     rtabmap_params = os.path.join(pkg_path, 'config', 'rtabmap.yaml')
+    rviz_config    = os.path.join(pkg_path, 'config', 'wall_e_nav.rviz')
 
     return LaunchDescription([
 
@@ -74,6 +75,16 @@ def generate_launch_description():
                 ('odom',              '/odom'),
             ],
             arguments=['--delete_db_on_start']
+        ),
+
+        # ── RVIZ2 ──
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            arguments=['-d', rviz_config],
+            parameters=[{'use_sim_time': True}],
+            output='screen'
         ),
 
         # ── NAV2 ──
