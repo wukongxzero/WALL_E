@@ -5,7 +5,9 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 
+
 enum class State { MANUAL, AUTONOMOUS, IDLE };
+
 
 constexpr double CAMERA_TIMEOUT_S  = 2.0;
 constexpr double LOCALIZATION_TIMEOUT_S = 3.0;
