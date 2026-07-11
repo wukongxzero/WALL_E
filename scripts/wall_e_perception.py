@@ -1,20 +1,20 @@
-import sys
-sys.argv += ["--/app/extensions/registryEnabled=false"]
-
 from isaacsim import SimulationApp
 
-simulation_app = SimulationApp(
-    {"headless": True, "anti_aliasing": 0},
-    experience="/home/wukong/WALL_E/scripts/wall_e.kit"
-)
+simulation_app = SimulationApp({"headless": True, "anti_aliasing": 0})
+
+import isaacsim.core.experimental.utils.app as app_utils
+
+app_utils.enable_extension("isaacsim.ros2.bridge")
+simulation_app.update()
 
 import omni
 import omni.graph.core as og
-from omni.isaac.core import World
+from isaacsim.core.api import World
 from pxr import Usd, UsdGeom, Gf
 
 USD_PATH = "/home/wukong/WALL_E/usd/wall_e.usd/wall_e.usda"
 ROBOT_PRIM = "/World/wall_e"
+CHASSIS_PRIM = ROBOT_PRIM + "/Geometry/base_footprint/base_link"
 
 world = World(stage_units_in_meters=1.0)
 
@@ -41,13 +41,12 @@ og.Controller.edit(
             ("PubTFOdom",    "isaacsim.ros2.bridge.ROS2PublishRawTransformTree"),
             ("PubTFRobot",   "isaacsim.ros2.bridge.ROS2PublishTransformTree"),
             ("SubCmdVel",    "isaacsim.ros2.bridge.ROS2SubscribeTwist"),
-            ("DiffDrive",    "isaacsim.robot.wheeled_robots.HolonomicRobotUsdSetup"),
         ],
         keys.SET_VALUES: [
             ("SimTime.inputs:resetOnStop",            True),
             ("Context.inputs:domain_id",              0),
             ("Clock.inputs:topicName",                "/clock"),
-            ("ComputeOdom.inputs:chassisPrim",        ROBOT_PRIM),
+            ("ComputeOdom.inputs:chassisPrim",        CHASSIS_PRIM),
             ("PubOdom.inputs:topicName",              "/odom"),
             ("PubOdom.inputs:chassisFrameId",         "base_footprint"),
             ("PubTFOdom.inputs:childFrameId",         "odom"),
