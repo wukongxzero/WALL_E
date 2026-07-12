@@ -128,8 +128,11 @@ private:
     void publish_state() {
         auto msg = std_msgs::msg::String();
         switch (state_) {
-            case State::MANUAL:     msg.data = "MANUAL";     break;
-            case State::AUTONOMOUS: msg.data = "AUTONOMOUS"; break;
+            case State::MANUAL:     msg.data = "MANUAL";     
+            break;
+            
+            case State::AUTONOMOUS: msg.data = "AUTONOMOUS"; 
+            break;
             case State::IDLE:
                 msg.data = "IDLE";
                 cmd_pub_->publish(geometry_msgs::msg::Twist());

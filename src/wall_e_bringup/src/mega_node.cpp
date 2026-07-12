@@ -208,6 +208,9 @@ private:
             odom_pub_->publish(odom);
             tf_broadcaster_->sendTransform(tf);
         }
+
+
+        
     }
 
     void configure_serial(int fd) {

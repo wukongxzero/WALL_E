@@ -14,7 +14,8 @@ from pxr import Usd, UsdGeom, Gf
 
 USD_PATH = "/home/wukong/WALL_E/usd/wall_e.usd/wall_e.usda"
 ROBOT_PRIM = "/World/wall_e"
-CHASSIS_PRIM = ROBOT_PRIM + "/Geometry/base_footprint/base_link"
+BASE_FOOTPRINT_PRIM = ROBOT_PRIM + "/Geometry/base_footprint"
+CHASSIS_PRIM = BASE_FOOTPRINT_PRIM + "/base_link"
 
 world = World(stage_units_in_meters=1.0)
 
@@ -49,9 +50,10 @@ og.Controller.edit(
             ("ComputeOdom.inputs:chassisPrim",        CHASSIS_PRIM),
             ("PubOdom.inputs:topicName",              "/odom"),
             ("PubOdom.inputs:chassisFrameId",         "base_footprint"),
-            ("PubTFOdom.inputs:childFrameId",         "odom"),
-            ("PubTFOdom.inputs:parentFrameId",        "world"),
-            ("PubTFRobot.inputs:targetPrims",         ROBOT_PRIM),
+            ("PubTFOdom.inputs:childFrameId",         "base_footprint"),
+            ("PubTFOdom.inputs:parentFrameId",        "odom"),
+            ("PubTFRobot.inputs:targetPrims",         CHASSIS_PRIM),
+            ("PubTFRobot.inputs:parentPrim",          CHASSIS_PRIM),
             ("PubTFRobot.inputs:topicName",           "/tf"),
             ("SubCmdVel.inputs:topicName",            "/cmd_vel"),
         ],
