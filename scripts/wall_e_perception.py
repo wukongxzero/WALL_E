@@ -42,6 +42,10 @@ og.Controller.edit(
             ("PubTFOdom",    "isaacsim.ros2.bridge.ROS2PublishRawTransformTree"),
             ("PubTFRobot",   "isaacsim.ros2.bridge.ROS2PublishTransformTree"),
             ("SubCmdVel",    "isaacsim.ros2.bridge.ROS2SubscribeTwist"),
+            ("BreakLinVel",  "omni.graph.nodes.BreakVector3"),
+            ("BreakAngVel",  "omni.graph.nodes.BreakVector3"),
+            ("DiffController", "isaacsim.robot.wheeled_robots.DifferentialController"),
+            ("ArtController", "isaacsim.core.nodes.IsaacArticulationController"),
         ],
         keys.SET_VALUES: [
             ("SimTime.inputs:resetOnStop",            True),
@@ -56,6 +60,10 @@ og.Controller.edit(
             ("PubTFRobot.inputs:parentPrim",          CHASSIS_PRIM),
             ("PubTFRobot.inputs:topicName",           "/tf"),
             ("SubCmdVel.inputs:topicName",            "/cmd_vel"),
+            ("DiffController.inputs:wheelRadius",     0.08),
+            ("DiffController.inputs:wheelDistance",   0.46),
+            ("ArtController.inputs:targetPrim",       CHASSIS_PRIM),
+            ("ArtController.inputs:jointNames",       ["left_track_joint", "right_track_joint"]),
         ],
         keys.CONNECT: [
             ("OnTick.outputs:tick",                   "Clock.inputs:execIn"),
@@ -79,6 +87,13 @@ og.Controller.edit(
             ("ComputeOdom.outputs:angularVelocity",   "PubOdom.inputs:angularVelocity"),
             ("ComputeOdom.outputs:position",          "PubTFOdom.inputs:translation"),
             ("ComputeOdom.outputs:orientation",       "PubTFOdom.inputs:rotation"),
+            ("OnTick.outputs:tick",                   "ArtController.inputs:execIn"),
+            ("SubCmdVel.outputs:execOut",             "DiffController.inputs:execIn"),
+            ("SubCmdVel.outputs:linearVelocity",      "BreakLinVel.inputs:tuple"),
+            ("BreakLinVel.outputs:x",                 "DiffController.inputs:linearVelocity"),
+            ("SubCmdVel.outputs:angularVelocity",     "BreakAngVel.inputs:tuple"),
+            ("BreakAngVel.outputs:z",                 "DiffController.inputs:angularVelocity"),
+            ("DiffController.outputs:velocityCommand", "ArtController.inputs:velocityCommand"),
         ],
     }
 )

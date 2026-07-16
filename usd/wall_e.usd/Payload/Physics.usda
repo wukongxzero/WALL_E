@@ -26,9 +26,9 @@ def Xform "wall_e"
         def PhysicsRevoluteJoint "left_track_joint"
         {
             uniform token physics:axis = "Y"
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/left_track>
-            point3f physics:localPos0 = (0, 0.23, 0.08)
+            point3f physics:localPos0 = (0, 0.23, -0.1225)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -39,9 +39,9 @@ def Xform "wall_e"
         def PhysicsRevoluteJoint "right_track_joint"
         {
             uniform token physics:axis = "Y"
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/right_track>
-            point3f physics:localPos0 = (0, -0.23, 0.08)
+            point3f physics:localPos0 = (0, -0.23, -0.1225)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
