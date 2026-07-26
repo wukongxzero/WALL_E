@@ -8,10 +8,12 @@ rtabmap:
     odom_frame_id: odom
     map_frame_id: map
 
-    # Scan-only mode — RGB/depth disabled until camera zeros bug is fixed
-    subscribe_depth: false
-    subscribe_rgb: false
-    subscribe_scan: true
+    # RGBD mode — Isaac Sim's depth camera doesn't have the Gazebo zeros bug,
+    # and there's no lidar on the robot, so scan-only mode has nothing to feed it.
+    subscribe_depth: true
+    subscribe_rgb: true
+    subscribe_scan: false
+    approx_sync: true
 
     # Topic remappings handled in launch file
 

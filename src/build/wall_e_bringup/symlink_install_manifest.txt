@@ -9,13 +9,16 @@
 /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/yolo_nav_node.py
 /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/webrtc_video_bridge.py
 /home/wukong/WALL_E/src/install/wall_e_bringup/lib/wall_e_bringup/odom_to_tf.py
+/home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/__pycache__/wall_e_isaac.launch.cpython-313.pyc
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/nav2_navigation.launch.py
+/home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/slam_test.launch.py
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/wall_e.launch.py
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/wall_e_gazebo.launch.py
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/launch/wall_e_isaac.launch.py
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/urdf/wall_e.urdf.xacro
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/nav2_params.yaml
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/rtabmap.yaml
+/home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/config/wall_e_nav.rviz
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/wall_e_bringup/worlds/test_room.sdf
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/package_run_dependencies/wall_e_bringup
 /home/wukong/WALL_E/src/install/wall_e_bringup/share/ament_index/resource_index/parent_prefix_path/wall_e_bringup
