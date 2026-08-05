@@ -1,0 +1,45 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.2"
+    }
+    defaultPrim = "wall_e"
+    doc = """Generated from Composed Stage of root layer /tmp/tmpte7cmjxb/wall_e.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_wall_e_upxqnbea/usdex_wall_e/wall_e.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_wall_e_upxqnbea/temp_wall_e/wall_e.usd
+
+
+Generated from Composed Stage of root layer /home/wukong/WALL_E/usd/wall_e_1/payloads/base.usd
+"""
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    subLayers = [
+        @./physics.usda@
+    ]
+    upAxis = "Z"
+)
+
+over "wall_e"
+{
+    over "Physics"
+    {
+        over "left_track_joint" (
+            prepend apiSchemas = ["PhysxJointAPI"]
+        )
+        {
+            float physxJoint:jointFriction = 0.5
+        }
+
+        over "right_track_joint" (
+            prepend apiSchemas = ["PhysxJointAPI"]
+        )
+        {
+            float physxJoint:jointFriction = 0.5
+        }
+    }
+}
+

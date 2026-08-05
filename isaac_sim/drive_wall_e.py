@@ -70,7 +70,30 @@ for _ in range(10):
     SimulationManager.step()
     simulation_app.update()
 
-root = RigidPrim("/World/wall_e/base_footprint")
+root = RigidPrim("/World/wall_e/wall_e/Geometry/base_footprint")
+
+# Fix spawn position — USD has a baked-in offset, reset to origin
+root.set_world_poses(
+    positions=np.array([[0.0, 0.0, 0.1]]),
+    orientations=np.array([[1.0, 0.0, 0.0, 0.0]])  # w,x,y,z identity
+)
+root.set_velocities(
+    linear_velocities=np.array([[0.0, 0.0, 0.0]]),
+    angular_velocities=np.array([[0.0, 0.0, 0.0]])
+)
+
+# Disable rigid body physics on sensor links to prevent inertia blow-up
+from pxr import UsdPhysics as UsdPhy
+sensor_paths = [
+    "/World/wall_e/wall_e/Geometry/base_footprint/base_link/camera_link/camera_color_optical_frame",
+    "/World/wall_e/wall_e/Geometry/base_footprint/base_link/camera_link/camera_depth_optical_frame",
+    "/World/wall_e/wall_e/Geometry/base_footprint/base_link/imu_link",
+]
+for sp in sensor_paths:
+    prim = stage.GetPrimAtPath(sp)
+    if prim and prim.IsValid():
+        UsdPhy.RigidBodyAPI(prim).GetRigidBodyEnabledAttr().Set(False)
+
 print(f"[INFO] WALL-E ready — driving at {V_LIN:.2f} m/s straight")
 
 for i in range(1_000_000):

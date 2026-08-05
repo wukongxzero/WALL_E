@@ -2,19 +2,23 @@
 <robot name="wall_e" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
   <!-- ── PROPERTIES ── -->
-  <xacro:property name="base_length"   value="0.365"/>  <!-- 8.5 inches -->
-  <xacro:property name="base_width"    value="0.390"/>   <!-- 46cm total -->
-  <xacro:property name="base_height"   value="0.245"/>   <!-- 56cm -->
-  <xacro:property name="track_width"   value="0.46"/>   <!-- sim only: places wheels outside body -->
-  <xacro:property name="track_thick"   value="0.07"/>   <!-- 7cm track thickness -->
-  <xacro:property name="wheel_radius"  value="0.08"/>   <!-- 8cm radius -->
+  <xacro:property name="base_length"   value="0.365"/>
+  <xacro:property name="base_width"    value="0.390"/>
+  <xacro:property name="base_height"   value="0.245"/>
+  <xacro:property name="track_width"   value="0.46"/>
+  <xacro:property name="track_thick"   value="0.07"/>
+  <xacro:property name="wheel_radius"  value="0.08"/>
 
-  <xacro:property name="cam_height"    value="0.245"/>   <!-- 20cm off ground -->
-  <xacro:property name="cam_forward"   value="0.15"/>  <!-- 14.7cm forward of center -->
-  <!-- <xacro:property name="pi"            value="3.141592653  58979"/> -->
+  <xacro:property name="cam_height"    value="0.245"/>
+  <xacro:property name="cam_forward"   value="0.15"/>
 
   <!-- ── BASE FOOTPRINT ── -->
-  <link name="base_footprint"/>
+  <link name="base_footprint">
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
 
   <joint name="base_footprint_joint" type="fixed">
     <parent link="base_footprint"/>
@@ -46,12 +50,12 @@
     </inertial>
   </link>
 
-  <!-- ── LEFT TRACK ── -->
+  <!-- ── LEFT TRACK (cylinder, rotation on joint) ── -->
   <link name="left_track">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="${base_length} ${track_thick} ${wheel_radius * 2}"/>
+        <cylinder length="${track_thick}" radius="${wheel_radius}"/>
       </geometry>
       <material name="black">
         <color rgba="0.1 0.1 0.1 1.0"/>
@@ -60,7 +64,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="${base_length} ${track_thick} ${wheel_radius * 2}"/>
+        <cylinder length="${track_thick}" radius="${wheel_radius}"/>
       </geometry>
     </collision>
     <inertial>
@@ -74,17 +78,17 @@
   <joint name="left_track_joint" type="continuous">
     <parent link="base_link"/>
     <child  link="left_track"/>
-    <origin xyz="0 ${track_width/2} ${-base_height/2}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
+    <origin xyz="0 ${track_width/2} ${-base_height/2}" rpy="1.5707963267948966 0 0"/>
+    <axis xyz="0 0 1"/>
     <dynamics damping="0.5" friction="0.5"/>
   </joint>
 
-  <!-- ── RIGHT TRACK ── -->
+  <!-- ── RIGHT TRACK (cylinder, rotation on joint) ── -->
   <link name="right_track">
     <visual>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="${base_length} ${track_thick} ${wheel_radius * 2}"/>
+        <cylinder length="${track_thick}" radius="${wheel_radius}"/>
       </geometry>
       <material name="black">
         <color rgba="0.1 0.1 0.1 1.0"/>
@@ -93,7 +97,7 @@
     <collision>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="${base_length} ${track_thick} ${wheel_radius * 2}"/>
+        <cylinder length="${track_thick}" radius="${wheel_radius}"/>
       </geometry>
     </collision>
     <inertial>
@@ -107,8 +111,8 @@
   <joint name="right_track_joint" type="continuous">
     <parent link="base_link"/>
     <child  link="right_track"/>
-    <origin xyz="0 ${-track_width/2} ${-base_height/2}" rpy="0 0 0"/>
-    <axis xyz="0 1 0"/>
+    <origin xyz="0 ${-track_width/2} ${-base_height/2}" rpy="1.5707963267948966 0 0"/>
+    <axis xyz="0 0 1"/>
     <dynamics damping="0.5" friction="0.5"/>
   </joint>
 
@@ -141,8 +145,13 @@
     <origin xyz="${cam_forward} 0 ${cam_height - wheel_radius}" rpy="0 0 0"/>
   </joint>
 
-  <!-- Camera optical frame — required by RealSense driver -->
-  <link name="camera_depth_optical_frame"/>
+  <!-- Camera depth optical frame -->
+  <link name="camera_depth_optical_frame">
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
 
   <joint name="camera_optical_joint" type="fixed">
     <parent link="camera_link"/>
@@ -150,7 +159,13 @@
     <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}"/>
   </joint>
 
-  <link name="camera_color_optical_frame"/>
+  <!-- Camera color optical frame -->
+  <link name="camera_color_optical_frame">
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
 
   <joint name="camera_color_optical_joint" type="fixed">
     <parent link="camera_link"/>
@@ -159,12 +174,17 @@
   </joint>
 
   <!-- ── IMU ── -->
-  <link name="imu_link"/>
+  <link name="imu_link">
+    <inertial>
+      <mass value="0.001"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6"/>
+    </inertial>
+  </link>
 
   <joint name="imu_joint" type="fixed">
     <parent link="base_link"/>
     <child  link="imu_link"/>
-    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
   </joint>
 
   <!-- ── GAZEBO PLUGINS ── -->
@@ -187,7 +207,6 @@
     </plugin>
   </gazebo>
 
-  <!-- Make base_link visible in Gazebo -->
   <gazebo reference="base_link">
     <material>Gazebo/Grey</material>
   </gazebo>
@@ -220,7 +239,7 @@
     </collision>
   </gazebo>
 
-  <!-- ── PASSIVE SUPPORT SPHERES (pitch stability + free turning) ── -->
+  <!-- ── PASSIVE SUPPORT SPHERES ── -->
   <xacro:macro name="support_wheel" params="name x_pos y_pos">
     <link name="${name}">
       <collision>

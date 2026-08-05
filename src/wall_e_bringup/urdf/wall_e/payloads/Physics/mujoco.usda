@@ -1,0 +1,198 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.2"
+    }
+    defaultPrim = "wall_e"
+    doc = """Generated from Composed Stage of root layer /tmp/tmp061bqoov/wall_e.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_wall_e_bmn9b9_v/usdex_wall_e/wall_e.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_wall_e_bmn9b9_v/temp_wall_e/wall_e.usd
+
+
+Generated from Composed Stage of root layer /home/wukong/WALL_E/src/wall_e_bringup/urdf/wall_e/payloads/base.usd
+"""
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    subLayers = [
+        @./physics.usda@
+    ]
+    upAxis = "Z"
+)
+
+over "wall_e"
+{
+    over "Physics"
+    {
+        def MjcActuator "left_track_joint_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, 0, -0.5, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = inf
+            uniform double mjc:forceRange:min = -inf
+            uniform double[] mjc:gainPrm = [0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            prepend rel mjc:target = </wall_e/Physics/left_track_joint>
+        }
+
+        def MjcActuator "right_track_joint_actuator"
+        {
+            uniform double[] mjc:biasPrm = [0, 0, -0.5, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:biasType = "affine"
+            uniform double mjc:forceRange:max = inf
+            uniform double mjc:forceRange:min = -inf
+            uniform double[] mjc:gainPrm = [0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            uniform token mjc:gainType = "fixed"
+            custom rel mjc:target
+            prepend rel mjc:target = </wall_e/Physics/right_track_joint>
+        }
+
+        over "left_track_joint" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            custom float mjc:frictionloss = 0.5
+        }
+
+        over "right_track_joint" (
+            delete apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            custom float mjc:frictionloss = 0.5
+        }
+
+        over "root_joint"
+        {
+        }
+
+        over "base_footprint_joint"
+        {
+        }
+
+        over "camera_joint"
+        {
+        }
+
+        over "camera_optical_joint"
+        {
+        }
+
+        over "left_front_support_joint"
+        {
+        }
+
+        over "left_rear_support_joint"
+        {
+        }
+
+        over "right_front_support_joint"
+        {
+        }
+
+        over "right_rear_support_joint"
+        {
+        }
+    }
+
+    over "Geometry"
+    {
+        over "base_footprint"
+        {
+            over "base_link"
+            {
+                over "left_track"
+                {
+                    over "box"
+                    {
+                    }
+
+                    over "box_1"
+                    {
+                    }
+                }
+
+                over "right_track"
+                {
+                    over "box"
+                    {
+                    }
+
+                    over "box_1"
+                    {
+                    }
+                }
+
+                over "camera_link"
+                {
+                    over "camera_depth_optical_frame"
+                    {
+                    }
+
+                    over "box"
+                    {
+                    }
+
+                    over "box_1"
+                    {
+                    }
+                }
+
+                over "left_front_support"
+                {
+                    over "sphere"
+                    {
+                    }
+                }
+
+                over "left_rear_support"
+                {
+                    over "sphere"
+                    {
+                    }
+                }
+
+                over "right_front_support"
+                {
+                    over "sphere"
+                    {
+                    }
+                }
+
+                over "right_rear_support"
+                {
+                    over "sphere"
+                    {
+                    }
+                }
+
+                over "box"
+                {
+                }
+
+                over "box_1"
+                {
+                }
+            }
+        }
+    }
+
+    over "Materials"
+    {
+        over "grey"
+        {
+        }
+
+        over "black"
+        {
+        }
+
+        over "blue"
+        {
+        }
+    }
+}
+
