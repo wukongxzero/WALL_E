@@ -17,7 +17,7 @@ from isaacsim.core.rendering_manager import RenderingManager
 from isaacsim.core.simulation_manager import SimulationManager
 from pxr import Usd
 
-WALL_E_USD = "/home/wukong/WALL_E/usd/wall_e_v2.usd"
+WALL_E_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
 
 # New stage
 stage_utils.create_new_stage()
@@ -32,7 +32,7 @@ light.set_intensities(3000)
 import omni.usd
 stage = omni.usd.get_context().get_stage()
 wall_e = stage.DefinePrim("/World/wall_e", "Xform")
-wall_e.GetReferences().AddReference(WALL_E_USD)
+wall_e.GetReferences().AddReference(WALL_E_USD, "/World/wall_e")
 
 SimulationManager.set_physics_dt(1.0 / 60.0)
 

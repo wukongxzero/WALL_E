@@ -44,7 +44,7 @@ from nav_msgs.msg import Odometry
 from rosgraph_msgs.msg import Clock
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 
-WALL_E_USD       = "/home/wukong/WALL_E/usd/wall_e_v2.usd"
+WALL_E_USD       = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
 WHEEL_RADIUS     = 0.08    # m
 K_YAW            = 5.0     # P-gain — holds heading when cmd_vel omega ≈ 0
 CAMERA_PATH      = "/World/WallECamera"   # top-level — IsaacCreateRenderProduct requires this
@@ -61,7 +61,7 @@ DistantLight("/World/DistantLight").set_intensities(3000)
 
 stage = omni.usd.get_context().get_stage()
 wall_e_prim = stage.DefinePrim("/World/wall_e", "Xform")
-wall_e_prim.GetReferences().AddReference(WALL_E_USD)
+wall_e_prim.GetReferences().AddReference(WALL_E_USD, "/World/wall_e")
 
 # ── Room: 10×10m enclosed space + colored landmark boxes ─────────────────────
 def make_box(path, pos, half_extents, color):
