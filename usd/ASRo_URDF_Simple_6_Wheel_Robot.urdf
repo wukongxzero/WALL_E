@@ -1,0 +1,233 @@
+<?xml version="1.0"?>
+<robot name="blue_shark_land_vehicle">
+
+  <!-- =============================== -->
+  <!-- MATERIALS                       -->
+  <!-- =============================== -->
+  <material name="shark_blue">
+    <color rgba="0.0 0.4 0.8 1.0"/>
+  </material>
+  
+  <material name="tire_grey">
+    <color rgba="0.1 0.1 0.1 1.0"/>
+  </material>
+
+  <!-- =============================== -->
+  <!-- BASE CHASSIS                    -->
+  <!-- =============================== -->
+  
+  <!-- Dummy root link (Protects articulation root in Isaac Sim) -->
+  <link name="base_footprint"/>
+
+  <!-- Main Chassis: 1.0m long, 0.6m wide, 0.3m tall -->
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="1.0 0.6 0.3"/>
+      </geometry>
+      <material name="shark_blue"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="1.0 0.6 0.3"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="30.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <!-- Ixx=(1/12)*m*(y^2+z^2), Iyy=(1/12)*m*(x^2+z^2), Izz=(1/12)*m*(x^2+y^2) -->
+      <inertia ixx="1.125" ixy="0.0" ixz="0.0" iyy="2.725" iyz="0.0" izz="3.4"/>
+    </inertial>
+  </link>
+
+  <joint name="base_joint" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <!-- Elevate chassis so wheels rest on the ground plane (Z=0) -->
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+  </joint>
+
+  <!-- =============================== -->
+  <!-- WHEEL MACRO EQUIVALENTS         -->
+  <!-- =============================== -->
+  <!-- URDF doesn't natively support macros without xacro, so wheels are written out. 
+       Radius: 0.15m, Width: 0.1m, Mass: 2.0kg -->
+
+  <!-- 1. Front Left Wheel -->
+  <link name="wheel_fl">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+      <material name="tire_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <inertia ixx="0.0129" ixy="0.0" ixz="0.0" iyy="0.0129" iyz="0.0" izz="0.0225"/>
+    </inertial>
+  </link>
+  <joint name="joint_wheel_fl" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_fl"/>
+    <!-- Y=0.375 keeps the wheel 2.5cm away from the chassis to prevent collision -->
+    <origin xyz="0.3 0.375 -0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="20.0"/>
+  </joint>
+
+  <!-- 2. Front Right Wheel -->
+  <link name="wheel_fr">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+      <material name="tire_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <inertia ixx="0.0129" ixy="0.0" ixz="0.0" iyy="0.0129" iyz="0.0" izz="0.0225"/>
+    </inertial>
+  </link>
+  <joint name="joint_wheel_fr" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_fr"/>
+    <origin xyz="0.3 -0.375 -0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="20.0"/>
+  </joint>
+
+  <!-- 3. Mid Left Wheel -->
+  <link name="wheel_ml">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+      <material name="tire_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <inertia ixx="0.0129" ixy="0.0" ixz="0.0" iyy="0.0129" iyz="0.0" izz="0.0225"/>
+    </inertial>
+  </link>
+  <joint name="joint_wheel_ml" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_ml"/>
+    <origin xyz="0.0 0.375 -0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="20.0"/>
+  </joint>
+
+  <!-- 4. Mid Right Wheel -->
+  <link name="wheel_mr">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+      <material name="tire_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <inertia ixx="0.0129" ixy="0.0" ixz="0.0" iyy="0.0129" iyz="0.0" izz="0.0225"/>
+    </inertial>
+  </link>
+  <joint name="joint_wheel_mr" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_mr"/>
+    <origin xyz="0.0 -0.375 -0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="20.0"/>
+  </joint>
+
+  <!-- 5. Rear Left Wheel -->
+  <link name="wheel_rl">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+      <material name="tire_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <inertia ixx="0.0129" ixy="0.0" ixz="0.0" iyy="0.0129" iyz="0.0" izz="0.0225"/>
+    </inertial>
+  </link>
+  <joint name="joint_wheel_rl" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_rl"/>
+    <origin xyz="-0.3 0.375 -0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="20.0"/>
+  </joint>
+
+  <!-- 6. Rear Right Wheel -->
+  <link name="wheel_rr">
+    <visual>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+      <material name="tire_grey"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.1"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="2.0"/>
+      <origin xyz="0 0 0" rpy="1.5708 0 0"/>
+      <inertia ixx="0.0129" ixy="0.0" ixz="0.0" iyy="0.0129" iyz="0.0" izz="0.0225"/>
+    </inertial>
+  </link>
+  <joint name="joint_wheel_rr" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_rr"/>
+    <origin xyz="-0.3 -0.375 -0.15" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="20.0"/>
+  </joint>
+
+</robot>

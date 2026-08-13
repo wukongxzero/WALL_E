@@ -1,0 +1,252 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.2"
+    }
+    defaultPrim = "blue_shark_land_vehicle"
+    doc = """Generated from Composed Stage of root layer /tmp/tmpvzquxdhh/blue_shark_land_vehicle.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_ASRo_URDF_Simple_6_Wheel_Robot__87i9j7l/usdex_ASRo_URDF_Simple_6_Wheel_Robot/blue_shark_land_vehicle.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_ASRo_URDF_Simple_6_Wheel_Robot__87i9j7l/temp_ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usd
+
+
+Generated from Composed Stage of root layer /home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot/payloads/base.usd
+"""
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+over "blue_shark_land_vehicle"
+{
+    over "Geometry"
+    {
+        over "base_footprint" (
+            prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsArticulationRootAPI", "NewtonArticulationRootAPI", "PhysicsMassAPI"]
+        )
+        {
+            bool newton:selfCollisionEnabled = 0
+            point3f physics:centerOfMass = (0, 0, 0.3)
+            float3 physics:diagonalInertia = (1.125, 2.725, 3.4)
+            float physics:mass = 30
+            quatf physics:principalAxes = (1, 0, 0, 0)
+
+            over "wheel_fl" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+            )
+            {
+                point3f physics:centerOfMass = (0, 0, 0)
+                float3 physics:diagonalInertia = (0.0129, 0.0129, 0.0225)
+                float physics:mass = 2
+                quatf physics:principalAxes = (0.70710546, 0.7071081, 0, 0)
+
+                over "cylinder_1" (
+                    prepend apiSchemas = ["NewtonCollisionAPI"]
+                )
+                {
+                }
+            }
+
+            over "wheel_fr" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+            )
+            {
+                point3f physics:centerOfMass = (0, 0, 0)
+                float3 physics:diagonalInertia = (0.0129, 0.0129, 0.0225)
+                float physics:mass = 2
+                quatf physics:principalAxes = (0.70710546, 0.7071081, 0, 0)
+
+                over "cylinder_1" (
+                    prepend apiSchemas = ["NewtonCollisionAPI"]
+                )
+                {
+                }
+            }
+
+            over "wheel_ml" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+            )
+            {
+                point3f physics:centerOfMass = (0, 0, 0)
+                float3 physics:diagonalInertia = (0.0129, 0.0129, 0.0225)
+                float physics:mass = 2
+                quatf physics:principalAxes = (0.70710546, 0.7071081, 0, 0)
+
+                over "cylinder_1" (
+                    prepend apiSchemas = ["NewtonCollisionAPI"]
+                )
+                {
+                }
+            }
+
+            over "wheel_mr" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+            )
+            {
+                point3f physics:centerOfMass = (0, 0, 0)
+                float3 physics:diagonalInertia = (0.0129, 0.0129, 0.0225)
+                float physics:mass = 2
+                quatf physics:principalAxes = (0.70710546, 0.7071081, 0, 0)
+
+                over "cylinder_1" (
+                    prepend apiSchemas = ["NewtonCollisionAPI"]
+                )
+                {
+                }
+            }
+
+            over "wheel_rl" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+            )
+            {
+                point3f physics:centerOfMass = (0, 0, 0)
+                float3 physics:diagonalInertia = (0.0129, 0.0129, 0.0225)
+                float physics:mass = 2
+                quatf physics:principalAxes = (0.70710546, 0.7071081, 0, 0)
+
+                over "cylinder_1" (
+                    prepend apiSchemas = ["NewtonCollisionAPI"]
+                )
+                {
+                }
+            }
+
+            over "wheel_rr" (
+                prepend apiSchemas = ["PhysicsRigidBodyAPI", "PhysicsMassAPI"]
+            )
+            {
+                point3f physics:centerOfMass = (0, 0, 0)
+                float3 physics:diagonalInertia = (0.0129, 0.0129, 0.0225)
+                float physics:mass = 2
+                quatf physics:principalAxes = (0.70710546, 0.7071081, 0, 0)
+
+                over "cylinder_1" (
+                    prepend apiSchemas = ["NewtonCollisionAPI"]
+                )
+                {
+                }
+            }
+
+            over "box_1" (
+                prepend apiSchemas = ["NewtonCollisionAPI"]
+            )
+            {
+            }
+        }
+    }
+
+    over "Physics"
+    {
+        def PhysicsRevoluteJoint "joint_wheel_fl" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            float drive:angular:physics:maxForce = 50
+            uniform token physics:axis = "Y"
+            custom rel physics:body0
+            prepend rel physics:body0 = </blue_shark_land_vehicle/Geometry/base_footprint>
+            custom rel physics:body1
+            prepend rel physics:body1 = </blue_shark_land_vehicle/Geometry/base_footprint/wheel_fl>
+            point3f physics:localPos0 = (0.3, 0.375, 0.15)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            custom float urdf:limit:effort = 50
+            custom float urdf:limit:velocity = 20
+        }
+
+        def PhysicsRevoluteJoint "joint_wheel_fr" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            float drive:angular:physics:maxForce = 50
+            uniform token physics:axis = "Y"
+            custom rel physics:body0
+            prepend rel physics:body0 = </blue_shark_land_vehicle/Geometry/base_footprint>
+            custom rel physics:body1
+            prepend rel physics:body1 = </blue_shark_land_vehicle/Geometry/base_footprint/wheel_fr>
+            point3f physics:localPos0 = (0.3, -0.375, 0.15)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            custom float urdf:limit:effort = 50
+            custom float urdf:limit:velocity = 20
+        }
+
+        def PhysicsRevoluteJoint "joint_wheel_ml" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            float drive:angular:physics:maxForce = 50
+            uniform token physics:axis = "Y"
+            custom rel physics:body0
+            prepend rel physics:body0 = </blue_shark_land_vehicle/Geometry/base_footprint>
+            custom rel physics:body1
+            prepend rel physics:body1 = </blue_shark_land_vehicle/Geometry/base_footprint/wheel_ml>
+            point3f physics:localPos0 = (0, 0.375, 0.15)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            custom float urdf:limit:effort = 50
+            custom float urdf:limit:velocity = 20
+        }
+
+        def PhysicsRevoluteJoint "joint_wheel_mr" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            float drive:angular:physics:maxForce = 50
+            uniform token physics:axis = "Y"
+            custom rel physics:body0
+            prepend rel physics:body0 = </blue_shark_land_vehicle/Geometry/base_footprint>
+            custom rel physics:body1
+            prepend rel physics:body1 = </blue_shark_land_vehicle/Geometry/base_footprint/wheel_mr>
+            point3f physics:localPos0 = (0, -0.375, 0.15)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            custom float urdf:limit:effort = 50
+            custom float urdf:limit:velocity = 20
+        }
+
+        def PhysicsRevoluteJoint "joint_wheel_rl" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            float drive:angular:physics:maxForce = 50
+            uniform token physics:axis = "Y"
+            custom rel physics:body0
+            prepend rel physics:body0 = </blue_shark_land_vehicle/Geometry/base_footprint>
+            custom rel physics:body1
+            prepend rel physics:body1 = </blue_shark_land_vehicle/Geometry/base_footprint/wheel_rl>
+            point3f physics:localPos0 = (-0.3, 0.375, 0.15)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            custom float urdf:limit:effort = 50
+            custom float urdf:limit:velocity = 20
+        }
+
+        def PhysicsRevoluteJoint "joint_wheel_rr" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular", "PhysicsJointStateAPI:angular"]
+        )
+        {
+            float drive:angular:physics:maxForce = 50
+            uniform token physics:axis = "Y"
+            custom rel physics:body0
+            prepend rel physics:body0 = </blue_shark_land_vehicle/Geometry/base_footprint>
+            custom rel physics:body1
+            prepend rel physics:body1 = </blue_shark_land_vehicle/Geometry/base_footprint/wheel_rr>
+            point3f physics:localPos0 = (-0.3, -0.375, 0.15)
+            point3f physics:localPos1 = (0, 0, 0)
+            quatf physics:localRot0 = (1, 0, 0, 0)
+            quatf physics:localRot1 = (1, 0, 0, 0)
+            custom float urdf:limit:effort = 50
+            custom float urdf:limit:velocity = 20
+        }
+    }
+}
+

@@ -1,0 +1,126 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.2"
+    }
+    defaultPrim = "blue_shark_land_vehicle"
+    doc = """Generated from Composed Stage of root layer /tmp/tmpvzquxdhh/blue_shark_land_vehicle.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_ASRo_URDF_Simple_6_Wheel_Robot__87i9j7l/usdex_ASRo_URDF_Simple_6_Wheel_Robot/blue_shark_land_vehicle.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_ASRo_URDF_Simple_6_Wheel_Robot__87i9j7l/temp_ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usd
+"""
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+over "blue_shark_land_vehicle" (
+    prepend apiSchemas = ["IsaacRobotAPI"]
+)
+{
+    prepend rel isaac:physics:robotJoints = [
+        </blue_shark_land_vehicle/Physics/joint_wheel_fl>,
+        </blue_shark_land_vehicle/Physics/joint_wheel_fr>,
+        </blue_shark_land_vehicle/Physics/joint_wheel_ml>,
+        </blue_shark_land_vehicle/Physics/joint_wheel_mr>,
+        </blue_shark_land_vehicle/Physics/joint_wheel_rl>,
+        </blue_shark_land_vehicle/Physics/joint_wheel_rr>,
+    ]
+    prepend rel isaac:physics:robotLinks = [
+        </blue_shark_land_vehicle/Geometry/base_footprint>,
+        </blue_shark_land_vehicle/Geometry/base_footprint/wheel_fl>,
+        </blue_shark_land_vehicle/Geometry/base_footprint/wheel_fr>,
+        </blue_shark_land_vehicle/Geometry/base_footprint/wheel_ml>,
+        </blue_shark_land_vehicle/Geometry/base_footprint/wheel_mr>,
+        </blue_shark_land_vehicle/Geometry/base_footprint/wheel_rl>,
+        </blue_shark_land_vehicle/Geometry/base_footprint/wheel_rr>,
+    ]
+    token isaac:robotType = "Default"
+
+    over "Geometry"
+    {
+        over "base_footprint" (
+            prepend apiSchemas = ["IsaacLinkAPI"]
+        )
+        {
+            over "wheel_fl" (
+                prepend apiSchemas = ["IsaacLinkAPI"]
+            )
+            {
+            }
+
+            over "wheel_fr" (
+                prepend apiSchemas = ["IsaacLinkAPI"]
+            )
+            {
+            }
+
+            over "wheel_ml" (
+                prepend apiSchemas = ["IsaacLinkAPI"]
+            )
+            {
+            }
+
+            over "wheel_mr" (
+                prepend apiSchemas = ["IsaacLinkAPI"]
+            )
+            {
+            }
+
+            over "wheel_rl" (
+                prepend apiSchemas = ["IsaacLinkAPI"]
+            )
+            {
+            }
+
+            over "wheel_rr" (
+                prepend apiSchemas = ["IsaacLinkAPI"]
+            )
+            {
+            }
+        }
+    }
+
+    over "Physics"
+    {
+        over "joint_wheel_fl" (
+            prepend apiSchemas = ["IsaacJointAPI"]
+        )
+        {
+        }
+
+        over "joint_wheel_fr" (
+            prepend apiSchemas = ["IsaacJointAPI"]
+        )
+        {
+        }
+
+        over "joint_wheel_ml" (
+            prepend apiSchemas = ["IsaacJointAPI"]
+        )
+        {
+        }
+
+        over "joint_wheel_mr" (
+            prepend apiSchemas = ["IsaacJointAPI"]
+        )
+        {
+        }
+
+        over "joint_wheel_rl" (
+            prepend apiSchemas = ["IsaacJointAPI"]
+        )
+        {
+        }
+
+        over "joint_wheel_rr" (
+            prepend apiSchemas = ["IsaacJointAPI"]
+        )
+        {
+        }
+    }
+}
+

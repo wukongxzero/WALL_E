@@ -1,0 +1,90 @@
+#usda 1.0
+(
+    customLayerData = {
+        string creator = "URDF USD Converter v0.1.2"
+    }
+    doc = """Generated from Composed Stage of root layer /tmp/tmpvzquxdhh/blue_shark_land_vehicle.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_ASRo_URDF_Simple_6_Wheel_Robot__87i9j7l/usdex_ASRo_URDF_Simple_6_Wheel_Robot/blue_shark_land_vehicle.usdc
+
+
+Generated from Composed Stage of root layer /tmp/urdf_import_ASRo_URDF_Simple_6_Wheel_Robot__87i9j7l/temp_ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usd
+
+
+Generated from Composed Stage of root layer /home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot/payloads/base.usd
+"""
+    kilogramsPerUnit = 1
+    metersPerUnit = 1
+    upAxis = "Z"
+)
+
+def Scope "Materials"
+{
+    def Material "shark_blue"
+    {
+        color3f inputs:diffuseColor = (0, 0.13286833, 0.6038274)
+        float inputs:metallic = 0
+        float inputs:opacity = 1
+        float inputs:roughness = 0.5
+        token inputs:wrapMode = "repeat"
+        token outputs:displacement (
+            displayGroup = "Outputs"
+        )
+        prepend token outputs:displacement.connect = </Materials/shark_blue/PreviewSurface.outputs:displacement>
+        token outputs:surface (
+            displayGroup = "Outputs"
+        )
+        prepend token outputs:surface.connect = </Materials/shark_blue/PreviewSurface.outputs:surface>
+        token outputs:volume (
+            displayGroup = "Outputs"
+        )
+
+        def Shader "PreviewSurface" (
+            apiSchemas = ["NodeDefAPI"]
+        )
+        {
+            token info:id = "UsdPreviewSurface"
+            prepend color3f inputs:diffuseColor.connect = </Materials/shark_blue.inputs:diffuseColor>
+            prepend float inputs:metallic.connect = </Materials/shark_blue.inputs:metallic>
+            prepend float inputs:opacity.connect = </Materials/shark_blue.inputs:opacity>
+            prepend float inputs:roughness.connect = </Materials/shark_blue.inputs:roughness>
+            token outputs:displacement
+            token outputs:surface
+        }
+    }
+
+    def Material "tire_grey"
+    {
+        color3f inputs:diffuseColor = (0.010022826, 0.010022826, 0.010022826)
+        float inputs:metallic = 0
+        float inputs:opacity = 1
+        float inputs:roughness = 0.5
+        token inputs:wrapMode = "repeat"
+        token outputs:displacement (
+            displayGroup = "Outputs"
+        )
+        prepend token outputs:displacement.connect = </Materials/tire_grey/PreviewSurface.outputs:displacement>
+        token outputs:surface (
+            displayGroup = "Outputs"
+        )
+        prepend token outputs:surface.connect = </Materials/tire_grey/PreviewSurface.outputs:surface>
+        token outputs:volume (
+            displayGroup = "Outputs"
+        )
+
+        def Shader "PreviewSurface" (
+            apiSchemas = ["NodeDefAPI"]
+        )
+        {
+            token info:id = "UsdPreviewSurface"
+            prepend color3f inputs:diffuseColor.connect = </Materials/tire_grey.inputs:diffuseColor>
+            prepend float inputs:metallic.connect = </Materials/tire_grey.inputs:metallic>
+            prepend float inputs:opacity.connect = </Materials/tire_grey.inputs:opacity>
+            prepend float inputs:roughness.connect = </Materials/tire_grey.inputs:roughness>
+            token outputs:displacement
+            token outputs:surface
+        }
+    }
+}
+

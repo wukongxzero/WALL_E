@@ -24,7 +24,7 @@ from isaacsim.core.simulation_manager import SimulationManager
 from isaacsim.core.experimental.prims import RigidPrim, Articulation
 import omni.usd
 import numpy as np
-from pxr import UsdPhysics, PhysxSchema, Gf
+from pxr import UsdPhysics, PhysxSchema, Gf, UsdGeom
 
 WALL_E_USD   = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
 WHEEL_RADIUS = 0.08   # m  (URDF cylinder radius)
@@ -87,25 +87,16 @@ for cp in TRACK_COLLIDER_PATHS:
     else:
         print(f"[WARN] Friction target not found (skipped): {cp}")
 
-# ── DriveAPI — spin the tracks visually in sync with body speed ───────────────
-# Body speed = ~0.55 m/s effective (measured), ω_track = v / r
-TRACK_VEL_DEG = (V_LIN / WHEEL_RADIUS) * 180.0 / np.pi   # ~286 deg/s
-TRACK_JOINTS  = ["left_track_joint", "right_track_joint"]
-for prim in stage.TraverseAll():
-    if prim.GetName() in TRACK_JOINTS:
-        drive = UsdPhysics.DriveAPI.Apply(prim, "angular")
-        drive.CreateTypeAttr("velocity")
-        drive.CreateStiffnessAttr(0.0)
-        # damping=1e3, maxForce=1e5 (previous values) were strong enough to
-        # physically dominate the body-velocity control — this drive is only
-        # meant to spin the tracks cosmetically, not drive the robot (the
-        # cylinder's rpy isn't preserved in USD export, so this axis is wrong
-        # anyway; see module docstring). Small values so it can't fight the
-        # real locomotion control on base_link.
-        drive.CreateDampingAttr(10.0)
-        drive.CreateMaxForceAttr(5.0)
-        drive.CreateTargetVelocityAttr(TRACK_VEL_DEG)
-        print(f"[INFO] Track spin {TRACK_VEL_DEG:.1f} deg/s → {prim.GetPath()}")
+# NOTE: previously applied a cosmetic DriveAPI here to spin the tracks
+# visually in sync with body speed. Removed — the track cylinder's rpy isn't
+# preserved in the USD export (see module docstring), so the joint's actual
+# rotation axis is wrong. Even a small torque (damping=10, maxForce=5) on a
+# wrong-axis joint accumulates real positional drift over long runs — the
+# tracks visibly separated from the body over time. This drive never
+# contributed to real locomotion (body-velocity control on base_link does
+# that), so removing it entirely fixes the drift with no functional loss.
+# Tracks now stay rigidly fixed at their spawn position/orientation relative
+# to base_link — visually static, not spinning, but no longer drifting off.
 
 # ── Simulate ──────────────────────────────────────────────────────────────────
 SimulationManager.set_physics_dt(1.0 / 60.0)
@@ -170,15 +161,22 @@ root.set_velocities(
     angular_velocities=np.array([[0.0, 0.0, 0.0]])
 )
 
-# Top-down viewport camera — removes ambiguity about "sideways vs forward."
-# From directly overhead, +X motion reads as unambiguous translation along
-# one screen axis regardless of the default camera's arbitrary starting angle.
-from omni.kit.viewport.utility import get_active_viewport, camera_state
+# Chase camera — top-level prim, world transform recomputed explicitly every
+# frame from the robot's actual pose (already read each iteration below).
+# Previously parented under base_link (an ArticulationRoot link) to inherit
+# its transform automatically — but articulation bodies update through the
+# physics tensor view, and that doesn't reliably propagate to child prim
+# transforms for rendering, so the camera stayed stuck ("drifting", not
+# following). Explicit world-space update every frame is more work but
+# actually verifiable — no dependency on USD inheritance behavior we can't
+# directly observe.
+_chase_cam_prim = stage.DefinePrim("/World/ChaseCam", "Camera")
+_chase_up = Gf.Vec3d(0.0, 0.0, 1.0)
+
+from omni.kit.viewport.utility import get_active_viewport
 _viewport = get_active_viewport()
 if _viewport is not None:
-    _cam_state = camera_state.ViewportCameraState(_viewport.camera_path, _viewport)
-    _cam_state.set_target_world(Gf.Vec3d(0.0, 0.0, 0.0), True)
-    _cam_state.set_position_world(Gf.Vec3d(0.0, -1.5, 2.5), True)  # close overhead, slightly behind
+    _viewport.camera_path = _chase_cam_prim.GetPath()
 
 # Let any residual spawn overlap resolve gently (capped at 3 m/s now) before
 # the control loop starts commanding velocity on top of it.
@@ -217,6 +215,27 @@ for i in range(1_000_000):
     if not root.is_physics_tensor_entity_valid():
         app_utils.play()
         simulation_app.update()
+
+    # Chase camera — recompute world eye/center every frame from the robot's
+    # actual current pose (pos_np, yaw), rotating the local offset by yaw so
+    # it stays behind-and-above regardless of heading.
+    _cos_y, _sin_y = np.cos(yaw), np.sin(yaw)
+    _local_eye = np.array([-1.5, 0.0])
+    _local_center = np.array([1.0, 0.0])
+    _world_eye_xy = pos_np[:2] + np.array([
+        _local_eye[0] * _cos_y - _local_eye[1] * _sin_y,
+        _local_eye[0] * _sin_y + _local_eye[1] * _cos_y,
+    ])
+    _world_center_xy = pos_np[:2] + np.array([
+        _local_center[0] * _cos_y - _local_center[1] * _sin_y,
+        _local_center[0] * _sin_y + _local_center[1] * _cos_y,
+    ])
+    _eye = Gf.Vec3d(float(_world_eye_xy[0]), float(_world_eye_xy[1]), float(pos_np[2]) + 1.2)
+    _center = Gf.Vec3d(float(_world_center_xy[0]), float(_world_center_xy[1]), float(pos_np[2]) + 0.3)
+    _view_matrix = Gf.Matrix4d().SetLookAt(_eye, _center, _chase_up)
+    _chase_xform = UsdGeom.Xformable(_chase_cam_prim)
+    _chase_xform.ClearXformOpOrder()
+    _chase_xform.AddTransformOp().Set(_view_matrix.GetInverse())
 
     root.set_velocities(
         linear_velocities=np.array([[vx, vy, 0.0]]),

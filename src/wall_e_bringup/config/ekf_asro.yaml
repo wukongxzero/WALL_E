@@ -1,0 +1,46 @@
+### robot_localization EKF config for ASRo.
+#
+# Fuses /odom (simulation ground-truth-equivalent pose) with /imu.
+#
+# Deliberately does NOT fuse orientation from both sources — odom already
+# provides yaw, and the IMU is only asked for angular velocity (vyaw) and
+# linear acceleration (ax, ay), not its own orientation estimate. Fusing
+# absolute orientation from two sources at once makes the filter fight
+# itself; the standard pattern is one source of truth for orientation,
+# the other source filling in the derivatives it doesn't have as cleanly.
+#
+# publish_tf is off on purpose: AsroBridge (ros2_asro.py) already owns the
+# odom -> base_footprint TF as ground truth. This EKF exists to produce a
+# fused /odometry/filtered estimate, not to take over TF authority — two
+# nodes publishing the same TF is a real conflict, not a redundancy.
+
+ekf_filter_node:
+  ros__parameters:
+    use_sim_time: true
+    frequency: 30.0
+    two_d_mode: true
+    publish_tf: false
+
+    map_frame: map
+    odom_frame: odom
+    base_link_frame: base_footprint
+    world_frame: odom
+
+    odom0: /odom
+    odom0_config: [true,  true,  false,
+                   false, false, true,
+                   true,  true,  false,
+                   false, false, true,
+                   false, false, false]
+    odom0_differential: false
+    odom0_relative: false
+
+    imu0: /imu
+    imu0_config: [false, false, false,
+                  false, false, false,
+                  false, false, false,
+                  false, false, true,
+                  true,  true,  false]
+    imu0_differential: false
+    imu0_relative: false
+    imu0_remove_gravitational_acceleration: true
