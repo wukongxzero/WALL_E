@@ -1,0 +1,60 @@
+# RTAB-Map parameters for ASRo D455 SLAM
+# Adapted from rtabmap.yaml (WALL-E/D435) — frame names (base_footprint/odom/map)
+# already matched ASRo exactly, so only the depth-range comment changed.
+# Depth range values (0.3-6.0m) are appropriate for the D455 too, no change needed.
+
+rtabmap:
+  ros__parameters:
+
+    # Frame IDs — must match ASRo's actual TF tree (ros2_asro.py)
+    frame_id: base_footprint
+    odom_frame_id: odom
+    map_frame_id: map
+
+    # RGBD mode — same reasoning as WALL-E: Isaac Sim's depth camera doesn't
+    # have the Gazebo zeros bug, and ASRo has no lidar, so scan-only mode
+    # has nothing to feed it.
+    subscribe_depth: true
+    subscribe_rgb: true
+    subscribe_scan: false
+    approx_sync: true
+
+    # Topic remappings handled in launch file
+
+    # RTAB-Map core params
+    Rtabmap/DetectionRate: "1"           # process at most 1Hz — drops frames to prevent queue backup
+    Rtabmap/TimeThr: "0"                # no time limit
+    Rtabmap/MemoryThr: "0"              # no memory limit
+
+    # Loop closure
+    Kp/MaxFeatures: "400"               # features per frame
+    Vis/MinInliers: "15"                # min matches for loop closure
+    Vis/InlierDistance: "0.1"
+
+    # Visual odometry
+    Odom/Strategy: "0"                  # 0=Frame-to-Map, 1=Frame-to-Frame
+    Odom/ResetCountdown: "1"
+    OdomF2M/MaxSize: "1000"
+
+    # Memory management
+    Mem/RehearsalSimilarity: "0.45"
+    Mem/STMSize: "10"                   # short term memory size
+    Mem/ImageKept: "false"              # save RAM — dont keep raw images
+
+    # RGBD
+    RGBD/AngularUpdate: "0.01"          # update map every 0.01 rad
+    RGBD/LinearUpdate: "0.01"           # update map every 1cm
+    RGBD/OptimizeFromGraphEnd: "false"
+    RGBD/ProximityBySpace: "true"
+
+    # Grid map for Nav2
+    Grid/FromDepth: "false"
+    Grid/RayTracing: "true"
+    Grid/3D: "false"                    # 2D occupancy grid for Nav2
+    Grid/NoiseFilteringRadius: "0.05"
+    Grid/NoiseFilteringMinNeighbors: "5"
+
+    # D455 depth range
+    Grid/DepthDecimation: "4"
+    Grid/RangeMin: "0.3"                # min depth 30cm
+    Grid/RangeMax: "6.0"                # 6m for Isaac Sim environment

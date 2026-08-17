@@ -361,8 +361,6 @@ for _ in range(30):
 rclpy.init()
 bridge = AsroBridge()
 
-sim_time = 0.0
-DT = 1.0 / 60.0
 frame = 0
 
 print("[INFO] ASRo ROS2 bridge running")
@@ -397,16 +395,27 @@ while simulation_app.is_running() and app_utils.is_playing():
     for d in right_drives:
         d.GetTargetVelocityAttr().Set(right_vel)
 
-    bridge.step(pos_np, q, v_lin, omega, sim_time)
-    bridge.publish_imu(imu_sensor.get_data(), sim_time)
-
     # No manual transform write needed here — the camera is now a real rigid
     # body on a FixedJoint to the chassis (see setup above), so PhysX itself
     # carries its position and heading every step.
 
     SimulationManager.step()
     simulation_app.update()
-    sim_time += DT
+
+    # Read Isaac's own authoritative simulation clock instead of hand-tracking
+    # a separate sim_time += DT accumulator. The OmniGraph-driven camera
+    # pipeline (ROS2CameraHelper, useSystemTime=False) stamps its messages
+    # from this same internal clock, not from anything our Python loop
+    # tracks — a manual accumulator drifted to roughly half this clock's
+    # rate (root cause never fully isolated, likely simulation_app.update()
+    # advancing time by more than one physics_dt per call), which showed up
+    # downstream as RTAB-Map rejecting "extrapolation into the future" on
+    # every odom->base_footprint TF lookup, since our /tf and /clock were
+    # stamped on the slower, wrong clock while images used the real one.
+    sim_time = SimulationManager.get_simulation_time()
+
+    bridge.step(pos_np, q, v_lin, omega, sim_time)
+    bridge.publish_imu(imu_sensor.get_data(), sim_time)
     frame += 1
 
     if frame % 300 == 0:
