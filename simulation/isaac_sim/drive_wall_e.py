@@ -26,7 +26,7 @@ import omni.usd
 import numpy as np
 from pxr import UsdPhysics, PhysxSchema, Gf, UsdGeom
 
-WALL_E_USD   = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
+WALL_E_USD   = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 WHEEL_RADIUS = 0.08   # m  (URDF cylinder radius)
 WHEEL_BASE   = 0.36   # m  (URDF wheel_separation)
 LEFT_VEL     = 5.0    # rad/s

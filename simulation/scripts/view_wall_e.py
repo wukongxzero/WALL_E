@@ -2,7 +2,7 @@
 
 Usage:
     cd /home/wukong/IsaacLab
-    ./isaaclab.sh -p /home/wukong/WALL_E/scripts/view_wall_e.py
+    ./isaaclab.sh -p /home/wukong/WALL_E/simulation/scripts/view_wall_e.py
 """
 
 import argparse
@@ -21,7 +21,7 @@ import omni.kit.app
 import isaaclab.sim as sim_utils
 from isaaclab.sim import SimulationContext
 
-USD_PATH = "/home/wukong/WALL_E/usd/wall_e.usd/wall_e.usda"
+USD_PATH = "/home/wukong/WALL_E/simulation/usd/wall_e.usd/wall_e.usda"
 
 
 def main():

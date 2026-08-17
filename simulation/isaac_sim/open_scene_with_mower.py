@@ -14,8 +14,8 @@ simulation_app = SimulationApp({"headless": False})
 from isaacsim.core.experimental.utils.stage import open_stage
 import omni.usd
 
-SCENE_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
-MOWER_USD = "/home/wukong/WALL_E/usd/crawler_mower_chassis.usda"
+SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
+MOWER_USD = "/home/wukong/WALL_E/simulation/usd/crawler_mower_chassis.usda"
 
 open_stage(SCENE_USD)
 stage = omni.usd.get_context().get_stage()

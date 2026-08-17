@@ -11,8 +11,8 @@ simulation_app = SimulationApp({"headless": True})
 
 from isaacsim.asset.importer.urdf import URDFImporter, URDFImporterConfig
 
-URDF_PATH = "/home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot.urdf"
-USD_OUT_DIR = "/home/wukong/WALL_E/usd"
+URDF_PATH = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot.urdf"
+USD_OUT_DIR = "/home/wukong/WALL_E/simulation/usd"
 
 config = URDFImporterConfig(
     urdf_path=URDF_PATH,

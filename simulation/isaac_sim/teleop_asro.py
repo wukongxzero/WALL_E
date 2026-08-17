@@ -24,8 +24,8 @@ import carb.input
 import numpy as np
 from pxr import UsdPhysics, UsdShade, UsdGeom, Gf, Usd
 
-SCENE_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
-ASRO_USD = "/home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
+SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
+ASRO_USD = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
 ASRO_ROOT_PATH = "/World/asro/Geometry/base_footprint"
 
 LEFT_WHEEL_JOINTS = ["joint_wheel_fl", "joint_wheel_ml", "joint_wheel_rl"]
@@ -174,16 +174,10 @@ for i in range(1_000_000):
         _local_eye[0] * _cos_y - _local_eye[1] * _sin_y,
         _local_eye[0] * _sin_y + _local_eye[1] * _cos_y,
     ])
-
-
-
     _world_center_xy = pos_np[:2] + np.array([
         _local_center[0] * _cos_y - _local_center[1] * _sin_y,
         _local_center[0] * _sin_y + _local_center[1] * _cos_y,
     ])
-
-
-    
     _eye = Gf.Vec3d(float(_world_eye_xy[0]), float(_world_eye_xy[1]), float(pos_np[2]) + 1.2)
     _center = Gf.Vec3d(float(_world_center_xy[0]), float(_world_center_xy[1]), float(pos_np[2]) + 0.3)
     _view_matrix = Gf.Matrix4d().SetLookAt(_eye, _center, _chase_up)

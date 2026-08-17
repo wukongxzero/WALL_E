@@ -19,8 +19,8 @@ simulation_app = app_launcher.app
 from isaaclab.sim.converters import UrdfConverter, UrdfConverterCfg
 
 cfg = UrdfConverterCfg(
-    asset_path="/home/wukong/WALL_E/usd/wall_e.urdf",
-    usd_dir="/home/wukong/WALL_E/usd/",
+    asset_path="/home/wukong/WALL_E/simulation/usd/wall_e.urdf",
+    usd_dir="/home/wukong/WALL_E/simulation/usd/",
     usd_file_name="wall_e_v2.usd",
     fix_base=False,
     merge_fixed_joints=True,

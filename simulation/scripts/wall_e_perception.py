@@ -13,7 +13,7 @@ import usdrt.Sdf
 from isaacsim.core.api import World
 from pxr import Usd, UsdGeom, Gf
 
-USD_PATH = "/home/wukong/WALL_E/usd/wall_e.usd/wall_e.usda"
+USD_PATH = "/home/wukong/WALL_E/simulation/usd/wall_e.usd/wall_e.usda"
 ROBOT_PRIM = "/World/wall_e"
 BASE_FOOTPRINT_PRIM = ROBOT_PRIM + "/Geometry/base_footprint"
 CHASSIS_PRIM = BASE_FOOTPRINT_PRIM + "/base_link"

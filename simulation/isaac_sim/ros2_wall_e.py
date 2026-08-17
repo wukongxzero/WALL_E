@@ -44,7 +44,7 @@ from nav_msgs.msg import Odometry
 from rosgraph_msgs.msg import Clock
 from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 
-WALL_E_USD       = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
+WALL_E_USD       = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 WHEEL_RADIUS     = 0.08    # m
 K_YAW            = 5.0     # P-gain — holds heading when cmd_vel omega ≈ 0
 CAMERA_PATH      = "/World/WallECamera"   # top-level — IsaacCreateRenderProduct requires this

@@ -122,6 +122,7 @@ docker compose up   # starts ros:humble + ollama/ollama services
 
 ### Build (native)
 ```bash
+cd ros2_ws
 source /opt/ros/humble/setup.bash
 colcon build --packages-select wall_e_bringup
 source install/setup.bash

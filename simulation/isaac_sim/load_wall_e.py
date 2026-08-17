@@ -17,7 +17,7 @@ from isaacsim.core.rendering_manager import RenderingManager
 from isaacsim.core.simulation_manager import SimulationManager
 from pxr import Usd
 
-WALL_E_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
+WALL_E_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 
 # New stage
 stage_utils.create_new_stage()

@@ -1,5 +1,5 @@
-asset_path: /home/wukong/WALL_E/usd/wall_e.urdf
-usd_dir: /home/wukong/WALL_E/usd/
+asset_path: /home/wukong/WALL_E/simulation/usd/wall_e.urdf
+usd_dir: /home/wukong/WALL_E/simulation/usd/
 usd_file_name: wall_e_v2.usd
 force_usd_conversion: true
 make_instanceable: false

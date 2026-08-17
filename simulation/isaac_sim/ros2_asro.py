@@ -76,8 +76,8 @@ from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
 
 from isaacsim.sensors.experimental.physics import IMU, IMUSensor
 
-SCENE_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
-ASRO_USD = "/home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
+SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
+ASRO_USD = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
 ASRO_ROOT_PATH = "/World/asro/Geometry/base_footprint"
 
 LEFT_WHEEL_JOINTS = ["joint_wheel_fl", "joint_wheel_ml", "joint_wheel_rl"]

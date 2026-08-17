@@ -11,8 +11,8 @@ from isaacsim.core.experimental.utils.stage import open_stage
 from pxr import UsdGeom
 import omni.usd
 
-SCENE_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
-ASRO_USD = "/home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
+SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
+ASRO_USD = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
 
 open_stage(SCENE_USD)
 stage = omni.usd.get_context().get_stage()

@@ -4,3 +4,6 @@ log/
 *.pyc
 __pycache__/
 isaac-sim/
+*.pt
+perf.data
+gitignore.back

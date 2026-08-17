@@ -24,7 +24,7 @@ EOF
 
 for i in $(seq 1 30); do
     echo "=== Attempt $i ==="
-    output=$($PYTHON /home/wukong/WALL_E/scripts/wall_e_perception.py 2>&1 | head -15)
+    output=$($PYTHON /home/wukong/WALL_E/simulation/scripts/wall_e_perception.py 2>&1 | head -15)
 
     missing=$(echo "$output" | grep -oP 'No versions of \K[^\s]+' | head -1)
 

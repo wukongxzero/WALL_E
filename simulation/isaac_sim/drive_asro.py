@@ -23,8 +23,8 @@ import omni.usd
 import numpy as np
 from pxr import UsdPhysics, UsdShade, UsdGeom, Gf
 
-SCENE_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
-ASRO_USD = "/home/wukong/WALL_E/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
+SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
+ASRO_USD = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
 ASRO_ROOT_PATH = "/World/asro/Geometry/base_footprint"
 
 WHEEL_TARGET_VEL_DEG = 200.0  # deg/s — real wheel-joint drive this time, not cosmetic

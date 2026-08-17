@@ -10,7 +10,7 @@ simulation_app = SimulationApp({"headless": False})
 
 from isaacsim.core.experimental.utils.stage import open_stage
 
-SCENE_USD = "/home/wukong/WALL_E/usd/wall_e_scene.usd"
+SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 
 open_stage(SCENE_USD)
 simulation_app.update()

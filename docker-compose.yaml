@@ -20,7 +20,7 @@ services:
   socketserver:
     build:
       context: .  # Changed from '..' since we are now in the root folder
-      dockerfile: WebSocketGateway/WebSocketGateway/Dockerfile
+      dockerfile: middleware/WebSocketGateway/WebSocketGateway/Dockerfile
     image: "socketserver"
     container_name: socketserver
     privileged: true
