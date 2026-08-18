@@ -149,7 +149,19 @@ camera_prim.GetReferences().AddReference(
     get_assets_root_path() + "/Isaac/Sensors/RealSense/D455/rsd455.usd"
 )
 simulation_app.update()
-UsdGeom.XformCommonAPI(camera_prim).SetTranslate((0.0, 0.0, CAMERA_HEIGHT))
+
+# The rsd455.usd asset mounts its leaf camera prims so the RIG's local -Y is
+# the actual optical forward axis and +X is "up" (verified by inspecting the
+# leaf cameras' baked xformOp:orient) — not the +X-forward/Z-up convention
+# base_footprint uses. With zero rotation here the D455 ended up staring
+# sideways off the robot's flank into open space (100% inf depth, uniform
+# dome-light-colored RGB — it was rendering nothing but sky/background).
+# This quaternion rotates the wrapper so its -Y (forward) aligns with
+# base_footprint's +X (the robot's actual drive-forward, confirmed via a
+# real cmd_vel test) and its +X (up) aligns with world Z.
+_CAMERA_MOUNT_ORIENT = Gf.Quatf(0.5, Gf.Vec3f(-0.5, 0.5, -0.5))  # (w, x, y, z)
+UsdGeom.Xformable(camera_prim).AddTranslateOp().Set(Gf.Vec3d(0.0, 0.0, CAMERA_HEIGHT))
+UsdGeom.Xformable(camera_prim).AddOrientOp().Set(_CAMERA_MOUNT_ORIENT)
 
 # Real physics attachment — a rigid body + FixedJoint to the chassis, same
 # mechanism WALL-E's URDF-defined sensor links (and the earlier lidar mount)
@@ -165,7 +177,10 @@ _cam_joint = UsdPhysics.FixedJoint.Define(stage, f"{CAMERA_PATH}/FixedJoint")
 _cam_joint.CreateBody0Rel().SetTargets([ASRO_ROOT_PATH])
 _cam_joint.CreateBody1Rel().SetTargets([CAMERA_PATH])
 _cam_joint.CreateLocalPos0Attr().Set(Gf.Vec3f(0.0, 0.0, CAMERA_HEIGHT))
-_cam_joint.CreateLocalRot0Attr().Set(Gf.Quatf(1.0, 0.0, 0.0, 0.0))
+# Same mount-orientation fix as the Xform ops above — body1 (the camera) has
+# no relative rotation of its own (LocalRot1 stays identity), so the joint's
+# LocalRot0 alone is what has to carry the wrapper's forward-axis correction.
+_cam_joint.CreateLocalRot0Attr().Set(_CAMERA_MOUNT_ORIENT)
 _cam_joint.CreateLocalPos1Attr().Set(Gf.Vec3f(0.0, 0.0, 0.0))
 _cam_joint.CreateLocalRot1Attr().Set(Gf.Quatf(1.0, 0.0, 0.0, 0.0))
 print("[INFO] D455 rigidly attached to chassis via FixedJoint")
