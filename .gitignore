@@ -7,3 +7,4 @@ isaac-sim/
 *.pt
 perf.data
 gitignore.back
+.claude/
