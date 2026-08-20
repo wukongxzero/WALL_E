@@ -4,3 +4,8 @@ log/
 *.pyc
 __pycache__/
 isaac-sim/
+
+# model weights / profiling artifacts
+yolov8n.pt
+*.pt
+perf.data
