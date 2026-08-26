@@ -11,7 +11,8 @@ import omni
 import omni.graph.core as og
 import usdrt.Sdf
 from isaacsim.core.api import World
-from pxr import Gf, UsdGeom
+from isaacsim.core.experimental.objects import DistantLight, GroundPlane
+from pxr import Gf, UsdGeom, UsdPhysics
 
 USD_PATH = "/home/wukong/WALL_E/simulation/usd/wall_e.usd/wall_e.usda"
 ROBOT_PRIM = "/World/wall_e"
@@ -27,6 +28,49 @@ world = World(stage_units_in_meters=1.0)
 stage = omni.usd.get_context().get_stage()
 ref_prim = stage.DefinePrim(ROBOT_PRIM, "Xform")
 ref_prim.GetReferences().AddReference(USD_PATH)
+
+# ── Simple test room: floor + 4 walls ───────────────────────────────────────
+# RTAB-Map needs actual range data. Previously this scene had no ground and
+# no walls, so the depth camera saw only empty space in every direction and
+# every frame came back "Cloud with only NaN values created!". Static
+# (no RigidBodyAPI) collision boxes are enough here — nothing needs to move.
+GroundPlane("/World/GroundPlane")
+DistantLight("/World/DistantLight").set_intensities(3000)
+
+ROOM_HALF_EXTENT = 3.0  # m — 6x6 room centered on the robot's spawn point
+WALL_HEIGHT = 2.5  # m
+WALL_THICKNESS = 0.1  # m
+
+
+def _add_wall(name: str, center: tuple[float, float, float], size: tuple[float, float, float]) -> None:
+    wall = UsdGeom.Cube.Define(stage, f"/World/Room/{name}")
+    wall.CreateSizeAttr(1.0)
+    xform = UsdGeom.XformCommonAPI(wall)
+    xform.SetTranslate(Gf.Vec3d(*center))
+    xform.SetScale(Gf.Vec3f(*size))
+    UsdPhysics.CollisionAPI.Apply(wall.GetPrim())
+
+
+_add_wall(
+    "WallNorth",
+    (0.0, ROOM_HALF_EXTENT, WALL_HEIGHT / 2.0),
+    (2 * ROOM_HALF_EXTENT, WALL_THICKNESS, WALL_HEIGHT),
+)
+_add_wall(
+    "WallSouth",
+    (0.0, -ROOM_HALF_EXTENT, WALL_HEIGHT / 2.0),
+    (2 * ROOM_HALF_EXTENT, WALL_THICKNESS, WALL_HEIGHT),
+)
+_add_wall(
+    "WallEast",
+    (ROOM_HALF_EXTENT, 0.0, WALL_HEIGHT / 2.0),
+    (WALL_THICKNESS, 2 * ROOM_HALF_EXTENT, WALL_HEIGHT),
+)
+_add_wall(
+    "WallWest",
+    (-ROOM_HALF_EXTENT, 0.0, WALL_HEIGHT / 2.0),
+    (WALL_THICKNESS, 2 * ROOM_HALF_EXTENT, WALL_HEIGHT),
+)
 
 # D435 color camera: ~69.5 deg HFOV / ~55 deg VFOV at 640x480 (4:3).
 # camera_color_optical_frame follows REP-103 (+Z forward, +Y down), but a USD
