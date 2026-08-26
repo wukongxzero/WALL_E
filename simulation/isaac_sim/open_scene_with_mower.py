@@ -9,10 +9,11 @@ even for local files). Referencing directly via script sidesteps that.
 Run with: ~/WALL_E/isaac-sim/python.sh ~/WALL_E/isaac_sim/open_scene_with_mower.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
-from isaacsim.core.experimental.utils.stage import open_stage
 import omni.usd
+from isaacsim.core.experimental.utils.stage import open_stage
 
 SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 MOWER_USD = "/home/wukong/WALL_E/simulation/usd/crawler_mower_chassis.usda"

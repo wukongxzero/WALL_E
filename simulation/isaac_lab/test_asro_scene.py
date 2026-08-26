@@ -19,9 +19,8 @@ simulation_app = app_launcher.app
 
 import sys
 
-import torch
-
 import isaaclab.sim as sim_utils
+import torch
 from isaaclab.scene import InteractiveScene
 from isaaclab.sim import SimulationContext
 

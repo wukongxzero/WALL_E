@@ -17,11 +17,10 @@ policy has a reason to notice them while navigating to a goal.
 """
 
 import isaaclab.sim as sim_utils
+from asro_cfg import ASRO_CFG
 from isaaclab.assets import AssetBaseCfg
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.utils.configclass import configclass
-
-from asro_cfg import ASRO_CFG
 
 # (scene key, class id) — class id is the label OBSTACLE_DETECTIONS in
 # asro_mdp.py one-hot-encodes. Keep this list and the scene entries below in

@@ -9,4 +9,4 @@
 	url = https://github.com/totalspectrum/flexprop
 [submodule "ParralaxController/test/Unity"]
 	path = firmware/ParralaxController/test/Unity
-	url = git@github.com:ThrowTheSwitch/Unity.git
+	url = https://github.com/ThrowTheSwitch/Unity.git

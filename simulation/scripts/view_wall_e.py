@@ -17,8 +17,8 @@ args_cli = parser.parse_args()
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
-import omni.kit.app
 import isaaclab.sim as sim_utils
+import omni.kit.app
 from isaaclab.sim import SimulationContext
 
 USD_PATH = "/home/wukong/WALL_E/simulation/usd/wall_e.usd/wall_e.usda"

@@ -3,6 +3,7 @@ from isaacsim import SimulationApp
 simulation_app = SimulationApp({"headless": True})
 
 import argparse
+
 from isaacsim.asset.importer.urdf import _urdf
 
 parser = argparse.ArgumentParser()
@@ -26,6 +27,6 @@ result, prim_path = _urdf.import_urdf(args.input, args.output, config)
 if result:
     print(f"[OK] USD saved to: {args.output}")
 else:
-    print(f"[ERROR] Conversion failed")
+    print("[ERROR] Conversion failed")
 
 simulation_app.close()

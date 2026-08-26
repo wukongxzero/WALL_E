@@ -30,6 +30,7 @@ light.set_intensities(3000)
 
 # Spawn WALL-E as a USD reference
 import omni.usd
+
 stage = omni.usd.get_context().get_stage()
 wall_e = stage.DefinePrim("/World/wall_e", "Xform")
 wall_e.GetReferences().AddReference(WALL_E_USD, "/World/wall_e")

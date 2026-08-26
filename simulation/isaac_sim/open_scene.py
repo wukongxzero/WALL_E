@@ -6,6 +6,7 @@ use the Stage panel, etc.
 Run with: ~/WALL_E/isaac-sim/python.sh ~/WALL_E/isaac_sim/open_scene.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
 from isaacsim.core.experimental.utils.stage import open_stage

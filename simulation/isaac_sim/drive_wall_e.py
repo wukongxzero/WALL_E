@@ -13,18 +13,18 @@ used and is sufficient for demo + RL obs collection.
 Run with: ~/isaac-sim/python.sh ~/WALL_E/isaac_sim/drive_wall_e.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
 import isaacsim.core.experimental.utils.app as app_utils
-import isaacsim.core.experimental.utils.stage as stage_utils
+import numpy as np
+import omni.usd
+from isaacsim.core.experimental.objects import GroundPlane
+from isaacsim.core.experimental.prims import Articulation
 from isaacsim.core.experimental.utils.stage import open_stage
-from isaacsim.core.experimental.objects import DistantLight, GroundPlane
 from isaacsim.core.rendering_manager import RenderingManager
 from isaacsim.core.simulation_manager import SimulationManager
-from isaacsim.core.experimental.prims import RigidPrim, Articulation
-import omni.usd
-import numpy as np
-from pxr import UsdPhysics, PhysxSchema, Gf, UsdGeom
+from pxr import Gf, PhysxSchema, UsdGeom, UsdPhysics
 
 WALL_E_USD   = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 WHEEL_RADIUS = 0.08   # m  (URDF cylinder radius)
@@ -66,6 +66,7 @@ GroundPlane("/World/GroundPlane")
 # both contacting surfaces' materials (default: average), so put it on both the
 # track colliders and the ground for it to actually matter.
 from pxr import UsdShade
+
 _friction_mat_prim = stage.DefinePrim("/World/Materials/TrackRubber", "Material")
 _friction_mat = UsdPhysics.MaterialAPI.Apply(_friction_mat_prim)
 _friction_mat.CreateStaticFrictionAttr().Set(0.9)
@@ -127,7 +128,6 @@ PhysxSchema.PhysxRigidBodyAPI.Apply(_base_link_prim).CreateMaxDepenetrationVeloc
 # it made the sensors detach and fall, not just print a warning). Fix: give
 # them small real mass instead, so the joint stays valid and they stay
 # rigidly attached.
-from pxr import UsdPhysics as UsdPhy
 sensor_paths = [
     "/World/wall_e/Geometry/base_footprint/base_link/camera_link/camera_color_optical_frame",
     "/World/wall_e/Geometry/base_footprint/base_link/camera_link/camera_depth_optical_frame",
@@ -174,6 +174,7 @@ _chase_cam_prim = stage.DefinePrim("/World/ChaseCam", "Camera")
 _chase_up = Gf.Vec3d(0.0, 0.0, 1.0)
 
 from omni.kit.viewport.utility import get_active_viewport
+
 _viewport = get_active_viewport()
 if _viewport is not None:
     _viewport.camera_path = _chase_cam_prim.GetPath()

@@ -6,6 +6,7 @@ Produces a correctly structured articulation with:
   - camera, imu, supports merged into base_link (merge_fixed_links=True)
 """
 import argparse
+
 from isaaclab.app import AppLauncher
 
 parser = argparse.ArgumentParser(description="Convert WALL-E URDF to USD")

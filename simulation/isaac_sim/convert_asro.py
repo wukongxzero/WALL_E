@@ -7,6 +7,7 @@ ERROR_CONNECTION, even for local files already on disk).
 Run with: ~/WALL_E/isaac-sim/python.sh ~/WALL_E/isaac_sim/convert_asro.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": True})
 
 from isaacsim.asset.importer.urdf import URDFImporter, URDFImporterConfig

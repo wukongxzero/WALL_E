@@ -3,6 +3,7 @@ hierarchy so we know the actual RGB/Depth camera prim paths before wiring
 ROS2 publishers to them. Run with: ~/isaac-sim/python.sh inspect_d455.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": True})
 
 import omni.usd

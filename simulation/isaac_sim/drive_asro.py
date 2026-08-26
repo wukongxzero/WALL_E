@@ -11,17 +11,18 @@ workaround.
 Run with: ~/isaac-sim/python.sh ~/WALL_E/isaac_sim/drive_asro.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
 import isaacsim.core.experimental.utils.app as app_utils
-from isaacsim.core.experimental.utils.stage import open_stage
+import numpy as np
+import omni.usd
 from isaacsim.core.experimental.objects import GroundPlane
+from isaacsim.core.experimental.prims import Articulation
+from isaacsim.core.experimental.utils.stage import open_stage
 from isaacsim.core.rendering_manager import RenderingManager
 from isaacsim.core.simulation_manager import SimulationManager
-from isaacsim.core.experimental.prims import Articulation
-import omni.usd
-import numpy as np
-from pxr import UsdPhysics, UsdShade, UsdGeom, Gf
+from pxr import Gf, UsdGeom, UsdPhysics, UsdShade
 
 SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 ASRO_USD = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"
@@ -83,6 +84,7 @@ root = Articulation(ASRO_ROOT_PATH)
 _chase_cam_prim = stage.DefinePrim("/World/AsroChaseCam", "Camera")
 _chase_up = Gf.Vec3d(0.0, 0.0, 1.0)
 from omni.kit.viewport.utility import get_active_viewport
+
 _viewport = get_active_viewport()
 if _viewport is not None:
     _viewport.camera_path = _chase_cam_prim.GetPath()

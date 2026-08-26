@@ -5,11 +5,12 @@ manual inspection. No control loop — just loads both and idles.
 Run with: ~/WALL_E/isaac-sim/python.sh ~/WALL_E/isaac_sim/open_scene_with_asro.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
+import omni.usd
 from isaacsim.core.experimental.utils.stage import open_stage
 from pxr import UsdGeom
-import omni.usd
 
 SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 ASRO_USD = "/home/wukong/WALL_E/simulation/usd/ASRo_URDF_Simple_6_Wheel_Robot/ASRo_URDF_Simple_6_Wheel_Robot.usda"

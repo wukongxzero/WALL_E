@@ -5,9 +5,11 @@ Converter extension (HOOPS-based, supports IGES/STEP/JT/DGN).
 Run with: ~/WALL_E/isaac-sim/python.sh ~/WALL_E/isaac_sim/convert_jackal.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": True})
 
 import asyncio
+
 import isaacsim.core.experimental.utils.app as app_utils
 
 app_utils.enable_extension("omni.kit.converter.cad")

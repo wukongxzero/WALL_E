@@ -11,13 +11,8 @@ output shape stays identical.
 """
 
 import torch
-
-from isaaclab.assets import Articulation
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.managers import SceneEntityCfg
-from isaaclab.utils.math import subtract_frame_transforms
-
-from asro_scene_cfg import OBSTACLE_REGISTRY
 
 
 def fake_yolo_detections(

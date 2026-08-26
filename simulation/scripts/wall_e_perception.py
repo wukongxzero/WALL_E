@@ -11,7 +11,7 @@ import omni
 import omni.graph.core as og
 import usdrt.Sdf
 from isaacsim.core.api import World
-from pxr import Usd, UsdGeom, Gf
+from pxr import Gf, UsdGeom
 
 USD_PATH = "/home/wukong/WALL_E/simulation/usd/wall_e.usd/wall_e.usda"
 ROBOT_PRIM = "/World/wall_e"

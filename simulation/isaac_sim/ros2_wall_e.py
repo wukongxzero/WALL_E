@@ -19,30 +19,32 @@ Run with:
   ~/isaac-sim/python.sh ~/WALL_E/isaac_sim/ros2_wall_e.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": False})
 
 import math
+
 import isaacsim.core.experimental.utils.app as app_utils
 import isaacsim.core.experimental.utils.stage as stage_utils
-from isaacsim.core.experimental.objects import DistantLight, GroundPlane
-from isaacsim.core.simulation_manager import SimulationManager
-from isaacsim.core.experimental.prims import RigidPrim
-import omni.usd
-import omni.graph.core as og
 import numpy as np
-from pxr import UsdGeom, UsdPhysics, Gf
+import omni.graph.core as og
+import omni.usd
 import usdrt.Sdf
+from isaacsim.core.experimental.objects import DistantLight, GroundPlane
+from isaacsim.core.experimental.prims import RigidPrim
+from isaacsim.core.simulation_manager import SimulationManager
+from pxr import Gf, UsdGeom, UsdPhysics
 
 # ── Enable ROS2 bridge (must happen before any rclpy import) ──────────────────
 app_utils.enable_extension("isaacsim.ros2.bridge")
 simulation_app.update()
 
 import rclpy
-from rclpy.node import Node
-from geometry_msgs.msg import Twist, TransformStamped
+from geometry_msgs.msg import TransformStamped, Twist
 from nav_msgs.msg import Odometry
+from rclpy.node import Node
 from rosgraph_msgs.msg import Clock
-from tf2_ros import TransformBroadcaster, StaticTransformBroadcaster
+from tf2_ros import StaticTransformBroadcaster, TransformBroadcaster
 
 WALL_E_USD       = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 WHEEL_RADIUS     = 0.08    # m
@@ -98,6 +100,7 @@ for prim in stage.TraverseAll():
 
 # ── Camera prim at top level (required by IsaacCreateRenderProduct) ───────────
 from pxr import Sdf
+
 cam_prim = UsdGeom.Camera(stage.DefinePrim(CAMERA_PATH, "Camera"))
 cam_xform = UsdGeom.XformCommonAPI(cam_prim)
 cam_xform.SetTranslate(Gf.Vec3d(CAM_FORWARD, 0.0, CAM_HEIGHT))
@@ -167,6 +170,7 @@ render_product_path = og.Controller.attribute(
 print(f"[DEBUG] render_product_path = '{render_product_path}'")
 
 import omni.syntheticdata._syntheticdata as sd
+
 rv_rgb   = omni.syntheticdata.SyntheticData.convert_sensor_type_to_rendervar(sd.SensorType.Rgb.name)
 rv_depth = omni.syntheticdata.SyntheticData.convert_sensor_type_to_rendervar(sd.SensorType.DistanceToImagePlane.name)
 rgb_gate_path   = omni.syntheticdata.SyntheticData._get_node_path(rv_rgb   + "IsaacSimulationGate", render_product_path)

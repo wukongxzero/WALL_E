@@ -18,11 +18,12 @@ prototype's own local bound, to get instance 279's actual world-space AABB.
 Run with: ~/WALL_E/isaac-sim/python.sh check_instancer_occlusion.py
 """
 from isaacsim import SimulationApp
+
 simulation_app = SimulationApp({"headless": True})
 
-from pxr import UsdGeom, Gf, Usd
-from isaacsim.core.experimental.utils.stage import open_stage
 import omni.usd
+from isaacsim.core.experimental.utils.stage import open_stage
+from pxr import Gf, Usd, UsdGeom
 
 SCENE_USD = "/home/wukong/WALL_E/simulation/usd/wall_e_scene.usd"
 
