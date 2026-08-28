@@ -14,10 +14,12 @@ import torch
 from isaaclab.envs import ManagerBasedRLEnv
 from isaaclab.managers import SceneEntityCfg
 
+_ROBOT_ENTITY_CFG = SceneEntityCfg("robot")
+
 
 def fake_yolo_detections(
     env: ManagerBasedRLEnv,
-    asset_cfg: SceneEntityCfg = SceneEntityCfg("asro"),
+    asset_cfg: SceneEntityCfg = _ROBOT_ENTITY_CFG,
     num_classes: int = 2,
     k: int = 3,
 ) -> torch.Tensor:

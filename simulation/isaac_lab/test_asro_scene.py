@@ -38,7 +38,7 @@ def main():
     scene = InteractiveScene(scene_cfg)
 
     sim.reset()
-    robot = scene["asro"]
+    robot = scene["robot"]
     print(f"[INFO] Spawned {args_cli.num_envs} parallel ASRo environments.")
     print(f"[INFO] Robot data shape (num_envs, num_joints): {robot.data.joint_pos.shape}")
     print(f"[INFO] Env origins:\n{scene.env_origins}")
