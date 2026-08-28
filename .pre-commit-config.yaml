@@ -1,0 +1,16 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.5
+    hooks:
+      - id: ruff
+        name: ruff (simulation/ Python)
+        files: ^simulation/
+        args: [--fix]
+
+  - repo: local
+    hooks:
+      - id: ament-uncrustify
+        name: ament_uncrustify (ROS2 C++ style)
+        entry: .githooks/check_uncrustify.sh
+        language: system
+        files: ^ros2_ws/src/wall_e_bringup/src/.*\.(cpp|hpp|h)$
