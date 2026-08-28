@@ -65,7 +65,14 @@ WALL_E_CFG = ArticulationCfg(
     actuators={
         "track_drives": ImplicitActuatorCfg(
             joint_names_expr=TRACK_JOINT_NAMES,
-            effort_limit_sim=1e5,
+            # 1e5 (carried over from the raw USD PhysicsDriveAPI value tuned
+            # for the OmniGraph test) let the velocity servo slam into torque
+            # far beyond what ~0.5 friction on an 8kg robot can convert to
+            # forward force -- tracks just slipped in place. Confirmed via
+            # test_navigation_behavior.py: error_pos never closed at 1e5.
+            # 30.0 matches ASRO_CFG's effort_limit_sim, which does navigate
+            # correctly under the same test.
+            effort_limit_sim=30.0,
             stiffness=0.0,
             damping=1e5,
         ),

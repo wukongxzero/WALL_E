@@ -1,0 +1,94 @@
+Isaac Lab navigation env — testing notes
+==========================================
+Living doc. Add to this as new questions/findings come up — don't let it
+go stale like the environment silently going stale did.
+
+THE FRAMEWORK
+--------------
+Four different questions you can be testing, roughly cheapest-to-most-
+expensive. Match the test to the actual question — testing the wrong
+layer either wastes time or gives you a signal you can't trust.
+
+  1. Does it construct?
+     Right prims, right joint names, doesn't crash on startup/step.
+     Catches wiring mistakes (typo'd joint name, wrong path, missing
+     import). Does NOT tell you the robot behaves sensibly.
+
+  2. Can it physically move?
+     Given correct wiring, does commanding a joint velocity actually
+     produce chassis motion? Pure torque/friction physics, nothing to
+     do with RL or reward yet. Cheap to check with a direct velocity
+     command outside any training loop.
+
+  3. Does the reward track the task?
+     Given the robot CAN move, does getting closer to the goal actually
+     produce higher reward, does episode reset actually randomize, etc.
+     Noisier layer than 1-2 if you're probing it with a hand-rolled
+     heuristic controller instead of a trained policy -- an ambiguous
+     result here can mean either "environment bug" or "my probe is bad
+     at the task," and you often can't tell which without more evidence.
+
+  4. Can it actually be learned?
+     Real training, real learning curve. The only layer that fully
+     answers "does this environment support the task" -- but expensive,
+     and a failure here gives almost no information about *why* unless
+     layers 1-3 already ruled out the cheap explanations.
+
+Test 1 -> 2 -> 3 before 4. Each layer catches bugs faster and cheaper
+than the next one would. A bug caught at layer 2 would otherwise show
+up at layer 4 as "training doesn't work" with no clue why.
+
+STATUS (2026-08-28)
+---------------------
+Layer 1 -- solid, both robots:
+  - test_wall_e_cfg.py, test_asro_cfg.py: joint names/drive params
+    confirmed correct.
+  - test_wall_e_navigation.py, test_asro_navigation.py: both envs
+    construct, reset, step cleanly. Same obs shape (10,), same 4 reward
+    terms, action space differs correctly (ASRo 6, WALL-E 2).
+
+Layer 2 -- real bug found and fixed:
+  - WALL_E_CFG's effort_limit_sim=1e5 (carried over from the raw USD
+    PhysicsDriveAPI value tuned for the OmniGraph/ROS2 test) let the
+    velocity servo slam into torque far beyond what ~0.5 friction on an
+    8kg robot converts to forward force -- tracks slipped in place.
+    error_pos drifted monotonically AWAY from goal under a proportional
+    controller (2.535 -> 2.720 over 300 steps).
+  - Fixed: effort_limit_sim=30.0 (matches ASRO_CFG's value, which does
+    navigate correctly under the identical test). No longer monotonic
+    drift-away; real fluctuation instead. Not proven optimal, just
+    proven not-obviously-broken.
+
+Layer 3 -- mixed, using test_navigation_behavior.py's hand-rolled P
+controller (steers toward the command term's own body-frame target):
+  - Confirmed clean: no NaNs either robot, episode length fires at the
+    expected ~120 steps once the terminated-vs-truncated bug in the
+    test script itself was fixed (mdp.time_out populates `truncated`,
+    not `terminated` -- Gymnasium convention, time limits aren't a true
+    MDP terminal state).
+  - ASRo: error_pos genuinely converges (1.159 -> 0.375, well under the
+    0.5 success threshold) -- proves the shared env's reward function
+    CAN work when the robot has enough real control authority.
+  - WALL-E post-fix: correlation(error_pos, reward) came back +0.965
+    (expected negative -- reward should rise as error falls). NOT
+    trusted as a real bug yet -- can't tell if this is a genuine reward
+    issue or an artifact of the crude P-controller / a
+    measurement-timing misalignment in my own test script between when
+    error_pos and reward get sampled relative to the physics step.
+    OPEN -- needs either a better probe or just let layer 4 answer it.
+  - Post-reset spawn position jump measured as ~0.001m (expected
+    nonzero -- reset_root_state_uniform's pose_range is +/-0.5m x/y).
+    Also OPEN -- possibly a real reset bug (in the shared env, would
+    affect ASRo too), possibly my detection is comparing the wrong pair
+    of before/after position snapshots. Not yet isolated.
+
+Layer 4 -- not started. No train.py exists for either robot yet.
+
+NEXT
+-----
+  - Either chase the two layer-3 open items with a better probe, or
+    accept them as open and let train.py's actual learning curve be the
+    tiebreaker -- a real trained policy is a much cleaner signal than
+    this hand-rolled controller for "does reward track the task."
+  - Build train.py (PPO via rsl_rl or skrl) -- still the actual missing
+    piece for either robot to learn anything.
