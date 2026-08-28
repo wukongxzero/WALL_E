@@ -142,6 +142,23 @@ def Xform "wall_e"
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
         }
+
+        # Default PhysX friction (0.5/0.5, never explicitly set) wasn't
+        # enough traction for this robot's mass/geometry: joint velocity
+        # diagnostics (2026-08-28) showed the tracks spinning at real,
+        # substantial speed (2-5 rad/s) while chassis position stayed
+        # frozen at ~0.0001m for 100+ steps -- genuine slip, not a torque
+        # or policy problem. Values match drive_asro.py's raw DriveAPI
+        # setup for ASRo's tracks (0.9/0.8), reused here as a starting
+        # point rather than re-deriving from scratch.
+        def Material "TrackMaterial" (
+            prepend apiSchemas = ["PhysicsMaterialAPI"]
+        )
+        {
+            float physics:staticFriction = 0.9
+            float physics:dynamicFriction = 0.8
+            float physics:restitution = 0.0
+        }
     }
 
     over "Geometry"
@@ -172,9 +189,10 @@ def Xform "wall_e"
                     quatf physics:principalAxes = (0.70710677, 0.70710677, 0, 0)
 
                     over "cylinder_1" (
-                        prepend apiSchemas = ["PhysicsCollisionAPI", "NewtonCollisionAPI"]
+                        prepend apiSchemas = ["PhysicsCollisionAPI", "NewtonCollisionAPI", "MaterialBindingAPI"]
                     )
                     {
+                        rel material:binding:physics = </wall_e/Physics/TrackMaterial>
                     }
                 }
 
@@ -187,9 +205,10 @@ def Xform "wall_e"
                     quatf physics:principalAxes = (0.70710677, 0.70710677, 0, 0)
 
                     over "cylinder_1" (
-                        prepend apiSchemas = ["PhysicsCollisionAPI", "NewtonCollisionAPI"]
+                        prepend apiSchemas = ["PhysicsCollisionAPI", "NewtonCollisionAPI", "MaterialBindingAPI"]
                     )
                     {
+                        rel material:binding:physics = </wall_e/Physics/TrackMaterial>
                     }
                 }
 

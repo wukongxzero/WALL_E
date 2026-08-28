@@ -39,12 +39,12 @@ def generate_launch_description():
             output='screen'
         ),
 
-        # Node(
-        #     package='wall_e_bringup',
-        #     executable='uno_bridge',
-        #     name='uno_bridge',
-        #     output='screen'
-        # ),
+        Node(
+            package='wall_e_bringup',
+            executable='uno_bridge',
+            name='uno_bridge',
+            output='screen'
+        ),
 
         # ── STATE MACHINE ──
         Node(
@@ -62,12 +62,12 @@ def generate_launch_description():
         ),
 
         # ── CONTROLLER ──
-        # Node(
-        #     package='wall_e_bringup',
-        #     executable='controller_node',
-        #     name='controller_node',
-        #     output='screen'
-        # ),
+        Node(
+            package='wall_e_bringup',
+            executable='controller_node',
+            name='controller_node',
+            output='screen'
+        ),
 
         # ── D435 REALSENSE ──
          Node(

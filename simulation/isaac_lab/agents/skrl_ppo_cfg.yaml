@@ -1,0 +1,87 @@
+# skrl PPO config for the shared navigation task.
+#
+# Structural template copied from Isaac Lab's own ANYmal-C navigation example
+# (isaaclab_tasks/manager_based/navigation/config/anymal_c/agents/skrl_flat_ppo_cfg.yaml).
+# Shared between ASRo and WALL-E -- skrl reads obs/action dimensions off the
+# env at runtime, not from this file, so the same hyperparameters apply to
+# both; only experiment.directory needs to differ per robot (set by train.py).
+#
+# rsl_rl was tried first and doesn't work in this environment: the installed
+# rsl-rl-lib==5.0.1 reports a version matching what Isaac Lab's own train.py
+# checks for, but its actual rsl_rl.modules namespace only has low-level
+# MLP/CNN/RNN building blocks -- no MLPModel class, which isaaclab_rl's
+# wrapper requires. skrl was verified end-to-end against Isaac Lab's own
+# built-in Isaac-Cartpole-Direct-v0 task before adopting it here.
+#
+# trainer.timesteps defaults low on purpose: the point of the first run is
+# to confirm the training loop actually produces a rising reward curve end
+# to end (Layer 4 in testing_notes.txt), not to converge a production
+# policy. Override with --max_iterations for a real training run.
+
+seed: 42
+
+models:
+  separate: False
+  policy:
+    class: GaussianMixin
+    clip_actions: False
+    clip_log_std: True
+    min_log_std: -20.0
+    max_log_std: 2.0
+    initial_log_std: -0.6931471805599453
+    network:
+      - name: net
+        input: OBSERVATIONS
+        layers: [128, 128]
+        activations: elu
+    output: ACTIONS
+  value:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: OBSERVATIONS
+        layers: [128, 128]
+        activations: elu
+    output: ONE
+
+memory:
+  class: RandomMemory
+  memory_size: -1  # automatically determined (same as agent:rollouts)
+
+agent:
+  class: PPO
+  rollouts: 24
+  learning_epochs: 5
+  mini_batches: 4
+  discount_factor: 0.99
+  lambda: 0.95
+  learning_rate: 1.0e-03
+  learning_rate_scheduler: KLAdaptiveLR
+  learning_rate_scheduler_kwargs:
+    kl_threshold: 0.01
+  state_preprocessor: null
+  state_preprocessor_kwargs: null
+  value_preprocessor: null
+  value_preprocessor_kwargs: null
+  random_timesteps: 0
+  learning_starts: 0
+  grad_norm_clip: 1.0
+  ratio_clip: 0.2
+  value_clip: 0.2
+  clip_predicted_values: True
+  entropy_loss_scale: 0.005
+  value_loss_scale: 1.0
+  kl_threshold: 0.0
+  rewards_shaper_scale: 1.0
+  time_limit_bootstrap: False
+  experiment:
+    directory: "navigation"  # overridden per-robot by train.py
+    experiment_name: ""
+    write_interval: auto
+    checkpoint_interval: auto
+
+trainer:
+  class: SequentialTrainer
+  timesteps: 3600  # 150 iterations * 24 rollouts -- overridden by --max_iterations
+  environment_info: log

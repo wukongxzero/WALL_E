@@ -59,20 +59,33 @@ WALL_E_CFG = ArticulationCfg(
         # base_link's own natural resting height above base_footprint/ground
         # (xformOp:translate in Geometry.usda) — same value the removed
         # base_footprint_joint used to provide.
-        pos=(0.0, 0.0, 0.2025),
+        pos=(0.0, 0.0, 0.0),
         joint_pos={name: 0.0 for name in TRACK_JOINT_NAMES},
     ),
     actuators={
         "track_drives": ImplicitActuatorCfg(
             joint_names_expr=TRACK_JOINT_NAMES,
-            # 1e5 (carried over from the raw USD PhysicsDriveAPI value tuned
-            # for the OmniGraph test) let the velocity servo slam into torque
-            # far beyond what ~0.5 friction on an 8kg robot can convert to
-            # forward force -- tracks just slipped in place. Confirmed via
-            # test_navigation_behavior.py: error_pos never closed at 1e5.
-            # 30.0 matches ASRO_CFG's effort_limit_sim, which does navigate
-            # correctly under the same test.
-            effort_limit_sim=30.0,
+            # 1e5 (raw USD PhysicsDriveAPI value tuned for the OmniGraph
+            # test) and then 30.0 (borrowed from ASRO_CFG) both caused
+            # continuous wheel slip -- confirmed via direct joint-velocity
+            # vs. chassis-position diagnostics (2026-08-28): wheels spin at
+            # real speed (0.6-6.9 rad/s) while position stays frozen at
+            # ~0.0001m for 100+ steps. Also confirmed friction (0.5 default
+            # -> explicit 0.9/0.8 material on the tracks, see Physics.usda)
+            # wasn't the actual bottleneck -- no change either way.
+            #
+            # The real number: this chassis's weight isn't carried by the
+            # 2 driven tracks alone -- 4 static skid pads share the load
+            # too (6 contact points total), so each track's actual normal
+            # force is roughly mass*g/6, not mass*g/2. At mu=0.9,
+            # ~9kg total mass, that caps non-slip torque per track at
+            # roughly 1-2 Nm -- 30.0 was ~15-20x too high regardless of
+            # friction coefficient, which is why raising friction alone
+            # never helped. 3.0 gives a little headroom above that
+            # estimate without repeating the same order-of-magnitude
+            # mistake; ASRO_CFG's 30.0 works for ASRo specifically because
+            # it splits its weight across 6 driven wheels, not 2.
+            effort_limit_sim=3.0,
             stiffness=0.0,
             damping=1e5,
         ),

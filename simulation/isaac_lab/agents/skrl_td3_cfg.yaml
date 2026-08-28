@@ -1,0 +1,118 @@
+# skrl TD3 config for the shared navigation task.
+#
+# No existing IsaacLab/skrl example ships a TD3 config to copy from (checked
+# both isaaclab_tasks and the installed skrl package -- neither has one), so
+# this was built from skrl's actual installed API rather than a template:
+# TD3's real model roles (policy, target_policy, critic_1, critic_2,
+# target_critic_1, target_critic_2) come from skrl.agents.torch.td3.TD3's
+# __init__ (self.models.get("policy", None) etc.), the field list from
+# dataclasses.fields(TD3_CFG), and the concatenate([OBSERVATIONS, ACTIONS])
+# critic-input syntax from the model instantiator's own AST-based parser
+# (skrl/utils/model_instantiators/torch/common.py) -- all verified by
+# reading the installed package directly, not guessed.
+#
+# Unlike PPO, TD3 is off-policy: it learns continuously from a replay
+# buffer (memory_size is a real number of transitions, not tied to
+# rollouts), needs a policy-smoothing noise on the target action (TD3's
+# actual innovation over DDPG) plus a separate exploration noise for
+# on-policy data collection, and delays policy updates every
+# policy_delay critic updates.
+#
+# trainer.timesteps defaults low on purpose, same reasoning as
+# skrl_ppo_cfg.yaml: confirm the loop runs and learns something end to
+# end (Layer 4 in testing_notes.txt) before a real training run.
+
+seed: 42
+
+models:
+  separate: True
+  policy:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: OBSERVATIONS
+        layers: [128, 128]
+        activations: elu
+    output: ACTIONS
+  target_policy:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: OBSERVATIONS
+        layers: [128, 128]
+        activations: elu
+    output: ACTIONS
+  critic_1:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: concatenate([OBSERVATIONS, ACTIONS])
+        layers: [128, 128]
+        activations: elu
+    output: ONE
+  critic_2:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: concatenate([OBSERVATIONS, ACTIONS])
+        layers: [128, 128]
+        activations: elu
+    output: ONE
+  target_critic_1:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: concatenate([OBSERVATIONS, ACTIONS])
+        layers: [128, 128]
+        activations: elu
+    output: ONE
+  target_critic_2:
+    class: DeterministicMixin
+    clip_actions: False
+    network:
+      - name: net
+        input: concatenate([OBSERVATIONS, ACTIONS])
+        layers: [128, 128]
+        activations: elu
+    output: ONE
+
+memory:
+  class: RandomMemory
+  memory_size: 15000  # replay buffer capacity in transitions -- off-policy, not tied to rollouts like PPO
+
+agent:
+  class: TD3
+  gradient_steps: 1
+  batch_size: 64
+  discount_factor: 0.99
+  polyak: 0.005
+  learning_rate: 1.0e-03
+  learning_rate_scheduler: null
+  random_timesteps: 0
+  learning_starts: 100  # warmup transitions collected before learning starts
+  grad_norm_clip: 0
+  exploration_noise: GaussianNoise
+  exploration_noise_kwargs:
+    mean: 0.0
+    std: 0.2
+  policy_delay: 2
+  smooth_regularization_noise: GaussianNoise
+  smooth_regularization_noise_kwargs:
+    mean: 0.0
+    std: 0.2
+  smooth_regularization_clip: 0.5
+  experiment:
+    directory: "navigation"  # overridden per-robot by train.py
+    experiment_name: ""
+    write_interval: auto
+    checkpoint_interval: auto
+
+trainer:
+  class: SequentialTrainer
+  timesteps: 3600  # overridden by --max_iterations (1:1 for off-policy, unlike PPO's rollouts multiplier)
+  environment_info: log
