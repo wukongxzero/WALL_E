@@ -41,11 +41,10 @@ install(PROGRAMS
   src/udp_godot_bridge.py
   src/yolo_nav_node.py
   src/webrtc_video_bridge.py
-  src/odom_to_tf.py
   DESTINATION lib/${PROJECT_NAME}
 )
 
-install(DIRECTORY launch urdf config worlds
+install(DIRECTORY launch urdf config
   DESTINATION share/${PROJECT_NAME}
 )
 
