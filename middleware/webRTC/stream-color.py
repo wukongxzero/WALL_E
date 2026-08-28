@@ -42,7 +42,7 @@ class CustomVideoStreamTrack(VideoStreamTrack):
                 await asyncio.sleep(0.033)  # Throttle to prevent spinning on failure
                 return await self.recv()
 
-            # 🌟 Fetch standard color frame from Vivobook webcam without blocking asyncio
+            # yesFetch standard color frame from Vivobook webcam without blocking asyncio
             ret, frame = await asyncio.to_thread(GLOBAL_CAP.read)
             if not ret:
                 print("Failed to grab frame from webcam. Retrying...")

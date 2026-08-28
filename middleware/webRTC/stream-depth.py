@@ -15,7 +15,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from aiortc import RTCConfiguration, RTCIceServer
 
-# 🌟 INITIALIZE HARDWARE ONCE GLOBALLY
+#  INITIALIZE HARDWARE ONCE GLOBALLY
 GLOBAL_PIPELINE = rs.pipeline()
 GLOBAL_CONFIG = rs.config()
 GLOBAL_CONFIG.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
@@ -29,7 +29,7 @@ ice_config = RTCConfiguration(
 )
 
 
-# 🌟 Helper function to handle ALL blocking C-extension / hardware code safely in a thread
+# Helper function to handle ALL blocking C-extension / hardware code safely in a thread
 def get_realsense_depth_frame():
     try:
         frames = GLOBAL_PIPELINE.wait_for_frames()

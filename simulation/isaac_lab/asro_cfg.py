@@ -58,9 +58,9 @@ ASRO_CFG = ArticulationCfg(
     actuators={
         "wheel_drives": ImplicitActuatorCfg(
             joint_names_expr=["joint_wheel_.*"],
-            effort_limit_sim=50.0,
+            effort_limit_sim=30.0,
             stiffness=0.0,
-            damping=1e4,
+            damping=1e5,
         ),
     },
 )

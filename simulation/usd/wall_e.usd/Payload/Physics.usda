@@ -13,17 +13,18 @@ def Xform "wall_e"
 {
     def Scope "Physics"
     {
-        def PhysicsFixedJoint "base_footprint_joint"
-        {
-            rel physics:body0 = </wall_e>
-            rel physics:body1 = </wall_e/Geometry/base_footprint/base_link>
-            point3f physics:localPos0 = (0, 0, 0.2025)
-            point3f physics:localPos1 = (0, 0, 0)
-            quatf physics:localRot0 = (1, 0, 0, 0)
-            quatf physics:localRot1 = (1, 0, 0, 0)
-        }
+        # base_link (below) already carries PhysicsArticulationRootAPI, which
+        # makes it a free 6-DOF floating base by default — no joint to world
+        # needed. There used to be a base_footprint_joint here fixing
+        # base_link to </wall_e>, but </wall_e> has no PhysicsRigidBodyAPI,
+        # so USD Physics treated that side as the static world frame and
+        # welded the whole robot in place. The (0,0,0.2025) offset it
+        # provided is redundant anyway — base_link's own xformOp:translate
+        # in Geometry.usda already has it.
 
-        def PhysicsRevoluteJoint "left_track_joint"
+        def PhysicsRevoluteJoint "left_track_joint" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
         {
             uniform token physics:axis = "Y"
             rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
@@ -34,9 +35,19 @@ def Xform "wall_e"
             quatf physics:localRot1 = (1, 0, 0, 0)
             custom float urdf:dynamics:damping = 0.5
             custom float urdf:dynamics:friction = 0.5
+            # Gazebo's DiffDrive plugin actuated this joint directly with no
+            # URDF transmission/actuator to convert, so the USD import brought
+            # in a passive hinge. IsaacArticulationController needs a velocity
+            # drive to have anything to command — stiffness 0 + damping makes
+            # it a pure velocity servo (target set live by the OmniGraph).
+            float drive:angular:physics:damping = 100000
+            float drive:angular:physics:stiffness = 0
+            float drive:angular:physics:maxForce = 100000
         }
 
-        def PhysicsRevoluteJoint "right_track_joint"
+        def PhysicsRevoluteJoint "right_track_joint" (
+            prepend apiSchemas = ["PhysicsDriveAPI:angular"]
+        )
         {
             uniform token physics:axis = "Y"
             rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
@@ -47,13 +58,16 @@ def Xform "wall_e"
             quatf physics:localRot1 = (1, 0, 0, 0)
             custom float urdf:dynamics:damping = 0.5
             custom float urdf:dynamics:friction = 0.5
+            float drive:angular:physics:damping = 100000
+            float drive:angular:physics:stiffness = 0
+            float drive:angular:physics:maxForce = 100000
         }
 
         def PhysicsFixedJoint "camera_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/camera_link>
-            point3f physics:localPos0 = (0.15, 0, 0.3675)
+            point3f physics:localPos0 = (0.15, 0, 0.165)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -61,9 +75,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "camera_optical_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/camera_link/camera_depth_optical_frame>
-            point3f physics:localPos0 = (0.15, 0, 0.3675)
+            point3f physics:localPos0 = (0.15, 0, 0.165)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (0.5, -0.5, 0.5, -0.5)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -71,9 +85,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "camera_color_optical_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/camera_link/camera_color_optical_frame>
-            point3f physics:localPos0 = (0.15, 0, 0.3675)
+            point3f physics:localPos0 = (0.15, 0, 0.165)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (0.5, -0.5, 0.5, -0.5)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -81,9 +95,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "imu_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/imu_link>
-            point3f physics:localPos0 = (0, 0, 0.2025)
+            point3f physics:localPos0 = (0, 0, 0)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -91,9 +105,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "left_front_support_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/left_front_support>
-            point3f physics:localPos0 = (0.1025, 0.23, 0.08)
+            point3f physics:localPos0 = (0.1025, 0.23, -0.1225)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -101,9 +115,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "left_rear_support_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/left_rear_support>
-            point3f physics:localPos0 = (-0.1025, 0.23, 0.08)
+            point3f physics:localPos0 = (-0.1025, 0.23, -0.1225)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -111,9 +125,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "right_front_support_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/right_front_support>
-            point3f physics:localPos0 = (0.1025, -0.23, 0.08)
+            point3f physics:localPos0 = (0.1025, -0.23, -0.1225)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)
@@ -121,9 +135,9 @@ def Xform "wall_e"
 
         def PhysicsFixedJoint "right_rear_support_joint"
         {
-            rel physics:body0 = </wall_e>
+            rel physics:body0 = </wall_e/Geometry/base_footprint/base_link>
             rel physics:body1 = </wall_e/Geometry/base_footprint/base_link/right_rear_support>
-            point3f physics:localPos0 = (-0.1025, -0.23, 0.08)
+            point3f physics:localPos0 = (-0.1025, -0.23, -0.1225)
             point3f physics:localPos1 = (0, 0, 0)
             quatf physics:localRot0 = (1, 0, 0, 0)
             quatf physics:localRot1 = (1, 0, 0, 0)

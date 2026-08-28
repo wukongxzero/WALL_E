@@ -1,6 +1,6 @@
 from isaacsim import SimulationApp
 
-simulation_app = SimulationApp({"headless": True, "anti_aliasing": 0})
+simulation_app = SimulationApp({"headless": False, "anti_aliasing": 0})
 
 import isaacsim.core.experimental.utils.app as app_utils
 

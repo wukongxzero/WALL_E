@@ -1,0 +1,93 @@
+WALL-E SLAM test — goal / problem scoping
+==========================================
+(Not a pip file — see ros2_ws/ or repo README for actual Python deps.)
+
+GOAL
+----
+Get RTAB-Map to build an actual map from WALL-E's simulated RGBD camera in
+Isaac Sim (RGBD mapping only, no Nav2 yet) — the next step before full
+autonomy stack integration.
+
+Already done, verified:
+  - Camera/TF pipeline: RGBD + camera_info publish over ROS2, correct frames
+    on /tf (2026-07-26).
+  - Room geometry: ground plane + 4 walls added so the depth camera sees
+    real range data instead of all-NaN clouds (2026-08-26).
+
+Not yet done, in progress:
+  - Confirm rtabmap actually builds a multi-node map (not just receives
+    valid depth clouds) while the robot moves through the room.
+
+SUCCESS CRITERIA
+-----------------
+  1. Commanding /cmd_vel produces real chassis translation in world frame —
+     verified via /odom position and /tf (odom -> base_footprint), not just
+     nonzero wheel joint velocity.
+  2. With the robot moving, rtabmap's working memory (WM) grows past 1 node
+     (currently frozen at WM=1 because the robot never moves).
+  3. rtabmap produces a non-trivial map (grid or cloud) covering more than
+     the spawn point, viewable in rviz2 via slam_test.launch.py.
+  4. No regressions to the already-verified camera/TF pipeline or the
+     NaN-free depth data.
+
+Out of scope for this pass: physically accurate track/ground traction
+tuning, Nav2, RL/Isaac Lab integration.
+
+CURRENT PROBLEM
+----------------
+Robot does not translate at all in the sim, regardless of /cmd_vel. This
+blocks success criteria 1-3 above.
+
+Confirmed via testing (2026-08-28):
+  - ROS2 -> OmniGraph chain (ROS2SubscribeTwist -> DifferentialController ->
+    IsaacArticulationController) does drive the wheel joints: joint
+    velocities respond to /cmd_vel (~3.37 rad/s measured for a 0.3 m/s
+    linear.x command).
+  - Isolated direct-API test (Articulation.set_joint_velocity_targets)
+    confirms the same: wheel joints spin and accumulate rotation.
+  - Despite wheels spinning, /odom position stays at ~0 (order 1e-6) after
+    10+ seconds of continuous driving. Chassis never translates or rotates
+    in world frame.
+
+Root cause (fairly confident, not yet fixed):
+  simulation/usd/wall_e.usd/Payload/Physics.usda defines
+  `PhysicsFixedJoint "base_footprint_joint"` with
+  `physics:body0 = </wall_e>`. `/wall_e` is a plain Xform (the reference
+  container created in wall_e_perception.py) with no PhysicsRigidBodyAPI.
+  When a USD Physics joint's body target isn't an actual rigid body, PhysX
+  treats that side as the static world frame — so this joint welds
+  base_link (the articulation root) to a fixed point in space. Wheels can
+  still spin (internal DOF), but the chassis itself can never move.
+
+  This has likely always been broken; it was never caught before because
+  every prior verified test (camera/TF check, depth NaN fix) kept the robot
+  stationary. This is the first test that actually commands the robot to
+  drive.
+
+  base_link's own xformOp:translate in Geometry.usda is already
+  (0, 0, 0.2025) — the same offset the fixed joint provides — so the joint
+  looks redundant for spawn positioning and removing it is the likely fix.
+  Not yet confirmed by testing.
+
+Secondary bug found and FIXED (2026-08-28, in Physics.usda):
+  left_track_joint / right_track_joint had no drive/actuator at all (no
+  PhysicsDriveAPI) — they came in as passive hinges because the original
+  URDF/Gazebo setup drove them via gz-sim-diff-drive-system directly, with
+  no URDF transmission for the importer to translate. Added
+  PhysicsDriveAPI:angular (stiffness=0, damping=100000, maxForce=100000) to
+  both joints so IsaacArticulationController has something to command.
+  Verified the joints do respond (see above). These damping/maxForce values
+  were picked to get *a* response, not validated against real wheel-ground
+  friction limits — revisit once the chassis can actually translate, since
+  they may be too aggressive relative to available traction (~0.5 default
+  friction coefficient, 8kg chassis) and cause wheel slip.
+
+OPEN QUESTIONS / NEXT STEPS
+-----------------------------
+  - Does removing base_footprint_joint (or reworking it so it doesn't
+    anchor to a non-rigid-body prim) actually free the chassis to move?
+  - Once it moves: is default PhysX friction (0.5/0.5, untouched) on the
+    track collision cylinders and GroundPlane enough for real traction, or
+    does drive damping/maxForce need retuning to avoid slip?
+  - After that: rerun rtabmap + drive the robot around the room, confirm
+    WM node count grows and a map forms.

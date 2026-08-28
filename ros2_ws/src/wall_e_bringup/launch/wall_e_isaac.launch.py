@@ -2,14 +2,10 @@ import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from ament_index_python.packages import get_package_share_directory
-import xacro
 
 def generate_launch_description():
 
     pkg_path = get_package_share_directory('wall_e_bringup')
-
-    xacro_file        = os.path.join(pkg_path, 'urdf', 'wall_e.urdf.xacro')
-    robot_description = xacro.process_file(xacro_file).toxml()
 
     nav2_params    = os.path.join(pkg_path, 'config', 'nav2_params.yaml')
     rtabmap_params = os.path.join(pkg_path, 'config', 'rtabmap.yaml')
@@ -23,17 +19,12 @@ def generate_launch_description():
 
     return LaunchDescription([
 
-        # ── ROBOT DESCRIPTION ──
-        Node(
-            package='robot_state_publisher',
-            executable='robot_state_publisher',
-            name='robot_state_publisher',
-            parameters=[{
-                'robot_description': robot_description,
-                'use_sim_time': True,
-            }],
-            output='screen'
-        ),
+        # No robot_state_publisher here — Isaac Sim's wall_e_perception.py
+        # (run as a separate process) publishes the entire /tf tree itself
+        # via OmniGraph (odom->base_footprint->base_link->camera/imu links).
+        # It doesn't publish /joint_states, so robot_state_publisher would
+        # have nothing to compute /tf from anyway, and would just contend
+        # with OmniGraph's publisher for the same frames.
 
         # ── STATE MACHINE ──
         Node(
