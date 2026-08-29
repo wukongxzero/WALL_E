@@ -37,13 +37,19 @@ def main():
     if args_cli.robot == "asro":
         from asro_navigation_env_cfg import AsroNavigationEnvCfg as EnvCfg
         # WHEEL_JOINT_NAMES order: fl, fr, ml, mr, rl, rr -- left = 0,2,4, right = 1,3,5
+
         left_idx, right_idx = [0, 2, 4], [1, 3, 5]
+
     else:
+
         from wall_e_navigation_env_cfg import WallENavigationEnvCfg as EnvCfg
+
         # TRACK_JOINT_NAMES order: left, right
         left_idx, right_idx = [0], [1]
 
+
     from isaaclab.envs import ManagerBasedRLEnv
+
 
     cfg = EnvCfg()
     cfg.scene.num_envs = 4
