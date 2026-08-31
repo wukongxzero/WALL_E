@@ -53,6 +53,17 @@ def generate_launch_description():
             name='state_machine',
             output='screen'
         ),
+        # ── LLM NATURAL LANGUAGE CONTROL ──
+        # Publishes /yolo_target — required for yolo_nav_node below to have anything
+        # to search for. Requires Ollama running locally with the model pulled
+        # (external service, not managed by this launch file).
+        Node(
+            package='wall_e_bringup',
+            executable='llama_interpreter_node.py',
+            name='llama_interpreter_node',
+            output='screen'
+        ),
+
         # ── YOLO NAV ──
         Node(
             package='wall_e_bringup',
