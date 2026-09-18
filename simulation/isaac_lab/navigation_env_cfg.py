@@ -24,6 +24,7 @@ functions that only read from the command manager, not ANYmal-specific.
 import math
 from dataclasses import MISSING
 
+from asro_mdp import fake_yolo_detections, obstacle_proximity_penalty
 from isaaclab.envs import ManagerBasedRLEnvCfg, mdp
 from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
@@ -51,6 +52,7 @@ class ObservationsCfg:
         # sense, instead of a physical tilt sensor.
         projected_gravity = ObsTerm(func=mdp.projected_gravity, params={"asset_cfg": SceneEntityCfg("robot")})
         pose_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "pose_command"})
+        obstacle_detections = ObsTerm(func=fake_yolo_detections, params={"asset_cfg": SceneEntityCfg("robot")})
 
     policy: PolicyCfg = PolicyCfg()
 
@@ -82,6 +84,11 @@ class RewardsCfg:
     )
     orientation_tracking = RewTerm(
         func=heading_command_error_abs, weight=-0.2, params={"command_name": "pose_command"}
+    )
+    obstacle_proximity = RewTerm(
+        func=obstacle_proximity_penalty,
+        weight=-2.0,
+        params={"asset_cfg": SceneEntityCfg("robot"), "threshold": 1.25},
     )
 
 

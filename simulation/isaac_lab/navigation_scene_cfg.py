@@ -62,6 +62,7 @@ class NavigationSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.CuboidCfg(
             size=(0.5, 0.5, 0.5),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.8, 0.2, 0.2)),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
     )
     obstacle_box_1 = AssetBaseCfg(
@@ -70,6 +71,7 @@ class NavigationSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.CuboidCfg(
             size=(0.5, 0.5, 0.5),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.8, 0.2, 0.2)),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
     )
 
@@ -81,6 +83,7 @@ class NavigationSceneCfg(InteractiveSceneCfg):
             radius=0.25,
             height=0.5,
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.9, 0.6, 0.1)),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
     )
     obstacle_cone_1 = AssetBaseCfg(
@@ -90,5 +93,6 @@ class NavigationSceneCfg(InteractiveSceneCfg):
             radius=0.25,
             height=0.5,
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.9, 0.6, 0.1)),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
         ),
     )
