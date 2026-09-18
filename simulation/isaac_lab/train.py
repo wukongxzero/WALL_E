@@ -113,6 +113,25 @@ def main():
     action_dim = env.single_action_space.shape[0]
     env.single_action_space = gym.spaces.Box(low=-3.0, high=3.0, shape=(action_dim,), dtype="float32")
     env.action_space = gym.vector.utils.batch_space(env.single_action_space, env.num_envs)
+    # skrl only logs total reward; Isaac Lab's per-term Episode_Reward/* values
+    # (in env.extras["log"], refreshed at each episode end) never reach tensorboard
+    # unless we write them ourselves. One env step == one skrl timestep.
+    from torch.utils.tensorboard import SummaryWriter
+
+    term_writer = SummaryWriter(log_dir)
+    term_step = [0]
+    raw_step = env.step
+
+    def step_and_log_terms(actions):
+        out = raw_step(actions)
+        term_step[0] += 1
+        if (out[2] | out[3]).any():
+            for key, value in env.extras.get("log", {}).items():
+                if key.startswith("Episode_Reward/"):
+                    term_writer.add_scalar(key, float(value), term_step[0])
+        return out
+
+    env.step = step_and_log_terms
     env = SkrlVecEnvWrapper(env, ml_framework="torch")
 
     os.makedirs(os.path.join(log_dir, "params"), exist_ok=True)
